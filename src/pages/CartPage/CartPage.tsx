@@ -12,8 +12,8 @@ import CustomButton from '../../elements/CustomButton/CustomButton'
 import styles from './CartPage.module.scss'
 
 export const CheckoutPage = () => {
-  const { user } = useAuth()
-  const { cartItems, setCartDropdownCollapsed, clearCart } = useCart()
+  const { currentUser } = useAuth()
+  const { cartItems, setCartDropdownCollapsed, clearCart, addPersonToBooking, removePersonOrBooking } = useCart()
   let total = 0
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export const CheckoutPage = () => {
         </div>
                
         <div className={styles.bottomRowContainer}>
-          <Link className={styles.checkoutButton} to={`/account/${user!.id}/payment`}>
+          <Link className={styles.checkoutButton} to={`/account/${currentUser?.id}/payment`}>
             <CustomButton rect around between>
               Proceed to Checkout
               <IoArrowForwardCircleOutline />

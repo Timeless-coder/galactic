@@ -7,9 +7,12 @@ import styles from './TourCard.module.scss'
 
 type TourCardProps = {
   tour: Tour
+  setEditTour: (tourId: string) => void
+  setShowSection: (section: string) => void
+  mode?: 'admin' | 'user'
 }
 
-export const TourCard = ({ tour }: TourCardProps) => {
+export const TourCard = ({ tour, setEditTour, setShowSection, mode }: TourCardProps) => {
   
   return (
   <div className={styles.card}>

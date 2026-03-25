@@ -9,6 +9,7 @@ import HomePage from './pages/HomePage/HomePage'
 import CartPage from './pages/CartPage/CartPage'
 
 import './index.scss' // only for parent container
+import UserPage from './pages/UserPage/UserPage'
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path='/account' element={<UserPage />} />
           <Route path='/tours' element={<ToursPage />} />
           <Route path='/tours/:slug' element={<TourSinglePage />} />
           <Route path='/cart' element={<CartPage/>} />

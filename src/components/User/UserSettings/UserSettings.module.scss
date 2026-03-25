@@ -1,0 +1,9 @@
+.link {
+  font-size: clamp(24px, 3vw, 30px);
+  color: var(--primary-blue-50);
+  letter-spacing: 4px;
+}
+
+.refresh {
+  display: none;
+}

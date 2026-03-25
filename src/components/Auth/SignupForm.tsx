@@ -3,12 +3,12 @@ import toast from "react-hot-toast"
 
 import type { SubmitEvent } from "react"
 
-import { useAuth } from '../hooks/useAuth'
+import { useAuth } from '../../hooks/useAuth'
 
-import CustomButton from "../elements/CustomButton/CustomButton"
+import CustomButton from "../../elements/CustomButton/CustomButton"
 
-import styles from '../elements/Form.module.scss'
-import '../index.scss'
+import styles from '../../elements/Form.module.scss'
+import '../../index.scss'
 
 type SignupFormProps = {
 	setHasAccount: (status: boolean) => void

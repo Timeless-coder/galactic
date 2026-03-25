@@ -1,4 +1,4 @@
-import { collection, addDoc, getDoc, doc, setDoc } from 'firebase/firestore'
+import { collection, addDoc, getDoc, doc, setDoc, where, getDocs, query } from 'firebase/firestore'
 
 import { db } from './firebaseConfig'
 import type { Booking } from '../../types/booking'
@@ -22,4 +22,9 @@ export const addPersonToBooking = async (bookingId: string): Promise<void> => {
 	}
 	const bookingData = bookingSnap.data() as Booking
 	await setDoc(bookingRef, { people: bookingData.people + 1 }, { merge: true })
+}
+
+export const getBookingsByUserId = async (userId: string): Promise<Booking[]> => {
+	const bookingsQuery = await getDocs(query(collection(db, 'bookings'), where('bookingUserId', '==', userId)))
+	return bookingsQuery.docs.map(doc => ({ id: doc.id, ...doc.data() } as Booking))
 }

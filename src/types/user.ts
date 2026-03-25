@@ -4,4 +4,5 @@ export type User = {
   email: string
   photoURL: string
   role: 'user' | 'admin'
+  providerId?: string
 }

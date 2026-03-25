@@ -11,7 +11,7 @@ type CheckoutTourProps = {
 }
 
 export const CartTour = ({ cartPageItem }: CheckoutTourProps) => {
-  const { subtractPersonFromBooking, addItemToCart, removeItemFromCart } = useCart()
+  const { removePersonOrBooking, addPersonToBooking, removeItemFromCart } = useCart()
 
   return (
     <div className={styles.checkoutTourContainer}>
@@ -28,11 +28,11 @@ export const CartTour = ({ cartPageItem }: CheckoutTourProps) => {
 
       <div className={styles.peopleContainer}>
         <div className={styles.carets}>
-          <div onClick={() => subtractPersonFromBooking}>
+          <div onClick={() => removePersonOrBooking(cartPageItem)}>
             &#10094;
           </div>
           <span>{cartPageItem.booking.people}</span>
-          <div onClick={() => addItemToCart(cartPageItem)}>
+          <div onClick={() => addPersonToBooking(cartPageItem)}>
             &#10095;
           </div>
         </div>

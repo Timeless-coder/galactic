@@ -1,20 +1,17 @@
 import React, { createContext, useEffect, useState } from "react"
 
-import {
-  loginService,
-  signupWithEmailAndPasswordService,
-  signinWithGoogleService,
-  logoutService,
-} from '../services/firebase/authService'
-import { auth } from '../services/firebase/firebaseConfig'
 import type { User } from '../types/user'
 
+import { loginService, signupWithEmailAndPasswordService, signinWithGoogleService, logoutService, updateAuthProfileService } from '../services/firebase/authService'
+import { auth } from '../services/firebase/firebaseConfig' // only for onAuthStateChanged listener
+
 export type AuthContextType = {
-  user: User | null
+  currentUser: User | null
   loading: boolean
   login: (email: string, password: string) => Promise<User>
   signUpWithEmailAndPassword: (email: string, password: string) => Promise<User>
   signInWithGoogle: () => Promise<User>
+  updateUserAccount: (email: string, displayName: string, photoURL: string) => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -26,20 +23,20 @@ const mapFirebaseUser = (firebaseUser: any): User => ({
   name: firebaseUser.displayName || "",
   email: firebaseUser.email || "",
   photoURL: firebaseUser.photoURL || "",
-  role: firebaseUser.role || 'user', // Default role, can be enhanced to fetch from Firestore if needed
+  role: firebaseUser.role || 'admin', // Default role, can be enhanced to fetch from Firestore if needed
 })
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null)
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   // Listen to Firebase auth state changes
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
       if (firebaseUser) {
-        setUser(mapFirebaseUser(firebaseUser))
+        setCurrentUser(mapFirebaseUser(firebaseUser))
       } else {
-        setUser(null)
+        setCurrentUser(null)
       }
       setLoading(false)
     })
@@ -49,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signupWithEmailAndPassword = async (email: string, password: string): Promise<User> => {
     try {
       const user = await signupWithEmailAndPasswordService(email, password)
-      setUser(user)
+      setCurrentUser(user)
       return user
     } catch (error) {
       console.log('Sign up error:', error)
@@ -60,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string): Promise<User> => {
     try {
       const user = await loginService(email, password)
-      setUser(user)
+      setCurrentUser(user)
       return user
     } catch (error) {
       console.log('Login error:', error)
@@ -71,7 +68,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signinWithGoogle = async (): Promise<User> => {
     try {
       const user = await signinWithGoogleService()
-      setUser(user)
+      setCurrentUser(user)
       return user
     } catch (error) {
       console.log('Google sign-in error:', error)
@@ -82,15 +79,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async (): Promise<void> => {
     try {
       await logoutService()
-      setUser(null)
+      setCurrentUser(null)
     } catch (error) {
       console.log('Logout error:', error)
       throw error
     }
   }
 
+  const updateUserAccount = async (email: string, displayName: string, photoURL: string) => {
+    await updateAuthProfileService(email, displayName, photoURL)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, signUpWithEmailAndPassword: signupWithEmailAndPassword, signInWithGoogle: signinWithGoogle, logout }}>
+    <AuthContext.Provider value={{ currentUser, loading, login, signUpWithEmailAndPassword: signupWithEmailAndPassword, signInWithGoogle: signinWithGoogle, logout, updateUserAccount }}>
       {children}
     </AuthContext.Provider>
   )

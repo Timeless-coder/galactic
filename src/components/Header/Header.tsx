@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router'
 import { VscRocket } from 'react-icons/vsc'
 import { BsCaretDown } from 'react-icons/bs'
@@ -11,21 +11,19 @@ import CartDropdown from './CartDropdown/CartDropdown'
 import CartIcon from './CartIcon/CartIcon'
 
 import styles from './Header.module.scss'
-
-const defaultUserImageURL = "https://firebasestorage.googleapis.com/v0/b/galactic-tours.appspot.com/o/1639865907685?alt=media&token=56876f9e-3a43-41b2-82b8-2bed4ea1bb5e"
+import anonymousImage from '../../assets/Anonymous.jpg'
+const defaultUserImageURL = anonymousImage
 
 export const Header = () => {
-  const { user, logout } = useAuth()
+  const { currentUser, logout } = useAuth()
   const { cartDropdownCollapsed } = useCart()
-  const [userImage, setUserImage] = useState(defaultUserImageURL)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [userImage, setUserImage] = useState(currentUser?.photoURL || defaultUserImageURL)
 
-  useEffect(() => {
-    if (user?.photoURL) {
-      setUserImage(user.photoURL)
-    }
-  }, [user])
+  console.table(currentUser)
 
-
+  const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen)
+  
   const signOut = () => {
     try {
       logout()
@@ -49,7 +47,7 @@ export const Header = () => {
         </Link>
 
          <div className={styles.headerMenuContainer}>          
-          {user
+          {currentUser
             ? (
                 <>
                   <div className={styles.userIcons}>
@@ -57,31 +55,31 @@ export const Header = () => {
                     <CartIcon />
                     {!cartDropdownCollapsed && <CartDropdown />}     
 
-                    <div className={styles.userImageContainer} onClick={() => {}}>
+                    <div className={styles.userImageContainer} onClick={toggleUserMenu}>
                       <img src={userImage} alt='View/Update your account' />
                       <BsCaretDown className={styles.caret} />
                     </div>
                   </div>
 
-                  {/* {userMenuOpen && (
+                  {userMenuOpen && (
                     <div className={styles.userDropdown}>
 
                       <Link onClick={() => setUserMenuOpen(false)}
-                        to={`/account/${user.id}/checkout`}>
+                        to={`/account/${currentUser.id}/checkout`}>
                         Checkout
                       </Link>
 
-                      <Link to={`/account/${user.id}`} onClick={() => setUserMenuOpen(false)}>
-                        {user.data().role === 'admin' ? 'Admin' : 'Account'}
+                      <Link to={`/account/${currentUser.id}`} onClick={() => setUserMenuOpen(false)}>
+                        {currentUser.role === 'admin' ? 'Admin' : 'Account'}
                       </Link>
 
                       <div onClick={signOut}><p>Sign Out</p></div>
                                         
                     </div>
-                  )} */}
+                  )}
                 </>
               )
-            : <Link to='/signupsignin'>SIGN IN / UP</Link>
+            : <Link to='/auth'>SIGN IN/UP</Link>
           }
         </div>
 

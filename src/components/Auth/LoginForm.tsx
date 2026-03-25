@@ -2,19 +2,19 @@ import { useState } from "react"
 import type { SubmitEvent } from "react"
 import toast from "react-hot-toast"
 
-import { useAuth } from '../hooks/useAuth'
+import { useAuth } from '../../hooks/useAuth'
 
-import CustomButton from "../elements/CustomButton/CustomButton"
+import CustomButton from "../../elements/CustomButton/CustomButton"
 
-import styles from '../elements/Form.module.scss'
-import '../index.scss'
+import styles from '../../elements/Form.module.scss'
+import '../../index.scss'
 
 type LoginFormProps = {
   setHasAccount: (status: boolean) => void
 }
 
 const LoginForm = ({ setHasAccount }: LoginFormProps) => {
-  const { login, signInWithGoogle, user } = useAuth()
+  const { login, signInWithGoogle, currentUser } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -46,7 +46,7 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
 
   return (
     <>
-      <h2>{user ? 'SIGN IN AS DIFFERENT USER' : 'SIGN IN'}</h2>
+      <h2>{currentUser ? 'SIGN IN AS DIFFERENT USER' : 'SIGN IN'}</h2>
 
       <div className={styles.status}>
         <p>No Account Yet?</p>

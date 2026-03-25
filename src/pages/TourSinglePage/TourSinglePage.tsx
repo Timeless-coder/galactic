@@ -4,7 +4,6 @@ import { Link, useParams, redirect } from 'react-router'
 import { AiFillCloseCircle } from 'react-icons/ai'
 
 import type { Tour } from '../../types/tour'
-import type { Booking } from '../../types/booking'
 
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
@@ -14,19 +13,18 @@ import CustomButton from '../../elements/CustomButton/CustomButton'
 import Reviews from '../../components/Reviews/Reviews/Reviews'
 
 import styles from './TourSinglePage.module.scss'
+import type { CartItem } from '../../contexts/CartContext'
 
 const TourSinglePage = () => {
   const modalRef = useRef<HTMLDivElement>(null)
   const { slug } = useParams()
-  const { user } = useAuth()
+  const { currentUser } = useAuth()
   const { addItemToCart, addPersonToBooking, cartItems } = useCart()
   const [tour, setTour] = useState<Tour>()
   const dateRefs = useRef<(HTMLDivElement | null)[]>([])
-  const peopleRef = useRef<HTMLHeadingElement>(null)
-  const [currentBooking, setCurrentBooking] = useState<Booking | null>(null)
   const [loading, setLoading] = useState(false)
-  const [people, setPeople] = useState(0)
 
+  // THIS JUST GETS THE TOUR FOR THIS PAGE
   useEffect(() => {
     let mounted = true
 
@@ -49,6 +47,18 @@ const TourSinglePage = () => {
       mounted = false
     }
   }, [slug])
+
+  // ANYTIME cartItems CHANGES, THIS CHECKS THE 3 dateRefs AGAINST THE CART FOR MATCHING BOOKINGS,
+  // AND CHANGES display TO 'block' FOR ANY WITH MATCHES IN CART.
+  useEffect(() => {
+    if (!tour?.startDates) return
+
+    dateRefs.current.forEach((ref, i) => {
+      if (!ref) return
+      const hasCartItem = cartItems.some(item => item.tour.id === tour.id && item.booking.departureDate === tour.startDates[i])
+      ref.style.display = hasCartItem ? 'block' : 'none'
+    })
+  }, [cartItems, tour])
    
   const closeInstructionsModal = () => {
     const modal = modalRef.current  // read at call time
@@ -60,47 +70,40 @@ const TourSinglePage = () => {
     }
 }
 
-  const handleBook = (selectedDepartureDate: string) => {
-    if (people === 0) {
-      tour?.startDates.forEach((date, i) => {
-        if (date !== selectedDepartureDate) {
-          const otherDateButton = dateRefs.current[i]
-          if (otherDateButton) {
-            otherDateButton.style.display = 'none'
-          }
-        }
-      })
-      const booking: Booking = {
-        id: `${tour!.id}-${selectedDepartureDate}`,
+  const handleBookingClick = (selectedDepartureDate: string) => {
+    const existingCartItem = cartItems.find(item => item.booking.tourId === tour!.id && item.booking.departureDate === selectedDepartureDate)
+
+    if (existingCartItem) {
+      addPersonToBooking(existingCartItem)            
+    }
+    else {
+      const booking = {
+        id: `${tour!.id} - ${selectedDepartureDate}`,
         createdAt: new Date().toISOString(),
         tourId: tour!.id,
-        bookingUserId: user!.id,
+        bookingUserId: currentUser!.id,
         departureDate: selectedDepartureDate,
-        people: 1,
+        people: 1
       }
-      setCurrentBooking(booking)
-      addItemToCart({ booking, tour: tour! })
-    } else {
-      addPersonToBooking({ booking: currentBooking!, tour: tour! })
-    }
-
-    setPeople(prev => prev + 1)
-    if (peopleRef.current) {
-      peopleRef.current.style.display = 'block'
-    }
+      addItemToCart({booking, tour: tour! })
+    }    
   }
 
-  const getBookButtonLabel = () => !user
-    ? 'Sign In/Up'
-    : cartItems.filter(item => item.tour.id === tour!.id).length > 0
-      ? `Add Person ${people + 1}`
-      : 'Book date'
+  // SET THE textContent OF THE BOOK BUTTONS AND THE "# people booked" TEXT UNDER THEM.
+  const setButtonLabelAndPeopleText = (selectedDepartureDate: string) => {
+    const existingCartItem = cartItems.find(item => item.tour.id === tour?.id && item.booking.departureDate === selectedDepartureDate)
+    if (!existingCartItem) return { buttonLabel: "Book Date", peopleText: "" }
+
+    const peoplePerson = existingCartItem.booking.people === 1 ? "person" : "people"
+    return {
+      buttonLabel: "Add Person",
+      peopleText: `${existingCartItem.booking.people} ${peoplePerson}`
+    }
+  }
+ 
+  const setClickFunction = (date: string) => currentUser ? handleBookingClick(date) : redirect('/auth')
     
-  const getClickFunction = (date: string) => user
-    ? handleBook(date)
-    : redirect('/auth')
-    
-  const getModalText = () => user
+  const getModalText = () => currentUser
     ? (
       <h2>Click one of the <span>Book Date </span> buttons to start your adventure.
       <br />
@@ -155,17 +158,19 @@ const TourSinglePage = () => {
 
             <div className={styles.tourDetails}>              
               <h2>Start Dates:</h2>
-              {tour.startDates?.map((departureDate, i) => (// index works fine for key, because there are always exactly 3
-                <div className={styles.tourDetailsText} key={i} ref={el => { dateRefs.current[i] = el }}>
+              {tour.startDates?.map((departureDate, i) => (
+                <div className={styles.tourDetailsText} key={departureDate}>
                   <h3>{format(new Date(departureDate), 'PPPP')}</h3>
-                   <div onClick={() => getClickFunction(departureDate)}>
+                   <div onClick={() => setClickFunction(departureDate)}>
                     <CustomButton rect between around>
-                    {getBookButtonLabel()}
+                      {setButtonLabelAndPeopleText(departureDate)?.buttonLabel}
                     </CustomButton>
+                    <p className={styles.peopleRef} ref={el => { dateRefs.current[i] = el }}>
+                      {setButtonLabelAndPeopleText(departureDate)?.peopleText} booked
+                    </p>
                   </div>             
                 </div>
               ))}
-              <h3 className={styles.peopleRef} ref={peopleRef}>{`${people === 1 ? 'Person' : 'People'} booked: ${people}`}</h3>
             </div>
 
           </div>
@@ -177,8 +182,8 @@ const TourSinglePage = () => {
         </div>
 
         <div className={styles.images}>
-          {tour.images?.map((image, i) => (// index works fine for key, because there are always exactly 3
-            <div className={styles.tourImageContainer} key={i}>
+          {tour.images?.map((image) => (
+            <div className={styles.tourImageContainer} key={image}>
               <img src={image} alt={tour.name}/>
             </div>
           ))}
@@ -199,3 +204,25 @@ const TourSinglePage = () => {
 }
 
 export default TourSinglePage
+
+
+
+// THIS WAS ALSO WORKING FOR ME, BUT IT WAS A BIT WONKY
+  // const setButtonLabelAndPeopleText = (selectedDepartureDate: string, selectedIndex: number) => {
+  //   if (!tour || !tour.startDates) return
+
+  //   const finalTextObject = { buttonLabel: "Book Date", peopleText: "" }
+
+  //   dateRefs.current.forEach((ref, i) => {
+  //     const existingCartItem = cartItems.find(item => item.tour.id === tour.id && item.booking.departureDate === selectedDepartureDate)
+  //     if (ref && existingCartItem && selectedIndex === i) {
+  //       ref.style.display = 'block'
+  //       finalTextObject.buttonLabel = "Add Person"
+  //       const peoplePerson = existingCartItem.booking.people === 1 ? "person" : 'people'
+  //       finalTextObject.peopleText = `${existingCartItem.booking.people} ${peoplePerson}`
+  //     }
+  //   })
+
+  //   return finalTextObject
+
+  // }

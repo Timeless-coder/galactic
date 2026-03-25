@@ -1,0 +1,14 @@
+.toursContainer {
+  background: transparent;
+  background-size: cover;
+  margin-top: var(--header-height);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(335px, 1fr));
+  gap: 10px;
+  @media all and (max-width: 600px) {
+    margin-top: 10px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

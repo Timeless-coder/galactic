@@ -4,8 +4,8 @@ import { AiOutlineGooglePlus } from 'react-icons/ai'
 
 import { useAuth } from '../../hooks/useAuth'
 
-import LoginForm from '../../components/LoginForm'
-import SignupForm from '../../components/SignupForm'
+import LoginForm from '../../components/Auth/LoginForm'
+import SignupForm from '../../components/Auth/SignupForm'
 import CustomButton from '../../elements/CustomButton/CustomButton'
 
 import styles from './AuthPage.module.scss'
@@ -14,12 +14,12 @@ import formStyles from '../../elements/Form.module.scss'
 
 const AuthPage = () => {
   const location = useLocation()
-  const { signInWithGoogle, user, logout } = useAuth()
+  const { signInWithGoogle, currentUser, logout } = useAuth()
   const [hasAccount, setHasAccount] = useState(false)
 
   useEffect(() => {
     let mounted = true
-    if (mounted) setHasAccount(Boolean(user))
+    if (mounted) setHasAccount(Boolean(currentUser))
     return () => {
       mounted = false
     }

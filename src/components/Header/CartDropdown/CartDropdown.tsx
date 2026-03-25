@@ -12,7 +12,7 @@ import CustomButton from '../../../elements/CustomButton/CustomButton'
 import styles from './CartDropdown.module.scss'
 
 export const CartDropdown = () => {
-  const { user } = useAuth()
+  const { currentUser } = useAuth()
   const { cartItems, setCartDropdownCollapsed, cartDropdownCollapsed } = useCart()
 
   return (

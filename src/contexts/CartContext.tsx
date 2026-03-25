@@ -9,11 +9,11 @@ export type CartItem = {
 
 export type CartContextType = {
 	cartItems: CartItem[]
+	addPersonToBooking: (item: CartItem) => void
 	addItemToCart: (item: CartItem) => void
+	removePersonOrBooking: (item: CartItem) => void
 	removeItemFromCart: (item: CartItem) => void
 	clearCart: () => void
-	addPersonToBooking: (item: CartItem) => void
-	subtractPersonFromBooking: (item: CartItem) => void
 	cartDropdownCollapsed: boolean
 	setCartDropdownCollapsed: (collapsed: boolean) => void
 }
@@ -22,27 +22,26 @@ export const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 	const [cartItems, setCartItems] = useState<CartItem[]>([])
-	const [cartDropdownCollapsed, setCartDropdownCollapsed] = useState(false)	
+	const [cartDropdownCollapsed, setCartDropdownCollapsed] = useState(false)
 
 	const addItemToCart = (item: CartItem) => {
-		setCartItems((prevCartItems) => [...prevCartItems, item])
+		item.booking.people= 1
+		setCartItems(prev => [...prev, item])
+	}
+
+	const addPersonToBooking = (item: CartItem) => {
+		setCartItems(prev =>
+			prev.map(cartItem =>
+				cartItem.booking.id === item.booking.id
+					? { ...cartItem, booking: { ...cartItem.booking, people: cartItem.booking.people + 1 } }
+					: cartItem
+			)
+		)
 	}
 
 	const removeItemFromCart = (item: CartItem) => {
 		setCartItems((prevCartItems) => prevCartItems.filter((i) => i !== item))
-	}
-
-	const clearCart = () => {
-		setCartItems([])
-	}
-
-	const addPersonToBooking = (item: CartItem) => {
-		setCartItems((prevCartItems) =>
-			prevCartItems.map((cartItem) =>
-				cartItem === item ? { ...cartItem, booking: { ...cartItem.booking, people: item.booking.people + 1 } } : cartItem
-			)
-		)
-	}
+	}	
 
 	const subtractPersonFromBooking = (item: CartItem) => {
 		setCartItems((prevCartItems) =>
@@ -52,6 +51,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 		)
 	}
 
+	const removePersonOrBooking = (item: CartItem) => {
+		if (item.booking.people === 1) removeItemFromCart(item)
+		else subtractPersonFromBooking(item)
+	}
+		
+	const clearCart = () => {
+		setCartItems([])
+	}
+
+
 	useEffect(() => {
 		const storedCart = localStorage.getItem('cartTours')
 		if (storedCart) {
@@ -60,8 +69,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 	}, [])
 
 	return (
-		<CartContext.Provider value={{ cartItems, addItemToCart, removeItemFromCart, clearCart, addPersonToBooking, subtractPersonFromBooking, cartDropdownCollapsed, setCartDropdownCollapsed }}>
+		<CartContext value={{ cartItems, addPersonToBooking, addItemToCart, removePersonOrBooking, removeItemFromCart, clearCart, cartDropdownCollapsed, setCartDropdownCollapsed }}>
 			{children}
-		</CartContext.Provider>
+		</CartContext>
 	)
 }
