@@ -1,0 +1,189 @@
+.tourSingleInstructions {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 40vw;
+  background-color: hsla(0, 0%, 0%, 0.5);
+  border-radius: 10px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  color: white;
+  transition: all .5s ease-out;
+  h2 {
+    background: url('../../../assets/OptimizedBacks/BlackBack.jpg');
+    padding: 1vw;
+    border-radius: 20px;
+    font-size: clamp(16px, 2vw, 30px);
+    font-weight: 400;
+    text-align: center;
+    width: 90%;
+    span {
+      color: var(--primary-blue-50);
+    }
+  }
+  .icon {
+    width: clamp(32px, 4vw, 54px);
+    height: clamp(32px, 4vw, 54px);
+    align-self: flex-start;
+    width: 10%;
+    cursor: pointer;
+  }
+  @media all and (max-width: 1200px){
+    width: 50vw
+  }
+  @media all and (max-width: 600px){
+    width: 70vw
+  }
+}
+
+.tourSingleContainer {
+  transition: 0.3s all;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  .tourHeader {
+    position: relative;
+    width: 100%;
+    .tourPicture {
+      position: relative;
+      height: 38vw;
+      img {
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
+      }
+    }
+    h1 {
+      position: absolute;
+      right: 6%;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 0 2px;
+      font-family: Orbitron;
+      font-size: 4vw;
+      font-weight: 500;
+      letter-spacing: 4px;
+    }
+  }
+  .main {
+    display: flex;
+    justify-content: center;
+    width: 70vw;
+    gap: 10vw;
+    padding: 5vw 0 2.5vw 0;
+    h2 {
+      font-family: Orbitron;
+      font-size: clamp(18px, 2.5vw, 30px);
+      margin-bottom: 10px;
+      font-weight: 300;
+    }
+    h3 {
+      white-space: nowrap;
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 400;
+      span {
+        font-size: clamp(14px, 1.5vw, 18px);
+      }
+    }
+    .mainLeft {
+      width: 60%;
+      .tourDetails {
+        margin-bottom: 2.5vw;
+        .tourDetailsText, .peopleRef {
+          padding: 2px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .peopleRef {
+          display: none;
+        }
+      }
+    }
+    .mainRight {
+      width: 40%;
+      h2 {
+        margin-bottom: 2.5vw;
+      }
+      p {
+        font-size: 18px;
+      }
+    }
+  }
+  .images {
+    width: 90vw;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 5vw;
+    .tourImageContainer {
+      width: 33%;
+      img {
+        max-width: 100%;
+        width: 100%;
+        object-fit: cover;
+      }
+      &:nth-child(2) {
+        margin-top: 2.5vw;
+      }
+      &:nth-child(3) {
+        margin-top: 5vw;
+      }
+    }
+  }
+  h2.reviewsTitle {
+    font-family: Orbitron;
+    font-size: clamp(18px, 2.5vw, 36px);
+    margin-bottom: 3.5vw;
+    transform: translateX(-30vw);
+  }
+  .book {
+    width: 100%;
+    padding-top: 50px;
+    display: grid;
+    justify-items: center;
+    p {
+      font-size: 18px;
+    }
+    a {
+      font-size: 18px;
+      color: var(--primary-blue-50);
+    }
+  }
+  @media all and (max-width: 1200px) {
+    .main {
+      width: 90vw;
+    }
+    h2.reviewsTitle {
+      transform: translateX(-39vw);
+    }
+  }
+  @media all and (max-width: 650px) {
+    .main {
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 10vw;
+      .mainLeft,
+      .mainRight {
+        width: 100%;
+      }
+    }
+    h2.reviewsTitle {
+      transform: unset;
+    }
+    .images {
+      flex-direction: column;
+      align-items: center;
+      .tourImageContainer {
+        width: 100%;
+        &:nth-child(2), &:nth-child(3) {
+        margin-top: unset;
+        }
+      }
+    }
+  }
+}

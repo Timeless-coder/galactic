@@ -1,0 +1,40 @@
+.toursPageContainer {
+  width: 100%;
+  padding-left: clamp(20px, 5vw, 100px);
+  padding-right: clamp(20px, 5vw, 100px);
+  .toursPageTop {
+    height: calc(var(--body-height) - 300px);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    h2 {
+      text-align: center;
+      font-family: Orbitron;
+      font-weight: 400;
+      font-size: clamp(18px, 10.5vw, 100px);
+      margin-bottom: 10px;
+    }
+    p {
+      text-align: center;
+      font-size: 30px;
+      margin-bottom: 20px;
+      span {
+        font-size: 10px;
+      }
+    }
+  }
+  .toursContainer {  
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;    
+  }
+  @media all and (max-width: 400px) {
+    padding: 0;
+    .toursContainer {
+      padding: 2vw;
+      color: #00bfff1a;
+    }
+  }
+}

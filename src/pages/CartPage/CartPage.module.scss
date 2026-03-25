@@ -1,0 +1,57 @@
+.checkoutPageContainer {
+  position: relative;
+  margin-top: var(--header-height);
+  padding: 30px 20vw 0 20vw;
+  min-height: var(--body-height);
+  color: white;
+  background-image: url('../../assets/OptimizedBacks/BlackBack.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  .checkoutPageContents {    
+    min-height: var(--body-height);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    .clearCartContainer {
+      align-self: flex-end;
+    }
+    .checkoutTours {
+      max-height: 65vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .bottomRowContainer {
+      align-self: flex-end;
+      display: flex;
+      justify-content: space-between;
+      .totalContainer {
+        margin-left: 30px;
+        h3 {
+          font-size: clamp(20px, 3vw, 36px);
+          span {
+            color: var(--primary-blue-50);
+            margin-left: 10px;
+          }
+        }
+      }
+      .checkoutButton {
+        align-self: flex-end;
+      }
+    }
+  }
+  @media all and (max-width: 1200px) {
+    padding: 5vw 15vw;
+  }
+  @media all and (max-width: 800px) {
+    padding: 5vw 10vw;
+  }
+  @media all and (max-width: 600px) {
+    padding: 5vw 5vw;
+  }
+  @media all and (max-width: 400px) {
+    padding: 5vw 2vw;
+  }
+}

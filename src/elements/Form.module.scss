@@ -1,0 +1,190 @@
+input[type="file"] {
+  display: none;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: clamp(360px, 80%, 560px);
+  outline: 3px transparent;
+  background: transparent;
+  border-radius: 30px;
+  text-align: center;
+  padding: clamp(20px, 2vw, 50px);
+  transition: all .3s ease-in-out;
+  h2 {
+    color: white;
+    font-weight: 500;
+    letter-spacing: 4px;
+    margin: 20px 0;
+  }
+  p {
+    font-weight: 500;
+    letter-spacing: 2px;
+    font-size: clamp(10px, 3vw, 18px);
+    color: white;
+    margin-bottom: 10px;
+  }
+  .icon {
+  width: clamp(10px, 3vw, 18px);
+  height: clamp(10px, 3vw, 18px);
+  margin-right: 15px;
+  }
+  form {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: space-around;
+    width: 80%;
+    height: 100%;
+    & .inputContainer {
+      label {
+        display: block;
+        color: white;
+        font-size: clamp(10px, 3vw, 18px);
+        margin-bottom: 7px;
+      }
+      input {
+        width: 100%;
+        height: clamp(20px, 9vw, 50px);
+        background: transparent;
+        border: none;
+        outline: none;
+        border-radius: 40px;
+        padding: 5px 15px;
+        color: var(--primary-blue-50);
+        font-family: 'Rajdhani', 'MS Shell Dlg 2', sans-serif;
+        font-weight: 600;
+        font-size: clamp(10px, 3vw, 18px);
+        margin-bottom: 10px;
+        box-shadow:
+          inset -1px -1px 1px rgba(255,255,255,0.2),
+          inset 3px 3px 3px rgba(0,0,0,1);
+        &::placeholder {
+          color: #868686;
+          font-size: clamp(10px, 3vw, 18px);
+        }
+        &[type='submit'] {
+          cursor: pointer;
+          color: var(--primary-blue-50);
+          box-shadow:
+          inset 1.5px 1.5px 2px rgba(255,255,255,0.2),
+          inset -1.5px -1.5px 3px rgba(0,0,0,1),
+          1.5px 1.5px 2px rgba(0,0,0, 1)
+          ;
+          &:active {
+            color: var(--primary-blue-70);
+            box-shadow:
+            inset -1.5px -1.5px 2px rgba(255,255,255,0.2),
+            inset 1.5px 1.5px 3px rgba(0,0,0,1);   
+          }
+        }
+      }
+      img {
+      max-width: 100%;
+      width: 70px;
+      }
+      .labelContainer {
+      padding: 12px;
+      border-radius: 50px;
+      box-shadow:
+        inset 1.5px 1.5px 2px rgba(255,255,255,0.2),
+        inset -1.5px -1.5px 3px rgba(0,0,0,1),
+        1.5px 1.5px 2px rgba(0,0,0, 1)
+      ;   
+      &:active {
+        box-shadow:
+          inset -1.5px -1.5px 2px rgba(255,255,255,0.2),
+          inset 1.5px 1.5px 3px rgba(0,0,0,1)
+          ;   
+      }
+      label {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        cursor: pointer;
+        width: 100%;
+        .icon {
+        margin-right: 10px;
+        }
+        img {
+        width: 20px;
+        border-radius: 50%;
+        }
+      }
+      }
+      textarea {
+      width: 100%;
+      min-height: 190px;
+      padding: 5px;
+      background: transparent;
+      font-family: Rajdhani;
+      font-size: 18px;
+      color: var(--primary-blue-50);;
+      border: none;
+      box-shadow:
+          inset -1px -1px 1px rgba(255,255,255,0.2),
+          inset 3px 3px 3px rgba(0,0,0,1);
+      }
+    }
+    .error {
+    color: red;
+    }
+  }  
+  .google, .password {
+  align-self: flex-end;
+  margin-bottom: 10px;
+  margin-left: auto;
+  }
+  &:hover {  
+  box-shadow: 
+      0 0 3px 3px var(--primary-blue-50),
+      20px 20px 20px rgba(0, 0, 0, 1);
+  transform: scale(1.01);
+  }
+}
+
+.userSettingsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  h1 {
+  font-size: clamp(18px, 3.5vw, 36px);
+  }
+}
+
+.status {
+  align-self: flex-end;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.ani {
+  overflow: hidden;
+  &::before {
+  content: '';
+  position: relative;
+  left: -60px;
+  width: 15px;
+  height: 100%;
+  opacity: 0;
+  background-color: hsla(0, 0%, 100%, 0.5);
+  box-shadow: 0 0 10px 10px hsla(0, 0%, 100%, 0.5);
+  transform: skewX(-30deg);
+  transition: transform .5s;   
+  }
+  &:hover {
+    &::before {
+      transform: skewX(-30deg) translateX(500px);
+      opacity: 1;
+    }
+  }   
+}

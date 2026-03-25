@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-blue-70: hsl(199, 100%, 70%);
+  --primary-blue-50: hsl(199, 100%, 50%);
+  --primary-blue-50-trans: hsla(199, 100%, 50%, .1);
+  --primary-blue-30: hsla(199, 100%, 30%, .1);
+  --primary-blue-20: hsl(199, 100%, 20%);
+  --primary-blue-10: hsl(199, 100%, 10%);
+  --primary-blue-dark: hsl(199, 100%, 5%);  
+  --primary-blue-shadow: hsla(199, 100%, 5%, .2);
+
+  --header-height: 7vh;
+  --body-height: calc(100vh - var(--header-height));
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'Rajdhani', sans-serif;
+  color: white;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  list-style: none;
+  h1 {
+  font-family: 'Orbitron', sans-serif;
+  white-space: nowrap;
+  }
+  h2, h3 {
+  letter-spacing: 2px;
+  }
+}
+
+a:active {
+  outline: none;
+}
+
+button:active {
+  outline: none;
+}
+
+.content-container {
+  margin-top: var(--header-height);
+  width: 100%;
+  height: 100%;
+  min-height: var(--body-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('./assets/OptimizedBacks/BlackBack.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+}

@@ -1,0 +1,55 @@
+.checkoutTourContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px 10px 0;
+  font-size: clamp(13px, 4vw, 22px);
+  &:not(:last-of-type) {    
+    border-bottom: 1px solid darkgrey;
+  }
+  .imageContainer {
+    width: 25%;
+    img {
+      width: 100%;
+    }
+  }
+  .textContainer {
+    .departureDate {
+      font-size: clamp(12px, 3vw, 20px);
+    }
+  }
+  .peopleContainer {
+    .carets {
+      display: flex;
+      span {
+        margin: 0 10px;
+      }  
+      div {
+        cursor: pointer;
+      }
+    }
+    p {
+      font-size: clamp(12px, 3vw, 20px);
+      text-align: center;
+    }
+  }
+  .removeButtonContainer {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    p {
+      font-size: clamp(12px, 3vw, 20px);
+      text-align: center;
+    }
+  }
+}
+
+
+
+
+
+
+
+

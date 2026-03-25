@@ -1,0 +1,110 @@
+.card {
+  overflow: hidden;
+  transition: all .3s ease-in;
+  min-height: 540px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  transform-style: preserve-3d;
+  .cardHeader {
+    position: relative;
+    .cardPicture {
+      height: 188px;
+      img {
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
+        border-radius: 10px / 0;
+      }
+    }
+    h1 {
+      position: absolute;
+      right: 20px;
+      bottom: 40px;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 0 4px;
+      color: white;
+      letter-spacing: 2.7px;
+      font-weight: 500;
+    }
+  }
+  .cardDetails {
+    color: white;
+    padding: 0 20px;
+    h2 {
+      font-family: Orbitron;
+      font-size: 20px;
+      white-space: nowrap;
+      margin-bottom: 20px;
+      font-weight: 200;
+    }
+    &.one {
+      padding: 20px;
+    }
+    .cardDetailsText {
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      h3 {
+        white-space: nowrap;
+        color: white;
+        font-size: 18px;
+        font-weight: 400;
+        span {
+          font-size: 14px;
+        }
+      }
+    }
+    .tourLink {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--primary-blue-50);
+      border: 1px solid var(--primary-blue-50);
+      padding: 10px 20px;
+      font-family: 'Rajdhani', 'MS Shell Dlg 2', sans-serif;
+      font-weight: 600;
+      font-size: clamp(10px, 3vw, 18px);
+      overflow: hidden;
+      transition: all .3s ease-in-out;
+      &::before {
+      content: '';
+      position: absolute;
+      left: -50px;
+      width: 15px;
+      height: 50px;
+      background-color: hsla(0, 0%, 100%, 0.6);
+      box-shadow: 0 0 10px 10px hsla(0, 0%, 100%, 0.5);
+      transform: skewX(-30deg);
+      transition: transform .5s;
+      opacity: 0;
+      }
+      &:hover {
+      outline: 1px solid var(--primary-blue-50);
+      box-shadow: 10px 10px 10px rgba(0, 0, 0, 1);
+      transform: scale(1.01);
+      &::before {
+        transform: skewX(-30deg) translateX(500px);
+        opacity: 1;
+      }
+      }
+    }  
+  }  
+  &:hover {
+    transform: translate();
+    background-color: hsla(199, 0%, 100%, .1);
+    box-shadow: 
+      0 0 3px 3px var(--primary-blue-50),
+      20px 20px 20px rgba(0, 0, 0, 1)
+    ;
+    border-radius: 5px;
+    .cardDetails {
+      h2, h3, span {
+      text-shadow: 20px 20px 5px rgba(0, 0, 0, .6)
+      }
+    }
+  }
+}

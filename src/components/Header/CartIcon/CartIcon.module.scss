@@ -1,0 +1,27 @@
+.cartIconContainer {
+  position: relative;
+  width: 5vh;
+  height: 5vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  .icon {
+  width: 5vh;
+  height: 5vh;
+  color: white;
+  transition: .2s ease-in;
+  &:hover {
+    color: var(--primary-blue-50);
+    transform: scale(1.1, 1.1);
+  }
+  }
+  .count {
+  position: absolute;
+  font-size: 2vh;
+  font-weight: bold;
+  bottom: 1.8vh;
+  left: 2.2vh;
+  color: var(--primary-blue-50);
+  }
+}

@@ -1,0 +1,20 @@
+.footer {
+  position: relative;
+  width: 100%;
+  height: calc(max(75px, 7vw));
+  background-image: url('../../assets/OptimizedBacks/home.jpg');
+  background-size: cover;
+  padding: 0 15vw;
+  .linksContainer {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,.8);
+    p {
+      color: white;
+    }
+    a {
+    display: inline;
+    }
+  }
+}

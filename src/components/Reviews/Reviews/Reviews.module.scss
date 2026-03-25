@@ -1,0 +1,14 @@
+.reviewsContainer {
+  width: 70vw;
+  min-height: 30vh;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(335px, 1fr));
+  gap: 10px;
+  .empty {
+    font-family: Rajdhani;
+    font-size: clamp(18px, 2.5vw, 36px);
+  }
+  @media all and (max-width: 1200px) {
+    width: 90vw;
+  }
+}
