@@ -13,28 +13,31 @@ const UserReviews = () => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    let mounted = true;
+    let mounted = true
+
     const getReviews = async () => {
-      setLoading(true);
+      setLoading(true)      
       try {
         if (!currentUser?.id) {
-          setReviews([]);
-          setLoading(false);
-          return;
+          setReviews([])
+          setLoading(false)
+          return
         }
         const myReviews: Review[] = await getReviewsByUserId(currentUser.id)
         if (mounted && myReviews?.length > 0) setReviews(myReviews)
       } catch (err) {
-        if (mounted) setReviews([]);
+        if (mounted) setReviews([])
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) setLoading(false)
       }
-    };
-    getReviews();
+    }
+
+    getReviews()
+    
     return () => {
-      mounted = false;
-    };
-  }, [currentUser]);
+      mounted = false
+    }
+  }, [currentUser])
 
   return (
     <>

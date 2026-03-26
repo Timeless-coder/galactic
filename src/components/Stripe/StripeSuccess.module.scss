@@ -1,0 +1,42 @@
+.paymentSuccessContainer {
+  background: url('../../../assets/OptimizedBacks/BlackBack.jpg');
+  margin-top: var(--header-height);
+  min-height: var(--body-height);
+  padding: 5vw;
+  color: white;
+  h1, h2, h3 {
+    font-family: Orbitron;
+    font-weight: 400;
+  }
+  h1 {
+    text-align: center;
+    font-size: clamp(24px, 4vw, 36px);
+    margin-bottom: 20px;
+  }
+  h2 {
+    font-size: clamp(18px, 3vw, 30px);
+    margin-bottom: 40px;
+  }
+  h2.enjoy {
+    text-align: center;
+  }
+  h3.cost {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+  .print {
+    width: 300px;
+    margin-left: 40px;
+    margin-bottom: 30px;
+  }
+  .continue {
+    width: 300px;
+    margin-left: 40px;
+  }
+  .receipt {
+    h2 {
+    text-align: left;
+    margin-bottom: 10px;
+    }
+  }
+}

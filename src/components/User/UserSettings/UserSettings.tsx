@@ -1,17 +1,16 @@
 import { useState } from 'react'
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
 
 import { useAuth } from '../../../hooks/useAuth'
 import { useCart } from '../../../hooks/useCart'
+import { deleteProfileImageIfNeeded, uploadProfileImage } from '../../../services/firebase/storageService'
 
 import styles from '../../../elements/Form.module.scss'
 import linkStyles from './UserSettings.module.scss'
 
-const MySettings = () => {
+const CurrentUserSettings = () => {
   const { cartItems } = useCart()
   const cart = [...cartItems]
   const { currentUser, updateUserAccount } = useAuth()
-  const storage = getStorage()
   const [newName, setNewName] = useState(currentUser?.name)
   const [newEmail, setNewEmail] = useState(currentUser?.email)
   const [newFile, setNewFile] = useState<File | null>(null)
@@ -21,20 +20,8 @@ const MySettings = () => {
     try {
       let imageURL = currentUser?.photoURL || ''
       if (newFile) {
-        // Delete old image if not default
-        if (currentUser?.photoURL && !currentUser.photoURL.includes('Anonymous.jpg')) {
-          try {
-            const oldImageRef = ref(storage, currentUser.photoURL);
-            await deleteObject(oldImageRef);
-          } catch (err) {
-            // Ignore if image doesn't exist or can't be deleted
-          }
-        }
-        // Upload new image
-        const now = Date.now().toString();
-        const imageRef = ref(storage, `profileImages/${now}_${newFile.name}`);
-        await uploadBytes(imageRef, newFile);
-        imageURL = await getDownloadURL(imageRef);
+        await deleteProfileImageIfNeeded(imageURL)
+        imageURL = await uploadProfileImage(newFile)
       }
       await updateUserAccount(
         newEmail!,
@@ -42,9 +29,8 @@ const MySettings = () => {
         imageURL
       )
       if (cart.length > 0) localStorage.setItem('galacticCart', JSON.stringify(cart));
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      window.location.reload();
+      
     } catch (err) {
       // handle error
     } 
@@ -134,4 +120,4 @@ const MySettings = () => {
   )
 }
 
-export default MySettings
+export default CurrentUserSettings

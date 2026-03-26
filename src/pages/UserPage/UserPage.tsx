@@ -6,22 +6,26 @@ import { IoPlanetOutline } from 'react-icons/io5'
 import { CgMathPlus } from 'react-icons/cg'
 import { RiLockPasswordLine } from 'react-icons/ri'
 
+import type { Tour } from '../../types/tour'
+
 import { useAuth } from '../../hooks/useAuth'
 
 import UserReviews from '../../components/User/UserReviews/UserReviews'
 import UserTours from '../../components/User/UserTours/UserTours'
 import UserSettings from '../../components/User/UserSettings/UserSettings'
 import ManageTours from '../../components/User/Admin/ManageTours/ManageTours'
-// import CreateTour from '../../components/User/Admin/CreateTour/CreateTour'
-// import EditTour from '../../components/User/Admin/EditTour/EditTour'
-// import UserPassword from '../../components/User/UserPassword/UserPassword'
+import CreateTour from '../../components/User/Admin/CreateTour/CreateTour'
+import EditTour from '../../components/User/Admin/EditTour/EditTour'
+import UserPassword from '../../components/User/UserPassword/UserPassword'
 
 import styles from './UserPage.module.scss'
 
 const UserPage = () => {
   const { currentUser } = useAuth()
   const [showSection, setShowSection] = useState('manageTours')
-  const [editTour, setEditTour] = useState('')
+  const [editTour, setEditTour] = useState<Tour | null>(null)
+  console.log(showSection)
+
   return (
     <div className={styles.accountContainer}>
 
@@ -56,9 +60,9 @@ const UserPage = () => {
         {showSection === 'userTours' && <UserTours />}
         {showSection === 'reviews' && <UserReviews />}
         {showSection === 'manageTours' && <ManageTours setShowSection={setShowSection} setEditTour={setEditTour} />}
-        {/* {showSection === 'password' && <UserPassword />} */}
-        {/* {showSection === 'createTour' && <CreateTour setShowSection={setShowSection} />} */}
-        {/* {showSection === 'editTour' && <EditTour setShowSection={setShowSection} editTour={editTour} />} */}
+        {showSection === 'password' && <UserPassword />}
+        {showSection === 'createTour' && <CreateTour setShowSection={setShowSection} />}
+        {showSection === 'editTour' && <EditTour setShowSection={setShowSection} editTour={editTour!} />}
       </section>
 
     </div>

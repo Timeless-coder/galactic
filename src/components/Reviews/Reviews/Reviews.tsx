@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import ReviewCard from '../ReviewCard/ReviewCard'
-
-import { getReviewsByTourId } from '../../../services/firebase/reviewsService'
 
 import type { Review } from '../../../types/review'
 import type { Tour } from '../../../types/tour'
+
+import { getReviewsByTourId } from '../../../services/firebase/reviewsService'
+
+import ReviewCard from '../ReviewCard/ReviewCard'
 
 import styles from './Reviews.module.scss'
 

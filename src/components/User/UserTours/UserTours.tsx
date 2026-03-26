@@ -28,21 +28,27 @@ const UserTours = () => {
           setLoading(false)
           return
         }
-        const myBookings: Booking[] = await getBookingsByUserId(currentUser.id)
 
+        const myBookings: Booking[] = await getBookingsByUserId(currentUser.id)
         const toursFromBookings: Tour[] = []
+
         for (const booking of myBookings) {
           const tourData = await getTourById(booking.tourId)
           if (tourData) toursFromBookings.push(tourData)
         }
+
         if (mounted) setMyTours(toursFromBookings)
+
       } catch (err) {
         if (mounted) setMyTours([])
+
       } finally {
         if (mounted) setLoading(false)
       }
     }
+
     getMyTours()
+
     return () => {
       mounted = false
     }
@@ -53,15 +59,7 @@ const UserTours = () => {
       {loading && <Spinner />}
       <div className={styles.userToursContainer}>
         {myTours.length > 0
-          ? myTours.map(tour => (
-            <TourCard
-              key={tour.id}
-              tour={tour}
-              mode='user'
-              setEditTour={() => {}}
-              setShowSection={() => {}}
-            />
-          ))
+          ? myTours.map(tour => <TourCard key={tour.id} tour={tour} mode='user' setEditTour={() => {}} setShowSection={() => {}}/>)
           : <h2>You have not booked any tours yet.</h2>
         }
       </div>

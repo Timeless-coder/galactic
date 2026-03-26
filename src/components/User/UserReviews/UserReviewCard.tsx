@@ -15,49 +15,46 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
   const [tour, setTour] = useState<Tour | null>(null)
 
   useEffect(() => {
-    let mounted = true;
+    let mounted = true
+
     const getTour = async () => {
       try {
         if (!review?.tourId) {
-          setTour(null);
-          return;
+          setTour(null)
+          return
         }
-        const tourData = await getTourById(review.tourId);
-        if (mounted) setTour(tourData);
+        const tourData = await getTourById(review.tourId)
+        if (mounted) setTour(tourData)
       } catch {
-        if (mounted) setTour(null);
+        if (mounted) setTour(null)
       }
-    };
-    getTour();
+    }
+
+    getTour()
+
     return () => {
-      mounted = false;
-    };
-  }, [review]);
+      mounted = false
+    }
+  }, [review])
   
   return (
     <div className={styles.reviewCard}>
-      {!review || !tour ? (
-        <Spinner />
-      ) : (
-        <>
-          <img
-            className={styles.backgroundImage}
-            src={tour.imageCover}
-            alt={tour.planet}
-          />
-          <div className={styles.content}>
-            <div className={styles.userImage}>
-              <img
-                src={currentUser?.photoURL || ''}
-                alt={currentUser?.name || 'User'}
-              />
+      {!review || !tour
+        ? <Spinner />
+        : (
+          <>
+            <img className={styles.backgroundImage} src={tour.imageCover} alt={tour.planet} />
+            <div className={styles.content}>
+              <div className={styles.userImage}>
+                <img src={currentUser?.photoURL || ''} alt={currentUser?.name || 'User'} />
+              </div>
+              <h3>{currentUser?.name || 'User'}</h3>
+              <p>{review.text}</p>
+              <h2>{review.rating} / 100</h2>
             </div>
-            <h3>{currentUser?.name || 'User'}</h3>
-            <p>{review.text}</p>
-            <h2>{review.rating} / 100</h2>
-          </div>
-        </>
-      )}
+          </>
+          )
+      }
     </div>
   )
 }

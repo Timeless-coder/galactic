@@ -1,4 +1,4 @@
-import { doc, getDoc, collection, query, where, getDocs, addDoc, setDoc, deleteDoc } from 'firebase/firestore'
+import { doc, getDoc, collection, query, where, getDocs, addDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore'
 
 import { db } from './firebaseConfig'
 import type { Tour } from '../../types/tour'
@@ -42,4 +42,15 @@ export const createTourService = async (tour: Omit<Tour, 'id'>): Promise<string>
 export const updateTourService = async (id: string, tour: Partial<Tour>): Promise<void> => {
 	const tourRef = doc(db, 'tours', id)
 	await setDoc(tourRef, tour, { merge: true })
+}
+
+const TOUR_INDEX_DOC = 'qiiJ5kJFuSM32hXW6Z1g'
+
+export const getNewTourIndexService = async (): Promise<number> => {
+	const snap = await getDoc(doc(db, 'newTourIndex', TOUR_INDEX_DOC))
+	return (snap.data() as { index: number }).index
+}
+
+export const incrementNewTourIndexService = async (current: number): Promise<void> => {
+	await updateDoc(doc(db, 'newTourIndex', TOUR_INDEX_DOC), { index: current + 1 })
 }

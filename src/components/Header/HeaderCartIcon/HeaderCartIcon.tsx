@@ -2,7 +2,7 @@ import { AiOutlineShoppingCart } from 'react-icons/ai'
 
 import { useCart } from '../../../hooks/useCart'
 
-import styles from './CartIcon.module.scss'
+import styles from './HeaderCartIcon.module.scss'
 
 export const CartIcon = () => {
   const { cartItems, setCartDropdownCollapsed, cartDropdownCollapsed } = useCart()

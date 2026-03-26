@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from 'react'
 
 import type { Booking } from '../types/booking'
 import type { Tour } from '../types/tour'
+
 export type CartItem = {
 	booking: Booking
 	tour: Tour
@@ -16,6 +17,7 @@ export type CartContextType = {
 	clearCart: () => void
 	cartDropdownCollapsed: boolean
 	setCartDropdownCollapsed: (collapsed: boolean) => void
+	total: number
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -60,6 +62,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 		setCartItems([])
 	}
 
+	const total = cartItems.reduce((acc, item) => acc + 1 * item.booking.people, 0)
 
 	useEffect(() => {
 		const storedCart = localStorage.getItem('cartTours')
@@ -69,7 +72,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 	}, [])
 
 	return (
-		<CartContext value={{ cartItems, addPersonToBooking, addItemToCart, removePersonOrBooking, removeItemFromCart, clearCart, cartDropdownCollapsed, setCartDropdownCollapsed }}>
+		<CartContext value={{ cartItems, addPersonToBooking, addItemToCart, removePersonOrBooking, removeItemFromCart, clearCart, cartDropdownCollapsed, setCartDropdownCollapsed, total }}>
 			{children}
 		</CartContext>
 	)

@@ -1,6 +1,7 @@
 import { useState } from "react"
-import type { SubmitEvent } from "react"
 import toast from "react-hot-toast"
+
+import type { SubmitEvent } from "react"
 
 import { useAuth } from '../../hooks/useAuth'
 
@@ -22,6 +23,7 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault()
     setLoading(true)
+
     try {
       const user = await login(email, password)
       toast.success(`Welcome back, ${user.name}!`)

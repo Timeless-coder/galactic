@@ -23,6 +23,7 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 	const handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault()
 		setLoading(true)
+		
 		try {
 			const user = await signUpWithEmailAndPassword(email, password)
 			toast.success(`Welcome back, ${user.name}!`)

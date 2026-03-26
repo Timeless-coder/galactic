@@ -1,7 +1,7 @@
-import styles from './CartDropdownTour.module.scss'
-
 import type { Booking } from '../../../types/booking'
 import type { Tour } from '../../../types/tour'
+
+import styles from './HeaderCartDropdownTour.module.scss'
 
 type CartDropdownTourProps = {
   booking: Booking

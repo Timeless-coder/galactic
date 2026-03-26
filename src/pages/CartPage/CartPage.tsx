@@ -6,12 +6,12 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
 
 import CartTour from '../../components/CartTour/CartTour'
-// import Spinner from '../../elements/Spinner/Spinner'
+import Spinner from '../../elements/Spinner/Spinner'
 import CustomButton from '../../elements/CustomButton/CustomButton'
 
 import styles from './CartPage.module.scss'
 
-export const CheckoutPage = () => {
+export const CartPage = () => {
   const { currentUser } = useAuth()
   const { cartItems, setCartDropdownCollapsed, clearCart, addPersonToBooking, removePersonOrBooking } = useCart()
   let total = 0
@@ -27,8 +27,8 @@ export const CheckoutPage = () => {
   }, [])
 
   return (
-    <div className={styles.checkoutPageContainer}>
-      <div className={styles.checkoutPageContents}>
+    <div className={styles.cartPageContainer}>
+      <div className={styles.cartPageContents}>
 
         <div className={styles.clearCartContainer} onClick={clearCart}>
           <CustomButton rect around between>
@@ -37,7 +37,7 @@ export const CheckoutPage = () => {
           </CustomButton>
         </div>
 
-        <div className={styles.checkoutTours}>
+        <div className={styles.cartTours}>
           {cartItems?.map(item => <CartTour key={item.booking.id} cartPageItem={item} />)}
         </div>
                
@@ -59,4 +59,4 @@ export const CheckoutPage = () => {
   )
 }
 
-export default CheckoutPage
+export default CartPage

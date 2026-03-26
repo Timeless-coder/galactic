@@ -1,8 +1,6 @@
-import type { Tour} from '../../types/tour'
+import { useCart } from '../../hooks/useCart'
 
 import type { CartItem } from '../../contexts/CartContext'
-
-import { useCart } from '../../hooks/useCart'
 
 import styles from './CartTour.module.scss'
 

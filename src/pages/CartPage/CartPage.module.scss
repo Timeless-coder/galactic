@@ -1,4 +1,4 @@
-.checkoutPageContainer {
+.cartPageContainer {
   position: relative;
   margin-top: var(--header-height);
   padding: 30px 20vw 0 20vw;
@@ -7,7 +7,7 @@
   background-image: url('../../assets/OptimizedBacks/BlackBack.jpg');
   background-size: cover;
   background-attachment: fixed;
-  .checkoutPageContents {    
+  .cartPageContents {    
     min-height: var(--body-height);
     display: flex;
     flex-direction: column;
@@ -16,7 +16,7 @@
     .clearCartContainer {
       align-self: flex-end;
     }
-    .checkoutTours {
+    .cartTours {
       max-height: 65vh;
       overflow-y: auto;
       display: flex;

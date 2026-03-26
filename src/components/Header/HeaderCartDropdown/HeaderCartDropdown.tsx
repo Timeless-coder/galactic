@@ -6,12 +6,12 @@ import { IoArrowDownCircleOutline } from 'react-icons/io5'
 import { useAuth } from '../../../hooks/useAuth'
 import { useCart } from '../../../hooks/useCart'
 
-import CartDropdownTour from '../CartDropdownTour/CartDropdownTour'
+import CartDropdownTour from '../HeaderCartDropdownTour/HeaderCartDropdownTour'
 import CustomButton from '../../../elements/CustomButton/CustomButton'
 
-import styles from './CartDropdown.module.scss'
+import styles from './HeaderCartDropdown.module.scss'
 
-export const CartDropdown = () => {
+export const HeaderCartDropdown = () => {
   const { currentUser } = useAuth()
   const { cartItems, setCartDropdownCollapsed, cartDropdownCollapsed } = useCart()
 
@@ -31,7 +31,7 @@ export const CartDropdown = () => {
       </div>
       <div className={styles.cartTours}>
         {cartItems.length > 0
-          ? cartItems.map(item => <CartDropdownTour key={item.booking.id} booking={item.booking} tour={item.tour} />          )
+          ? cartItems.map(item => <CartDropdownTour key={item.booking.id} booking={item.booking} tour={item.tour} />)
           : <div className={styles.cartMessage}>Your cart is empty</div>
         }
       </div>
@@ -45,4 +45,4 @@ export const CartDropdown = () => {
   )
 }
 
-export default CartDropdown
+export default HeaderCartDropdown

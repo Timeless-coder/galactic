@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { VscRocket } from 'react-icons/vsc'
 import { BsCaretDown } from 'react-icons/bs'
@@ -7,11 +7,12 @@ import { IoPlanetOutline } from 'react-icons/io5'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
 
-import CartDropdown from './CartDropdown/CartDropdown'
-import CartIcon from './CartIcon/CartIcon'
+import HeaderCartDropdown from './HeaderCartDropdown/HeaderCartDropdown'
+import CartIcon from './HeaderCartIcon/HeaderCartIcon'
 
 import styles from './Header.module.scss'
 import anonymousImage from '../../assets/Anonymous.jpg'
+
 const defaultUserImageURL = anonymousImage
 
 export const Header = () => {
@@ -20,9 +21,16 @@ export const Header = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [userImage, setUserImage] = useState(currentUser?.photoURL || defaultUserImageURL)
 
-  console.table(currentUser)
-
   const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen)
+
+  // Probably not necessary, but just in case something goes wrong with photoURL.
+  useEffect(() => {
+    if (currentUser?.photoURL) {
+      setUserImage(currentUser.photoURL)
+    } else {
+      setUserImage(defaultUserImageURL)
+    }
+  }, [currentUser?.photoURL])
   
   const signOut = () => {
     try {
@@ -53,7 +61,7 @@ export const Header = () => {
                   <div className={styles.userIcons}>
 
                     <CartIcon />
-                    {!cartDropdownCollapsed && <CartDropdown />}     
+                    {!cartDropdownCollapsed && <HeaderCartDropdown />}     
 
                     <div className={styles.userImageContainer} onClick={toggleUserMenu}>
                       <img src={userImage} alt='View/Update your account' />

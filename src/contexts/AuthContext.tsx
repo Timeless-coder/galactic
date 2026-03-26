@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from "react"
 
 import type { User } from '../types/user'
 
-import { loginService, signupWithEmailAndPasswordService, signinWithGoogleService, logoutService, updateAuthProfileService } from '../services/firebase/authService'
+import { loginService, signupWithEmailAndPasswordService, signinWithGoogleService, logoutService, updateAuthProfileService, updatePasswordService, sendPasswordResetEmailService } from '../services/firebase/authService'
 import { auth } from '../services/firebase/firebaseConfig' // only for onAuthStateChanged listener
 
 export type AuthContextType = {
@@ -12,7 +12,9 @@ export type AuthContextType = {
   signUpWithEmailAndPassword: (email: string, password: string) => Promise<User>
   signInWithGoogle: () => Promise<User>
   updateUserAccount: (email: string, displayName: string, photoURL: string) => Promise<void>
+  updatePassword: (newPassword: string) => Promise<void>
   logout: () => Promise<void>
+  sendPasswordResetEmail: (email: string) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -90,8 +92,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await updateAuthProfileService(email, displayName, photoURL)
   }
 
+  const updatePassword = async (newPassword: string) => {
+    try {
+      await updatePasswordService(newPassword)
+    } catch (error) {
+      console.log('Password update error:', error)
+      throw error
+    }
+  }
+
+  const sendPasswordResetEmail = async (email: string) => {
+    try {
+      await sendPasswordResetEmailService(email)
+    } catch (error) {
+      console.log('Password reset email error:', error)
+      throw error
+    }
+  }
+
+
   return (
-    <AuthContext.Provider value={{ currentUser, loading, login, signUpWithEmailAndPassword: signupWithEmailAndPassword, signInWithGoogle: signinWithGoogle, logout, updateUserAccount }}>
+    <AuthContext.Provider value={{ currentUser, loading, login, signUpWithEmailAndPassword: signupWithEmailAndPassword, signInWithGoogle: signinWithGoogle, logout, updateUserAccount, updatePassword, sendPasswordResetEmail }}>
       {children}
     </AuthContext.Provider>
   )
