@@ -23,7 +23,10 @@ export type CartContextType = {
 export const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-	const [cartItems, setCartItems] = useState<CartItem[]>([])
+	const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+		const stored = localStorage.getItem('galacticCart')
+		return stored ? JSON.parse(stored) : []
+	})
 	const [cartDropdownCollapsed, setCartDropdownCollapsed] = useState(false)
 
 	const addItemToCart = (item: CartItem) => {
@@ -65,11 +68,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 	const total = cartItems.reduce((acc, item) => acc + 1 * item.booking.people, 0)
 
 	useEffect(() => {
-		const storedCart = localStorage.getItem('cartTours')
-		if (storedCart) {
-			setCartItems(JSON.parse(storedCart))
-		}
-	}, [])
+		localStorage.setItem('galacticCart', JSON.stringify(cartItems))
+	}, [cartItems])
 
 	return (
 		<CartContext value={{ cartItems, addPersonToBooking, addItemToCart, removePersonOrBooking, removeItemFromCart, clearCart, cartDropdownCollapsed, setCartDropdownCollapsed, total }}>

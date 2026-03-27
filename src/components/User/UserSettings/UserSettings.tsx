@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import { useAuth } from '../../../hooks/useAuth'
 import { useCart } from '../../../hooks/useCart'
@@ -7,33 +9,45 @@ import { deleteProfileImageIfNeeded, uploadProfileImage } from '../../../service
 import styles from '../../../elements/Form.module.scss'
 import linkStyles from './UserSettings.module.scss'
 
+type UserSettingsFormData = {
+  newEmail: string
+  newName: string
+  newFile: FileList
+}
+
 const CurrentUserSettings = () => {
   const { cartItems } = useCart()
   const cart = [...cartItems]
   const { currentUser, updateUserAccount } = useAuth()
-  const [newName, setNewName] = useState(currentUser?.name)
-  const [newEmail, setNewEmail] = useState(currentUser?.email)
-  const [newFile, setNewFile] = useState<File | null>(null)
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<UserSettingsFormData>({
+    defaultValues: {
+      newEmail: currentUser?.email ?? '',
+      newName: currentUser?.name ?? '',
+    }
+  })
+  const [loading, setLoading] = useState(false)
 
-  const profileChangeSubmit = async () => {
+  const watchNewFile = watch('newFile')
 
+  const formSubmit = async (data: UserSettingsFormData) => {
+    setLoading(true)
+    
     try {
       let imageURL = currentUser?.photoURL || ''
-      if (newFile) {
+      if (data.newFile?.[0]) {
         await deleteProfileImageIfNeeded(imageURL)
-        imageURL = await uploadProfileImage(newFile)
+        imageURL = await uploadProfileImage(data.newFile[0])
       }
-      await updateUserAccount(
-        newEmail!,
-        newName!,
-        imageURL
-      )
-      if (cart.length > 0) localStorage.setItem('galacticCart', JSON.stringify(cart));
-      window.location.reload();
-      
-    } catch (err) {
-      // handle error
-    } 
+      await updateUserAccount(data.newEmail, data.newName, imageURL)
+      window.location.reload()
+    }
+    catch (err: any) {
+      console.error(err)
+      toast.error('Failed to update profile. Please try again.')
+    }
+    finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -57,51 +71,48 @@ const CurrentUserSettings = () => {
 
           <h1>Update Your Account Settings</h1>
 
-          <form onSubmit={e => { e.preventDefault(); profileChangeSubmit(); }}>
+          <form onSubmit={handleSubmit(formSubmit)}>
 
             <div className={styles.inputContainer}>
-              <label htmlFor='newEmail'>
-                Update Email
-              </label>
+              <label htmlFor='newEmail'>Update Email</label>
+              {errors.newEmail && <p className={styles.error}>{errors.newEmail.message}</p>}
               <input
+                {...register('newEmail', {
+                  required: 'Email is required'
+                })}
+                id='newEmail'
                 type='email'
-                name='newEmail'
-                value={newEmail}
-                onChange={e =>setNewEmail(e.target.value)}
               />
             </div>
 
             <div className={styles.inputContainer}>
-              <label htmlFor='newName'>
-                Update DisplayName
-              </label>
+              <label htmlFor='newName'>Update Display Name</label>
+              {errors.newName && <p className={styles.error}>{errors.newName.message}</p>}
               <input
+                {...register('newName', {
+                  required: 'Display name is required'
+                })}
+                id='newName'
                 type='text'
-                name='newName'
-                value={newName}
-                onChange={e => setNewName(e.target.value)}
               />
             </div>
 
-            <div className={styles.inputContainer}>                  
+            <div className={styles.inputContainer}>
               <div className={styles.labelContainer}>
-                <label
-                  className={styles.label}
-                  htmlFor='file'>
+                <label className={styles.label} htmlFor='newFile'>
                   <img
                     className={styles.icon}
                     src={currentUser?.photoURL}
                     alt={currentUser?.name}
                   />
-                  Choose a New Photo
+                  {watchNewFile?.[0] ? 'Photo selected' : 'Choose a New Photo'}
                 </label>
               </div>
               <input
-                id='file'
+                {...register('newFile')}
+                id='newFile'
                 type='file'
-                name='newFile'
                 accept='image/*'
-                onChange={e => setNewFile(e.target.files ? e.target.files[0] : null)}
               />
             </div>
 
@@ -109,7 +120,8 @@ const CurrentUserSettings = () => {
               <input
                 type='submit'
                 name='submit'
-                value='Update Profile'
+                value={loading ? 'Updating...' : 'Update Profile'}
+                disabled={loading}
               />
             </div>
 

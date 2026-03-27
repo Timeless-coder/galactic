@@ -6,14 +6,13 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
 
 import CartTour from '../../components/CartTour/CartTour'
-import Spinner from '../../elements/Spinner/Spinner'
 import CustomButton from '../../elements/CustomButton/CustomButton'
 
 import styles from './CartPage.module.scss'
 
 export const CartPage = () => {
   const { currentUser } = useAuth()
-  const { cartItems, setCartDropdownCollapsed, clearCart, addPersonToBooking, removePersonOrBooking } = useCart()
+  const { cartItems, setCartDropdownCollapsed, clearCart } = useCart()
   let total = 0
 
   useEffect(() => {
@@ -42,7 +41,7 @@ export const CartPage = () => {
         </div>
                
         <div className={styles.bottomRowContainer}>
-          <Link className={styles.checkoutButton} to={`/account/${currentUser?.id}/payment`}>
+          <Link className={styles.checkoutButton} to={`/account/${currentUser!.id}/checkout`}>
             <CustomButton rect around between>
               Proceed to Checkout
               <IoArrowForwardCircleOutline />

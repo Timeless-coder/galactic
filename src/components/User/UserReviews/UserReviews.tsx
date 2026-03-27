@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import type { Review } from '../../../types/review'
 import { useAuth } from '../../../hooks/useAuth'
@@ -16,7 +16,8 @@ const UserReviews = () => {
     let mounted = true
 
     const getReviews = async () => {
-      setLoading(true)      
+      setLoading(true)
+
       try {
         if (!currentUser?.id) {
           setReviews([])
@@ -25,9 +26,11 @@ const UserReviews = () => {
         }
         const myReviews: Review[] = await getReviewsByUserId(currentUser.id)
         if (mounted && myReviews?.length > 0) setReviews(myReviews)
-      } catch (err) {
+      }
+    catch (err) {
         if (mounted) setReviews([])
-      } finally {
+      }
+    finally {
         if (mounted) setLoading(false)
       }
     }

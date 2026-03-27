@@ -1,54 +1,49 @@
 import { useState } from "react"
+import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-
-import type { SubmitEvent } from "react"
 
 import { useAuth } from '../../hooks/useAuth'
 
 import CustomButton from "../../elements/CustomButton/CustomButton"
+import Spinner from '../../elements/Spinner/Spinner'
 
 import styles from '../../elements/Form.module.scss'
-import '../../index.scss'
 
 type LoginFormProps = {
   setHasAccount: (status: boolean) => void
 }
 
+type LoginFormData = {
+  email: string
+  password: string
+}
+
 const LoginForm = ({ setHasAccount }: LoginFormProps) => {
-  const { login, signInWithGoogle, currentUser } = useAuth()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const { login } = useAuth()
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>()
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: SubmitEvent) => {
-    e.preventDefault()
+  const formSubmit = async (data: LoginFormData) => {
     setLoading(true)
 
     try {
-      const user = await login(email, password)
-      toast.success(`Welcome back, ${user.name}!`)
-    } catch (error: any) {
-      toast.error(error.message || "Login failed")
-    } finally {
-      setLoading(false)
+      const user = await login(data.email, data.password)
+      const firstName = user.name.split(' ')[0]
+      toast.success(`Welcome back, ${firstName}!`)
     }
-  }
-
-  const handleGoogleLogin = async () => {
-    setLoading(true)
-    try {
-      const user = await signInWithGoogle()
-      toast.success(`Welcome, ${user.name}!`)
-    } catch (error: any) {
-      toast.error(error.message || "Google login failed")
-    } finally {
+    catch (error) {
+      const code = (error as { code?: string }).code
+      if (code === 'auth/invalid-credential') toast.error('Invalid email or password')
+      else toast.error('Login failed')
+    }
+    finally {
       setLoading(false)
     }
   }
 
   return (
     <>
-      <h2>{currentUser ? 'SIGN IN AS DIFFERENT USER' : 'SIGN IN'}</h2>
+      <h2>LOGIN</h2>
 
       <div className={styles.status}>
         <p>No Account Yet?</p>
@@ -57,29 +52,35 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
         </div>
       </div>
       
-      <form onSubmit={handleSubmit} className="your-glassy-styles">
+      <form onSubmit={handleSubmit(formSubmit)} className="your-glassy-styles">
         <div className={styles.inputContainer}>
           <label htmlFor="login-email">Email</label>
+          {errors.email && <p className={styles.error}>{errors.email.message}</p>}
           <input
+            {...register('email', {
+              required: 'Email is required'
+            })}
             id="login-email"
             type="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
+
         <div className={styles.inputContainer}>
           <label htmlFor="login-password">Password</label>
+          {errors.password && <p className={styles.error}>{errors.password.message}</p>}
           <input
+            {...register('password', {
+              required: 'Password is required'
+            })}
             id="login-password"
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+
         <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? <Spinner /> : "Login"}
         </button>
       </form>
     </>

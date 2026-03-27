@@ -10,7 +10,7 @@ import { useCart } from '../../hooks/useCart'
 import { getTourBySlug } from '../../services/firebase/toursService'
 
 import CustomButton from '../../elements/CustomButton/CustomButton'
-import Reviews from '../../components/Reviews/Reviews/Reviews'
+import TourReviews from '../../components/TourReviews/Reviews/TourReviews'
 
 import styles from './TourSinglePage.module.scss'
 import type { CartItem } from '../../contexts/CartContext'
@@ -190,7 +190,7 @@ const TourSinglePage = () => {
         </div>
         
         <h2 className={styles.reviewsTitle}>Reviews:</h2>
-        <Reviews tour={tour} id={tour.id} />
+        <TourReviews tour={tour} id={tour.id} />
 
         <div className={styles.book}>
           <p>Click one of the <strong><a href='#book'>Book Date</a></strong> buttons above to start your adventure.</p>

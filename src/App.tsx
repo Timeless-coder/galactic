@@ -7,6 +7,8 @@ import Header from './components/Header/Header'
 import Footer from './components/Footer/Footer'
 import HomePage from './pages/HomePage/HomePage'
 import CartPage from './pages/CartPage/CartPage'
+import CheckoutPage from './pages/CheckoutPage/CheckoutPage'
+import StripeSuccessPage from './pages/StripeSuccessPage/StripeSuccessPage'
 
 import './index.scss' // only for parent container
 import UserPage from './pages/UserPage/UserPage'
@@ -21,6 +23,8 @@ function App() {
           <Route path='/' element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path='/account/:userId' element={<UserPage />} />
+          <Route path='/account/:userId/checkout' element={<CheckoutPage />} />
+          <Route path='/sale-complete-success' element={<StripeSuccessPage />} />
           <Route path='/tours' element={<ToursPage />} />
           <Route path='/tours/:slug' element={<TourSinglePage />} />
           <Route path='/cart' element={<CartPage/>} />

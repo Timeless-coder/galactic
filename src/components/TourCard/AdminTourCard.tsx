@@ -9,7 +9,7 @@ type TourCardProps = {
   mode: string
 }
 
-export const TourCard = ({ tour, setEditTour, setShowSection }: TourCardProps) => {
+export const AdminTourCard = ({ tour, setEditTour, setShowSection }: TourCardProps) => {
 
   const setEditTourSetShowSectionAndEdit = () => {
     setEditTour(tour)
@@ -45,4 +45,4 @@ export const TourCard = ({ tour, setEditTour, setShowSection }: TourCardProps) =
   )
 }
 
-export default TourCard
+export default AdminTourCard

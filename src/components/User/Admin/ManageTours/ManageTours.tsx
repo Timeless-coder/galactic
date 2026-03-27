@@ -23,6 +23,7 @@ export const Tours = ({ setEditTour, setShowSection }: ManageToursProps) => {
 
     const getTours = async () => {
       setLoading(true)
+      
       try {
         const newTours: Tour[] = await getAllToursService()
         if (mounted) setTours(newTours)

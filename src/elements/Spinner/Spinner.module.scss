@@ -1,3 +1,6 @@
+@use 'sass:color';
+@use 'sass:map';
+@use 'sass:math';
 @mixin keyframes($name) {
   @-webkit-keyframes #{$name} {@content}
   @-moz-keyframes #{$name} {@content}
@@ -10,7 +13,7 @@
   $animationTime: 3s;
   $pufSize: 7px;
   $pufCount: 45;
-  $intervalDegree: 360 / $pufCount;
+  $intervalDegree: math.div(360, $pufCount);
   $smokeRatioDisapear: 60%;
   $particleMap: (
   _1: particle,
@@ -98,7 +101,7 @@
   line-height: 25px;
   margin: 0 auto;
   font-size: 26px;
-  color: darken(#3498db, 40%);
+  color: color.adjust(#3498db, $lightness: -40%);
   
   }
   
@@ -140,8 +143,8 @@
     }
     
     @for $i from 1 through $pufCount {
-    $pufRatio: $i * 100 / $pufCount;
-    $animationTimeDelay: $animationTime * $pufRatio / 100;
+    $pufRatio: calc($i * 100 / #{$pufCount});
+    $animationTimeDelay: calc($animationTime * $pufRatio / 100);
     // $rand: (random(40) - 20) / 10;
     &:nth-child(#{$i}) {
       transform: rotate(#{$i * $intervalDegree}deg);
@@ -197,18 +200,18 @@
     }
     
     @for $i from 1 through $pufCount {
-    $pufRatio: $i * 100 / $pufCount;
-    $animationTimeDelay: $animationTime * $pufRatio / 100;
+    $pufRatio: calc($i * 100 / #{$pufCount});
+    $animationTimeDelay: calc($animationTime * $pufRatio / 100);
     &:nth-child(#{$i}) {
-      transform: rotate(#{$i * $intervalDegree}deg);
+      transform: rotate(calc(#{$i} * #{$intervalDegree}));
     }
     &:nth-child(#{$i}):after {
       animation-delay: $animationTimeDelay;
       //@if $i % 3 == 0 {
       @if $i % 3 == 0 {
-      animation-name: map-get($particleMap, _1);
+      animation-name: map.get($particleMap, _1);
       } @else {
-      animation-name: map-get($particleMap, _2);
+      animation-name: map.get($particleMap, _2);
       }
     }    
     } 
@@ -219,7 +222,7 @@
   @include keyframes(puf) {
   0% {
     opacity: 1;
-    color: darken(#3498db, 60%);
+    color: color.adjust(#3498db, $lightness: -60%);
     transform: scale(1);
   }
   10% {

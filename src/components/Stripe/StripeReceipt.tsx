@@ -1,18 +1,30 @@
-import { Component } from 'react'
-import ReceiptTour from '../../Tours/ReceiptTour/ReceiptTour'
+import { useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
+
+import { useCart } from '../../hooks/useCart'
+
+import ReceiptTour from '../ReceiptCartItem/ReceiptCartItem'
 
 import styles from './StripeReceipt.module.scss'
 
-export default class StripeReceipt extends Component {
-  render() {
+const StripeReceipt = () => {
+  const contentRef = useRef<HTMLDivElement>(null)
+  const reactToPrintFn = useReactToPrint({ contentRef })
+  const { cartItems, total } = useCart()
+
     return (
-      <div className={styles.receipt}>
-        <h2>GalacticTours</h2>
-        {this.props.receipt.map(tour => (
-          <ReceiptTour key={tour.string} tour={tour} />
-        ))}
-        <h3 className={styles.cost}>Total Cost: ${this.props.total}</h3>
-      </div>
+      <>
+        <div className={styles.receipt} ref={contentRef}>
+          <h2>GalacticTours</h2>
+          {cartItems.map(cartItem => (
+            <ReceiptTour key={cartItem.booking.id} cartItem={cartItem} />
+          ))}
+          <h3 className={styles.cost}>Total Cost: ${total}</h3>
+        </div>
+
+        <button onClick={reactToPrintFn}>Print Receipt</button>
+      </>
     )
   }  
-}
+
+  export default StripeReceipt

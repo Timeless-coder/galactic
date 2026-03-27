@@ -1,37 +1,32 @@
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import { useAuth } from '../../../hooks/useAuth'
 
 import styles from '../../../elements/Form.module.scss'
 import linkStyles from '../UserSettings/UserSettings.module.scss'
 
+type UserPasswordFormData = {
+  newPassword: string
+  newPasswordConfirm: string
+}
+
 const PasswordReset = () => {
   const { currentUser, updatePassword } = useAuth()
+  const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<UserPasswordFormData>()
 
-  const [newPassword, setNewPassword] = useState('')
-  const [newPasswordConfirm, setNewPasswordConfirm] = useState('')
-
-  const passwordChangeSubmit = () => {
+  const formSubmit = async (data: UserPasswordFormData) => {
     try {
-      if (newPassword !== newPasswordConfirm) throw new Error('Passwords must match')
-
-      updatePassword(newPassword)
-      .then(() => {
-        console.log("Placeholder")
-      })
-      .catch(err => {
-        console.error('Password update error:', err)
-      })
-      .finally(() => {
-        return setTimeout(() => {
-          setNewPassword('')
-          setNewPasswordConfirm('')
-        }, 3000)
-      })
-    } catch (err) {
+      await updatePassword(data.newPassword)
+      toast.success('Password updated successfully!')
+      reset()
+    }
+    catch (err: any) {
       console.error('Password update error:', err)
+      toast.error('Failed to update password. Please try again.')
     }
   }
+
   return (
     <div className={styles.userSettingsContainer}>
 
@@ -51,32 +46,37 @@ const PasswordReset = () => {
       {!currentUser?.providerId && (
         <div className={styles.formContainer}>
 
-          <form onSubmit={passwordChangeSubmit}>
+          <form onSubmit={handleSubmit(formSubmit)}>
 
-          <h1>Update Your Password</h1>
+            <h1>Update Your Password</h1>
 
             <div className={styles.inputContainer}>
-              <label htmlFor='newPassword'>
-                New Password
-              </label>
+              <label htmlFor='newPassword'>New Password</label>
+              {errors.newPassword && <p className={styles.error}>{errors.newPassword.message}</p>}
               <input
+                {...register('newPassword', {
+                  required: 'Password is required',
+                  minLength: {
+                    value: 8,
+                    message: 'Password must have a minimum of 8 characters'
+                  }
+                })}
+                id='newPassword'
                 type='password'
-                name='newPassword'
-                value={newPassword}
-                onChange={e =>setNewPassword(e.target.value)}
                 placeholder='********'
               />
             </div>
 
             <div className={styles.inputContainer}>
-              <label htmlFor='newPasswordConfirm'>
-                Confirm New Password
-              </label>
+              <label htmlFor='newPasswordConfirm'>Confirm New Password</label>
+              {errors.newPasswordConfirm && <p className={styles.error}>{errors.newPasswordConfirm.message}</p>}
               <input
+                {...register('newPasswordConfirm', {
+                  required: 'Please confirm your new password',
+                  validate: value => value === watch('newPassword') || 'Passwords do not match'
+                })}
+                id='newPasswordConfirm'
                 type='password'
-                name='newPasswordConfirm'
-                value={newPasswordConfirm}
-                onChange={e => setNewPasswordConfirm(e.target.value)}
                 placeholder='********'
               />
             </div>

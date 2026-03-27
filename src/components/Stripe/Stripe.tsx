@@ -1,14 +1,17 @@
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import Payment from '../Payment/Payment'
+import StripePaymentForm from './StripePaymentForm'
 
-const promise = loadStripe("pk_test_rmIJuNRa6eXw7MGQPKRoGlsg0002CNZNtQ");
+type StripeProps = {
+  promise: ReturnType<typeof loadStripe>
+  options: { clientSecret: string }
+}
 
-export default function Stripe() {
+export default function Stripe({ promise, options }: StripeProps) {
   return (  
     <div className="App">  
-      <Elements stripe={promise}>  
-        <Payment />  
+      <Elements stripe={promise} options={options}>  
+        <StripePaymentForm />  
       </Elements>  
     </div>  
   );  

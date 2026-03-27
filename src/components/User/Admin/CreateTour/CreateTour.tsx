@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from "react-hot-toast"
 import { MdAddAPhoto } from 'react-icons/md'
 import { AiOutlineCheck } from 'react-icons/ai'
 
-import { createTourService, getNewTourIndexService, incrementNewTourIndexService } from '../../../../services/firebase/toursService'
+import { createTourService, getNewTourIndexService } from '../../../../services/firebase/toursService'
 import { uploadTourImage } from '../../../../services/firebase/storageService'
 import { useAuth } from '../../../../hooks/useAuth'
 import { slugify } from '../../../../utils/slugify'
@@ -16,87 +18,71 @@ type CreateTourProps = {
   setShowSection: (section: string) => void
 }
 
+type CreateTourFormData = {
+  planet: string
+  name: string
+  summary: string
+  description: string
+  difficulty: number
+  imageCoverFile: FileList
+  image1File: FileList
+  image2File: FileList
+  image3File: FileList
+}
+
 const CreateTour = ({ setShowSection }: CreateTourProps) => {
   const { currentUser } = useAuth()
+  const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<CreateTourFormData>()
   const [loading, setLoading] = useState(false)
-  const [planet, setPlanet] = useState('')
-  const [name, setName] = useState('')
-  const [summary, setSummary] = useState('')
-  const [description, setDescription] = useState('')
-  const [difficulty, setDifficulty] = useState(0)
-  const [imageCoverFile, setImageCoverFile] = useState<File | null>(null)
-  const [image1File, setImage1File] = useState<File | null>(null)
-  const [image2File, setImage2File] = useState<File | null>(null)
-  const [image3File, setImage3File] = useState<File | null>(null)
-  const newTourIndex = useRef<number>(10)
 
-  const getNewTourIndex = async () => {
-    newTourIndex.current = await getNewTourIndexService()
-  }
+  const watchImageCover = watch('imageCoverFile')
+  const watchImage1 = watch('image1File')
+  const watchImage2 = watch('image2File')
+  const watchImage3 = watch('image3File')
 
-  const formSubmit = async (e: React.SubmitEvent) => {
-    e.preventDefault()
-
+  const formSubmit = async (data: CreateTourFormData) => {
     setLoading(true)
+
     const now = new Date()
     const year = now.getFullYear()
     const month = now.getMonth()
     const day = now.getDate()
-    let imageCoverURL
-    let image1URL
-    let image2URL
-    let image3URL
+
     try {
-      if (imageCoverFile instanceof File)
-        imageCoverURL = await uploadTourImage(imageCoverFile, `tour-${newTourIndex.current}-cover`)
-      if (image1File instanceof File)
-        image1URL = await uploadTourImage(image1File, `tour-${newTourIndex.current}-1`)
-      if (image2File instanceof File)
-        image2URL = await uploadTourImage(image2File, `tour-${newTourIndex.current}-2`)
-      if (image3File instanceof File)
-        image3URL = await uploadTourImage(image3File, `tour-${newTourIndex.current}-3`)
+      const currentTourIndex = await getNewTourIndexService()
 
-      if (imageCoverURL && image1URL && image2URL && image3URL) {
-        await createTourService({
-          planet,
-          name,
-          summary,
-          description,
-          difficulty: Number(difficulty),
-          imageCover: imageCoverURL,
-          images: [image1URL, image2URL, image3URL],
-          averageRating: 0,
-          reviews: 0,
-          createdAt: `${year} ${month + 1} ${day}`,
-          creator: currentUser!.id,
-          index: newTourIndex.current,
-          slug: slugify(name),
-          startDates: ['2021 7 4', '2022 1 3', '2023 5 4']
-        })
+      const imageCoverURL = await uploadTourImage(data.imageCoverFile[0], `tour-${currentTourIndex}-cover`)
+      const image1URL = await uploadTourImage(data.image1File[0], `tour-${currentTourIndex}-1`)
+      const image2URL = await uploadTourImage(data.image2File[0], `tour-${currentTourIndex}-2`)
+      const image3URL = await uploadTourImage(data.image3File[0], `tour-${currentTourIndex}-3`)
 
-        await getNewTourIndex()
-        setPlanet('')
-        setName('')
-        setSummary('')
-        setDescription('')
-        setDifficulty(0)
-        setImageCoverFile(null)
-        setImage1File(null)
-        setImage2File(null)
-        setImage3File(null)
-        setShowSection('manageTours')           
-      }
+      await createTourService({
+        planet: data.planet,
+        name: data.name,
+        summary: data.summary,
+        description: data.description,
+        difficulty: data.difficulty,
+        imageCover: imageCoverURL,
+        images: [image1URL, image2URL, image3URL],
+        averageRating: 0,
+        reviews: 0,
+        createdAt: `${year} ${month + 1} ${day}`,
+        creator: currentUser!.id,
+        slug: slugify(data.name),
+        startDates: ['2021 7 4', '2022 1 3', '2023 5 4']
+      })
+
+      reset()
+      setShowSection('manageTours')
     }
     catch (err: any) {
-        throw new Error(`Tour creation failed. ${err.message}`)
-      } finally {
-        setLoading(false)
-      }
+      console.error(err)
+      toast.error(`Error creating tour: ${err.message || err}`)
+    }
+    finally {
+      setLoading(false)
+    }
   }
-
-  useEffect(() => {
-    getNewTourIndex()
-  }, [])
 
   return (
     <>
@@ -105,135 +91,174 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
         <div className={styles.formContainer}>
           <h2>Create New Tour</h2>
 
-          <form onSubmit={formSubmit}>
+          <form onSubmit={handleSubmit(formSubmit)}>
 
             <div className={styles.inputContainer}>
               <label htmlFor='planet'>Planet</label>
+              {errors.planet && <p className={styles.error}>{errors.planet.message}</p>}
               <input
+                {...register('planet', {
+                  required: 'Planet name is required',
+                  maxLength: {
+                    value: 30,
+                    message: 'Name of planet can be a maximum of 30 characters'
+                  }
+                })}
+                id='planet'
                 type='text'
-                name='planet'
-                value={planet}
-                onChange={e => setPlanet(e.target.value)}
                 placeholder='Choose a planet for this tour'
               />
             </div>
 
             <div className={styles.inputContainer}>
               <label htmlFor='name'>Name</label>
+              {errors.name && <p className={styles.error}>{errors.name.message}</p>}
               <input
+                {...register('name', {
+                  required: 'Tour name is required',
+                  maxLength: {
+                    value: 50,
+                    message: 'Tour name can be a maximum of 50 characters'
+                  }
+                })}
+                id='name'
                 type='text'
-                name='name'
-                value={name}
-                onChange={e => setName(e.target.value)}
                 placeholder='Choose a name for this tour'
               />
             </div>
 
             <div className={styles.inputContainer}>
               <label htmlFor='summary'>Summary</label>
+              {errors.summary && <p className={styles.error}>{errors.summary.message}</p>}
               <input
+                {...register('summary', {
+                  required: 'Summary is required',
+                  maxLength: {
+                    value: 150,
+                    message: 'Summary can be a maximum of 150 characters'
+                  }
+                })}
+                id='summary'
                 type='text'
-                name='summary'
-                value={summary}
-                onChange={e => setSummary(e.target.value)}
                 placeholder='Create a brief summary'
               />
             </div>
 
             <div className={styles.inputContainer}>
               <label htmlFor='description'>Description</label>
+              {errors.description && <p className={styles.error}>{errors.description.message}</p>}
               <input
+                {...register('description', {
+                  required: 'Description is required'
+                })}
+                id='description'
                 type='text'
-                name='description'
-                value={description}
-                onChange={e => setDescription(e.target.value)}
                 placeholder='Create a full description'
               />
             </div>
 
             <div className={styles.inputContainer}>
               <label htmlFor='difficulty'>Difficulty</label>
+              {errors.difficulty && <p className={styles.error}>{errors.difficulty.message}</p>}
               <input
+                {...register('difficulty', {
+                  required: 'Difficulty level is required',
+                  min: {
+                    value: 0,
+                    message: 'Please set a difficulty between 0 and 100'
+                  },
+                  max: {
+                    value: 100,
+                    message: 'Please set a difficulty between 0 and 100'
+                  },
+                  valueAsNumber: true
+                })}
+                id='difficulty'
                 type='number'
-                name='difficulty'
-                value={difficulty}
-                onChange={e => setDifficulty(Number(e.target.value))}
               />
             </div>
 
             <div className={styles.inputContainer}>
               <div className={styles.labelContainer}>
                 <label className={styles.label} htmlFor='imageCoverFile'>
-                  {imageCoverFile
+                  {watchImageCover?.[0]
                     ? <AiOutlineCheck className={styles.icon} />
                     : <MdAddAPhoto className={styles.icon} />
                   }
-                  ImageCover
-                </label>                
+                  Image Cover
+                </label>
               </div>
+              {errors.imageCoverFile && <p className={styles.error}>{errors.imageCoverFile.message as string}</p>}
               <input
+                {...register('imageCoverFile', {
+                  required: 'A cover image is required'
+                })}
                 id='imageCoverFile'
                 type='file'
-                name='imageCoverFile'
                 accept='image/jpg'
-                onChange={e => setImageCoverFile(e.target.files?.[0] || null)}
               />
             </div>
 
             <div className={styles.inputContainer}>
               <div className={styles.labelContainer}>
                 <label className={styles.label} htmlFor='image1File'>
-                  {image1File
+                  {watchImage1?.[0]
                     ? <AiOutlineCheck className={styles.icon} />
                     : <MdAddAPhoto className={styles.icon} />
                   }
                   Image 1
-                </label>                
+                </label>
               </div>
+              {errors.image1File && <p className={styles.error}>{errors.image1File.message as string}</p>}
               <input
+                {...register('image1File', {
+                  required: 'Image 1 is required'
+                })}
                 id='image1File'
                 type='file'
-                name='image1File'
                 accept='image/jpg'
-                onChange={e => setImage1File(e.target.files?.[0] || null)}
               />
             </div>
 
             <div className={styles.inputContainer}>
               <div className={styles.labelContainer}>
                 <label className={styles.label} htmlFor='image2File'>
-                  {image2File
+                  {watchImage2?.[0]
                     ? <AiOutlineCheck className={styles.icon} />
                     : <MdAddAPhoto className={styles.icon} />
                   }
                   Image 2
                 </label>
               </div>
+              {errors.image2File && <p className={styles.error}>{errors.image2File.message as string}</p>}
               <input
+                {...register('image2File', {
+                  required: 'Image 2 is required'
+                })}
                 id='image2File'
                 type='file'
-                name='image2File'
                 accept='image/jpg'
-                onChange={e => setImage2File(e.target.files?.[0] || null)}
               />
             </div>
 
             <div className={styles.inputContainer}>
               <div className={styles.labelContainer}>
                 <label className={styles.label} htmlFor='image3File'>
-                  {image3File
+                  {watchImage3?.[0]
                     ? <AiOutlineCheck className={styles.icon} />
                     : <MdAddAPhoto className={styles.icon} />
                   }
                   Image 3
                 </label>
               </div>
+              {errors.image3File && <p className={styles.error}>{errors.image3File.message as string}</p>}
               <input
+                {...register('image3File', {
+                  required: 'Image 3 is required'
+                })}
                 id='image3File'
                 type='file'
-                name='image3File'
                 accept='image/jpg'
-                onChange={e => setImage3File(e.target.files?.[0] || null)}
               />
             </div>
 

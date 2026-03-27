@@ -5,7 +5,8 @@ export const deleteProfileImageIfNeeded = async (photoURL: string): Promise<void
   try {
     const storage = getStorage()
     await deleteObject(ref(storage, photoURL))
-  } catch {
+  }
+  catch {
     // Ignore if image doesn't exist or can't be deleted
   }
 }

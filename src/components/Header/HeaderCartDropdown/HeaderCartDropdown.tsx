@@ -3,7 +3,6 @@ import { AiFillCloseCircle } from 'react-icons/ai'
 import { IoArrowForwardCircleOutline } from 'react-icons/io5'
 import { IoArrowDownCircleOutline } from 'react-icons/io5'
 
-import { useAuth } from '../../../hooks/useAuth'
 import { useCart } from '../../../hooks/useCart'
 
 import CartDropdownTour from '../HeaderCartDropdownTour/HeaderCartDropdownTour'
@@ -12,7 +11,6 @@ import CustomButton from '../../../elements/CustomButton/CustomButton'
 import styles from './HeaderCartDropdown.module.scss'
 
 export const HeaderCartDropdown = () => {
-  const { currentUser } = useAuth()
   const { cartItems, setCartDropdownCollapsed, cartDropdownCollapsed } = useCart()
 
   return (

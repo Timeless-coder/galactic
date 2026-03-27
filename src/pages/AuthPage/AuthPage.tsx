@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
+import toast from 'react-hot-toast'
 import { AiOutlineGooglePlus } from 'react-icons/ai'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -17,9 +18,23 @@ const AuthPage = () => {
   const { signInWithGoogle, currentUser, logout } = useAuth()
   const [hasAccount, setHasAccount] = useState(false)
 
+  const signInWithGoogleAndGreet = async() => {
+    try {
+      const user = await signInWithGoogle()
+      const firstName = user.name.split(' ')[0]
+			toast.success(`Welcome to Galactic Tours, ${firstName}!`)
+    }
+    catch(err: any) {
+      console.error(err)
+      toast.error(`Unable to sign in with Google: ${err.message}`)
+    }
+  }
+
   useEffect(() => {
     let mounted = true
+
     if (mounted) setHasAccount(Boolean(currentUser))
+
     return () => {
       mounted = false
     }
@@ -29,7 +44,7 @@ const AuthPage = () => {
     <div className={styles.authContainer}>
       <div className={formStyles.formContainer}>
 
-      <div onClick={signInWithGoogle} className={formStyles.google}>
+      <div onClick={signInWithGoogleAndGreet} className={formStyles.google}>
         <CustomButton around between rect>
           <AiOutlineGooglePlus className={buttonStyles.icon} />
           Sign in With Google

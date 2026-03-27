@@ -1,5 +1,4 @@
 import { Link } from 'react-router'
-import { IoArrowForwardCircleOutline } from 'react-icons/io5'
 
 import type { Tour } from '../../types/tour'
 
