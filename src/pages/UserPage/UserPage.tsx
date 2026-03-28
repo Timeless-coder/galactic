@@ -15,16 +15,18 @@ import UserTours from '../../components/User/UserTours/UserTours'
 import UserSettings from '../../components/User/UserSettings/UserSettings'
 import ManageTours from '../../components/User/Admin/ManageTours/ManageTours'
 import CreateTour from '../../components/User/Admin/CreateTour/CreateTour'
+import CreateReview from '../../components/User/UserReviews/CreateReview'
 import EditTour from '../../components/User/Admin/EditTour/EditTour'
 import UserPassword from '../../components/User/UserPassword/UserPassword'
 
 import styles from './UserPage.module.scss'
+import { Role } from '../../types/user'
 
 const UserPage = () => {
   const { currentUser } = useAuth()
-  const [showSection, setShowSection] = useState('manageTours')
+  const [showSection, setShowSection] = useState('settings')
   const [editTour, setEditTour] = useState<Tour | null>(null)
-  console.log(showSection)
+  const [reviewTour, setReviewTour] = useState<Tour | null>(null)
 
   return (
     <div className={styles.accountContainer}>
@@ -42,7 +44,7 @@ const UserPage = () => {
         <div className={styles.sideNavItem} onClick={() => setShowSection('reviews')}>
           <IoClipboardOutline /><p>My Reviews</p>
         </div>
-      {currentUser?.role === 'admin' && (
+      {currentUser?.role === Role.Admin && (
         <>
         <h2>Administration:</h2>
         <div className={styles.sideNavItem} onClick={() => setShowSection('createTour')}>
@@ -57,7 +59,8 @@ const UserPage = () => {
 
       <section className={styles.accountSection}>
         {showSection === 'settings' && <UserSettings />}
-        {showSection === 'userTours' && <UserTours />}
+        {showSection === 'userTours' && <UserTours setShowSection={setShowSection} setReviewTour={setReviewTour} />}
+        {showSection === 'reviewTour' && <CreateReview setShowSection={setShowSection} reviewTour={reviewTour} />}
         {showSection === 'reviews' && <UserReviews />}
         {showSection === 'manageTours' && <ManageTours setShowSection={setShowSection} setEditTour={setEditTour} />}
         {showSection === 'password' && <UserPassword />}

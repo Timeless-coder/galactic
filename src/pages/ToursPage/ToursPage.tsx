@@ -7,21 +7,39 @@ import { getAllToursService } from '../../services/firebase/toursService'
 import TourCard from '../../components/TourCard/TourCard'
 
 import styles from './ToursPage.module.scss'
+import toast from 'react-hot-toast'
 
 export const ToursPage = () => {
   const [loading, setLoading] = useState(false)
   const [tours, setTours] = useState<Tour[]>([])
 
   useEffect(() => {
-    setLoading(true);
-    getAllToursService()
-      .then((receivedTours) => setTours(receivedTours))
-      .catch((error) => {
-        console.log(`Error fetching tours: ${error.message}`)
-        setTours([]);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    let mounted = true
+
+    const getAllTours = async() => {
+      setLoading(true)
+
+      try {
+        const fetchedTours = await getAllToursService()
+        if (mounted) setTours(fetchedTours)
+      }
+      catch(err: any) {
+        console.log(`Error fetching tours: ${err.message}`)
+        setTours([])
+        toast.error(`Failed to fetch tours: ${err.message}`)
+      }
+      finally {
+        setLoading(false)
+      }      
+    }
+
+    getAllTours()
+
+    return () => {
+      mounted = false
+    }
+    
+  }, [])
 
   return (
     <div className={styles.toursPageContainer}>
@@ -33,7 +51,7 @@ export const ToursPage = () => {
       </div>
 
       <div className={styles.toursContainer}>
-        {tours?.map(tour => <TourCard key={tour.id} tour={tour} />)}
+        {tours?.map(tour => <TourCard key={tour.id} tour={tour} mode='all' />)}
       </div>
     </div>
   )

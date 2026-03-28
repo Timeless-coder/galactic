@@ -1,8 +1,12 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { useNavigate } from 'react-router'
 import toast from "react-hot-toast"
+import { MdAddAPhoto } from 'react-icons/md'
+import { AiOutlineCheck } from 'react-icons/ai'
 
 import { useAuth } from '../../hooks/useAuth'
+import { uploadProfileImage } from '../../services/firebase/storageService'
 
 import CustomButton from "../../elements/CustomButton/CustomButton"
 
@@ -13,15 +17,20 @@ type SignupFormProps = {
 }
 
 type SignupFormData = {
+	name: string
 	email: string
 	password: string
 	passwordConfirm: string
+	profileImage: FileList
 }
 
 const SignupForm = ({ setHasAccount }: SignupFormProps) => {
-	const { signUpWithEmailAndPassword } = useAuth()
-	const { register, handleSubmit, formState: { errors }, watch } = useForm<SignupFormData>()
+	const navigate = useNavigate()
+	const { signupWithEmailAndPassword } = useAuth()
+	const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<SignupFormData>()
 	const [loading, setLoading] = useState(false)
+
+	const watchProfileImage = watch('profileImage')
 
 	const formSubmit = async (data: SignupFormData) => {
 		if (data.password !== data.passwordConfirm) {
@@ -32,14 +41,18 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 		setLoading(true)
 
 		try {
-			const user = await signUpWithEmailAndPassword(data.email, data.password)
+			const photoURL = await uploadProfileImage(data.profileImage[0], `profileImages/${data.email}-profileImage`)
+			const user = await signupWithEmailAndPassword(data.name, data.email, data.password, photoURL)
 			const firstName = user.name.split(' ')[0]
 			toast.success(`Welcome to Galactic Tours, ${firstName}!`)
+			reset()
+			navigate('/')
+
 		}
 		catch (error) {
 			const code = (error as { code?: string }).code
 			if (code === 'auth/email-already-in-use') toast.error('Email is already in use')
-			else if (code === 'auth/weak-password') toast.error('Password should be at least 6 characters')
+			else if (code === 'auth/weak-password') toast.error('Password should be at least 8 characters')
 			else if (code === 'auth/invalid-email') toast.error('Please include a valid email address')
 			else toast.error('Sign Up failed')
 		}
@@ -60,6 +73,7 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 			</div>
 			
 			<form onSubmit={handleSubmit(formSubmit)} className="your-glassy-styles">
+
 				<div className={styles.inputContainer}>
 					<label htmlFor="signup-email">Email</label>
 					{errors.email && <p className={styles.error}>{errors.email.message}</p>}
@@ -72,6 +86,24 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 						placeholder="Email"
 					/>
 				</div>
+
+				<div className={styles.inputContainer}>
+					<label htmlFor='name'>Name</label>
+					{errors.name && <p className={styles.error}>{errors.name.message}</p>}
+					<input
+						{...register('name', {
+							required: 'Your name is required',
+							maxLength: {
+								value: 50,
+								message: 'Your name can be a maximum of 50 characters'
+							}
+						})}
+						id='name'
+						type='text'
+						placeholder='Your name'
+					/>
+				</div>
+
 				<div className={styles.inputContainer}>
 					<label htmlFor="signup-password">Password</label>
 					{errors.password && <p className={styles.error}>{errors.password.message}</p>}
@@ -88,6 +120,7 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 						placeholder="Password"
 					/>
 				</div>
+
 				<div className={styles.inputContainer}>
 					<label htmlFor="signup-password-confirm">Confirm Password</label>
 					{errors.passwordConfirm && <p className={styles.error}>{errors.passwordConfirm.message}</p>}
@@ -101,6 +134,28 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 						placeholder="Confirm Password"
 					/>
 				</div>
+
+				<div className={styles.inputContainer}>
+					<div className={styles.labelContainer}>
+						<label className={styles.label} htmlFor='profileImage'>
+							{watchProfileImage?.[0]
+								? <AiOutlineCheck className={styles.icon} />
+								: <MdAddAPhoto className={styles.icon} />
+							}
+							Profile Image
+						</label>
+					</div>
+					{errors.profileImage && <p className={styles.error}>{errors.profileImage.message as string}</p>}
+					<input
+						{...register('profileImage', {
+							
+						})}
+						id='profileImage'
+						type='file'
+						accept='image/jpeg'
+					/>
+				</div>
+
 				<button type="submit" disabled={loading}>
 					{loading ? "Signing up..." : "Sign Up"}
 				</button>

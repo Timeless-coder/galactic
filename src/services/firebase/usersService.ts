@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteField } from 'firebase/firestore'
 
 import { db } from './firebaseConfig'
 import type { User } from '../../types/user'
@@ -18,3 +18,15 @@ export const getAllUsers = async (): Promise<User[]> => {
 }
 
 // *** ADMIN ***
+export const migrateDisplayNameToName = async (): Promise<void> => {
+	const usersSnapshot = await getDocs(collection(db, 'users'))
+	for (const userDoc of usersSnapshot.docs) {
+		const data = userDoc.data()
+		if ('displayName' in data) {
+			await updateDoc(doc(db, 'users', userDoc.id), {
+				name: data.displayName,
+				displayName: deleteField(),
+			})
+		}
+	}
+}

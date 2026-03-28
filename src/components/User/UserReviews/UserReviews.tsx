@@ -9,7 +9,7 @@ import { getReviewsByUserId } from '../../../services/firebase/reviewsService'
 
 const UserReviews = () => {
   const { currentUser } = useAuth()
-  const [reviews, setReviews] = useState<Review[]>([])
+  const [myReviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -45,10 +45,15 @@ const UserReviews = () => {
   return (
     <>
       {loading && <Spinner />}
+      {!loading && myReviews?.length == 0 && <h2>You have not reviewed any tours yet.</h2>}
       <div className={styles.reviewsContainer}>
-        {reviews.length > 0
-          ? reviews.map(review => (<UserReviewCard key={review.id} review={review} />))
-          : <h2>You have not reviewed any tours yet.</h2>
+        {myReviews.length > 0 && (
+          <>
+          <h2>My Reviews</h2>
+          {myReviews.map(review => (<UserReviewCard key={review.id} review={review} />))}
+          </>
+          
+        )
         }
       </div>
     </>

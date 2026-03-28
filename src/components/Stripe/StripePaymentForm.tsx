@@ -7,7 +7,6 @@ import { IoArrowBackCircleOutline } from 'react-icons/io5'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
 import type { CartItem } from '../../contexts/CartContext'
-import { createNewBooking } from '../../services/firebase/bookingsService'
 
 import CustomButton from '../../elements/CustomButton/CustomButton'
 

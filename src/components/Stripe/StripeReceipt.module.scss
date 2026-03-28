@@ -1,14 +1,25 @@
-.receipt {
-  padding: 40px;
-  h2 {
-    font-family: Orbitron;
-    font-weight: 400;
-    font-size: clamp(18px, 3vw, 30px);
-    text-align: left;
-    margin-bottom: 10px;
-  }
-  h3.cost {
-    font-size: 24px;
-    margin-bottom: 30px;
+@media print {
+  .receipt {
+    color: black;
+    background: white;
+    padding: 40px;
+    h1 {
+      font-family: Orbitron;
+      font-weight: 700;
+      font-size: clamp(22px, 4vw, 36px);
+      text-align: left;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-family: Orbitron;
+      font-weight: 400;
+      font-size: clamp(18px, 3vw, 30px);
+      text-align: left;
+      margin-bottom: 10px;
+    }
+    h3.cost {
+      font-size: 24px;
+      margin-bottom: 30px;
+    }
   }
 }

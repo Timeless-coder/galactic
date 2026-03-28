@@ -1,0 +1,22 @@
+.howThisWorks {
+  color: white;
+  h2 {
+    font-family: Orbitron;
+    font-size: clamp(18px, 2.5vw, 36px);
+    font-weight: 400;
+    margin-bottom: 10px;
+  }
+  h3 {
+    white-space: nowrap;
+    font-size: clamp(16px, 2vw, 24px);
+    font-weight: 700;
+    margin-bottom: 40px;
+  }
+  p {
+    font-size: 18px;
+    margin-bottom: 20px;
+    span {
+    font-size: 10px;
+    }
+  }
+}

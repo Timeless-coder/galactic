@@ -2,9 +2,17 @@ import { Link } from 'react-router'
 import { VscRocket } from 'react-icons/vsc'
 import { GiStrikingArrows } from 'react-icons/gi'
 
+import { useAuth } from '../../hooks/useAuth'
+
+import zik from '../../assets/AlienHead.svg'
+
 import styles from './HomePage.module.scss'
 
+const tourGuide = zik
+
 const Home = () => {
+  const { currentUser } = useAuth()
+
   return (
   <div className={styles.homeContainer}>
 
@@ -17,7 +25,7 @@ const Home = () => {
       <h2>Begin Your Interstellar Adventure Today! </h2>
       <div className={styles.text}>
       <div className={styles.imageContainer}>
-        <img src='./img/AlienHead.svg' alt='' />
+        <img src={tourGuide} alt='' />
         <p>
         <span>Zik Kun - tour guide</span>
         </p>
@@ -51,7 +59,7 @@ const Home = () => {
       <Link to='/tours' className={styles.button}>
       Browse All Tours
       </Link>
-      <Link to='/auth' className={styles.button}>
+      <Link to={`/account/${currentUser?.id}`} className={styles.button}>
       Sign Up or Sign In!
       </Link>
     </div>

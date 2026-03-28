@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from 'react-router'
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 
@@ -19,8 +20,9 @@ type LoginFormData = {
 }
 
 const LoginForm = ({ setHasAccount }: LoginFormProps) => {
+  const navigate = useNavigate()
   const { login } = useAuth()
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>()
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<LoginFormData>()
   const [loading, setLoading] = useState(false)
 
   const formSubmit = async (data: LoginFormData) => {
@@ -30,6 +32,8 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
       const user = await login(data.email, data.password)
       const firstName = user.name.split(' ')[0]
       toast.success(`Welcome back, ${firstName}!`)
+      reset()
+      navigate('/')
     }
     catch (error) {
       const code = (error as { code?: string }).code

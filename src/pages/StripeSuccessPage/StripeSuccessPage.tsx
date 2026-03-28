@@ -1,6 +1,9 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router'
 
 import { useCart } from '../../hooks/useCart'
+import { useAuth } from '../../hooks/useAuth'
+import { addBookingsFromCart } from '../../services/firebase/bookingsService'
 
 import CustomButton from '../../elements/CustomButton/CustomButton'
 import StripeReceipt from '../../components/Stripe/StripeReceipt'
@@ -8,16 +11,49 @@ import StripeReceipt from '../../components/Stripe/StripeReceipt'
 import styles from './StripeSuccess.module.scss'
 
 const StripeSuccessPage = () => {
-  const { clearCart } = useCart()
+  const { clearCart, cartItems } = useCart()
+  const { currentUser } = useAuth()
+
+  useEffect(() => {
+    let mounted = true
+
+    const addBookings = async () => {
+      if (!currentUser || cartItems.length === 0) return
+      
+      try {
+        const bookings = cartItems.map(item => ({
+          tourId: item.tour.id,
+          bookingUserId: currentUser.id,
+          departureDate: item.booking.departureDate,
+          people: item.booking.people
+        }))
+        if (mounted) {
+          await addBookingsFromCart(bookings)
+          clearCart()
+        }
+      } catch (error: any) {
+        console.log(error.message)
+      }
+    }
+
+    addBookings()
+
+    return () => { mounted = false }
+  }, [currentUser, cartItems])
+
+  useEffect(() => {
+      return () => {
+        localStorage.removeItem('galacticCartReceiptItems')
+        localStorage.removeItem('galacticCartReceiptTotal')
+      }
+    }, [])
 
   return (
     <div className={styles.paymentSuccessContainer}>
-      <h1>Thank you so much for choosing GalacticTours!</h1>
-      <h2 className={styles.enjoy}>Enjoy your trip!</h2>
 
       <StripeReceipt />
 
-      <div className={styles.continue} onClick={clearCart}>
+      <div className={styles.continue}>
         <Link to='/tours'>
           <CustomButton rect around between>Continue Shopping</CustomButton>
         </Link>

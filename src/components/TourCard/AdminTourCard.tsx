@@ -1,3 +1,5 @@
+import { IoArrowForwardCircleOutline } from 'react-icons/io5'
+
 import type { Tour } from '../../types/tour'
 
 import styles from './TourCard.module.scss'
@@ -6,7 +8,6 @@ type TourCardProps = {
   tour: Tour
   setEditTour: React.Dispatch<React.SetStateAction<Tour | null>>
   setShowSection: React.Dispatch<React.SetStateAction<string>>
-  mode: string
 }
 
 export const AdminTourCard = ({ tour, setEditTour, setShowSection }: TourCardProps) => {
@@ -38,7 +39,14 @@ export const AdminTourCard = ({ tour, setEditTour, setShowSection }: TourCardPro
         <div className={styles.cardDetailsText}>
           <h3>Total Reviews:</h3> <h3>{tour.reviews}</h3>
         </div>
-      </div>      
+      </div>
+
+       <div className={styles.cardDetails}>
+        <div className={styles.tourLink}>
+        Edit this tour
+        <IoArrowForwardCircleOutline />
+        </div>
+      </div> 
     </div>
     )}
   </div>

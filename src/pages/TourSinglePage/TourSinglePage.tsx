@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
+import toast from 'react-hot-toast'
 import { format } from 'date-fns/format'
 import { Link, useParams, redirect } from 'react-router'
 import { AiFillCloseCircle } from 'react-icons/ai'
@@ -13,7 +14,6 @@ import CustomButton from '../../elements/CustomButton/CustomButton'
 import TourReviews from '../../components/TourReviews/Reviews/TourReviews'
 
 import styles from './TourSinglePage.module.scss'
-import type { CartItem } from '../../contexts/CartContext'
 
 const TourSinglePage = () => {
   const modalRef = useRef<HTMLDivElement>(null)
@@ -24,25 +24,41 @@ const TourSinglePage = () => {
   const dateRefs = useRef<(HTMLDivElement | null)[]>([])
   const [loading, setLoading] = useState(false)
 
+  const closeInstructionsModal = (time: number) => {
+    const modal = modalRef.current  // read at call time
+    if (modal) {
+      setTimeout(() => {
+        modal.style.opacity = '0'
+        setTimeout(() => {
+          modal.style.display = 'none'
+        }, 1000)
+      }, time);
+      
+    }
+  }
+
   // THIS JUST GETS THE TOUR FOR THIS PAGE
   useEffect(() => {
     let mounted = true
 
     const getTour = async () => {
+      setLoading(true)
+
       try {
-        setLoading(true)
         const tourData = await getTourBySlug(slug!)
-        if (mounted) {
-          setTour(tourData)
-        }
-      } catch (error) {
+        if (mounted) setTour(tourData)
+      }
+      catch (error: any) {
         console.error(error)
-      } finally {
+        toast.error(`Failed to fetch the tour: ${error.message}`)
+      }
+      finally {
         if (mounted) setLoading(false)
       }
     }
 
     getTour()
+    
     return () => {
       mounted = false
     }
@@ -59,16 +75,12 @@ const TourSinglePage = () => {
       ref.style.display = hasCartItem ? 'block' : 'none'
     })
   }, [cartItems, tour])
+
+  useEffect(() => {
+    closeInstructionsModal(15_000)
+  }, [])
    
-  const closeInstructionsModal = () => {
-    const modal = modalRef.current  // read at call time
-    if (modal) {
-      modal.style.opacity = '0'
-      setTimeout(() => {
-        modal.style.display = 'none'
-      }, 1000)
-    }
-}
+  
 
   const handleBookingClick = (selectedDepartureDate: string) => {
     const existingCartItem = cartItems.find(item => item.booking.tourId === tour!.id && item.booking.departureDate === selectedDepartureDate)
@@ -127,7 +139,7 @@ const TourSinglePage = () => {
 
     <div className={styles.tourSingleInstructions} id='modal' ref={modalRef}>
       {getModalText()}
-      <AiFillCloseCircle className={styles.icon} onClick={closeInstructionsModal} />      
+      <AiFillCloseCircle className={styles.icon} onClick={() => closeInstructionsModal(0)} />      
     </div>
 
     {tour &&
@@ -163,10 +175,10 @@ const TourSinglePage = () => {
                   <h3>{format(new Date(departureDate), 'PPPP')}</h3>
                    <div onClick={() => setClickFunction(departureDate)}>
                     <CustomButton rect between around>
-                      {setButtonLabelAndPeopleText(departureDate)?.buttonLabel}
+                      {setButtonLabelAndPeopleText(departureDate).buttonLabel}
                     </CustomButton>
                     <p className={styles.peopleRef} ref={el => { dateRefs.current[i] = el }}>
-                      {setButtonLabelAndPeopleText(departureDate)?.peopleText} booked
+                      {setButtonLabelAndPeopleText(departureDate).peopleText} booked
                     </p>
                   </div>             
                 </div>

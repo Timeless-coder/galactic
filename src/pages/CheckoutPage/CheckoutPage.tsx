@@ -7,12 +7,9 @@ import { getFunctions, httpsCallable } from 'firebase/functions'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
 
-import CustomButton from '../../elements/CustomButton/CustomButton'
-
 import Stripe from '../../components/Stripe/Stripe'
 
 import styles from './CheckoutPage.module.scss'
-import formStyles from '../../elements/Form.module.scss'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 
@@ -31,6 +28,10 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (total <= 0) return
+
+    localStorage.setItem('galacticCartReceiptItems', JSON.stringify(cartItems)) // only for receipt
+    localStorage.setItem('galacticCartReceiptTotal', JSON.stringify(total))
+
     const functions = getFunctions()
     const createPaymentIntent = httpsCallable<
       { amount: number; userId: string; cartItems: { tourId: string; departureDate: string; people: number }[] },

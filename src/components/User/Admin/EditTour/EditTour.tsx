@@ -5,9 +5,11 @@ import { MdAddAPhoto } from 'react-icons/md'
 import { AiOutlineCheck } from 'react-icons/ai'
 
 import type { Tour } from '../../../../types/tour'
+import { Role } from '../../../../types/user'
 
 import { updateTourService } from '../../../../services/firebase/toursService'
 import { uploadTourImage } from '../../../../services/firebase/storageService'
+import { useAuth } from '../../../../hooks/useAuth'
 import { slugify } from '../../../../utils/slugify'
 
 import Spinner from '../../../../elements/Spinner/Spinner'
@@ -33,6 +35,7 @@ type EditTourFormData = {
 }
 
 const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
+  const { currentUser } = useAuth()
   const { register, handleSubmit, formState: { errors }, watch } = useForm<EditTourFormData>({
     defaultValues: {
       planet: editTour.planet,
@@ -50,6 +53,8 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
   const watchImage3 = watch('image3File')
 
   const formSubmit = async (data: EditTourFormData) => {
+    if (!currentUser || currentUser.role !== Role.Admin) return
+
     setLoading(true)
     try {
       const imageCoverURL = data.imageCoverFile?.[0]
@@ -74,7 +79,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
         imageCover: imageCoverURL,
         images: [image1URL, image2URL, image3URL],
         slug: slugify(data.name)
-      })
+      }, currentUser.email)
 
       setShowSection('manageTours')
     }

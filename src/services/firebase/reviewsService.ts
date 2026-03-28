@@ -1,4 +1,4 @@
-import { doc, getDoc, collection, query, where, getDocs, addDoc, setDoc, deleteDoc } from 'firebase/firestore'
+import { collection, query, where, getDocs, addDoc } from 'firebase/firestore'
 
 import { db } from './firebaseConfig'
 import type { Review } from '../../types/review'

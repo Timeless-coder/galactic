@@ -11,9 +11,9 @@ export const deleteProfileImageIfNeeded = async (photoURL: string): Promise<void
   }
 }
 
-export const uploadProfileImage = async (file: File): Promise<string> => {
+export const uploadProfileImage = async (file: File, fileName: string): Promise<string> => {
   const storage = getStorage()
-  const imageRef = ref(storage, `profileImages/${Date.now()}_${file.name}`)
+  const imageRef = ref(storage, fileName)
   await uploadBytes(imageRef, file)
   return getDownloadURL(imageRef)
 }

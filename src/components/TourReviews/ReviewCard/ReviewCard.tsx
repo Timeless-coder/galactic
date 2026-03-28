@@ -4,7 +4,7 @@ import { getUserById } from '../../../services/firebase/usersService'
 
 import type { Review } from '../../../types/review'
 import type { Tour } from '../../../types/tour'
-import type { User } from '../../../types/user'
+import { Role, type User } from '../../../types/user'
 
 import Spinner from '../../../elements/Spinner/Spinner'
 
@@ -26,17 +26,25 @@ const ReviewCard = ({ review, tour }: ReviewCardProps) => {
 
     const fetchReviewUser = async () => {
       try {
-        const fetchedUser = await getUserById(review.userId)
-        if (mounted) setReviewUser(fetchedUser)
+        const fetchedUser: User = await getUserById(review.userId) ||
+        {
+          id: 'unknown',
+          name: 'Anonymous',
+          email: "unknown@example.com",
+          photoURL: defaultUserImageURL,
+          role: Role.User
+        }
+        if (mounted) {
+          setReviewUser(fetchedUser)
+        }
       }
       catch(err) {
-        console.error(err)
         const placeholderUser: User = {
           id: 'unknown',
           name: 'Anonymous',
           email: "unknown@example.com",
           photoURL: defaultUserImageURL,
-          role: 'user'
+          role: Role.User
         }
         if (mounted) setReviewUser(placeholderUser)
       }

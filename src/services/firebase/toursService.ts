@@ -1,7 +1,9 @@
 import { doc, getDoc, collection, query, where, getDocs, addDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore'
 
 import { db } from './firebaseConfig'
+import { getRole } from './authService'
 import type { Tour } from '../../types/tour'
+import { Role } from '../../types/user'
 
 const TOUR_INDEX_DOC = 'qiiJ5kJFuSM32hXW6Z1g'
 
@@ -45,14 +47,22 @@ export const deleteTourService = async (id: string): Promise<void> => {
 
 // *** ADMIN ***
 // Omit the secondary 'id' property - see note in type.
-export const createTourService = async (tour: Omit<Tour, 'id' | 'index'>): Promise<string> => {
+export const createTourService = async (tour: Omit<Tour, 'id' | 'index'>, email: string): Promise<string> => {
+	const userRole = await getRole(email)
+	if (userRole !== Role.Admin) {
+		throw new Error('There was an issue verifying your Admin credentials')
+	}
   const index = await getNewTourIndexService()
   const docRef = await addDoc(collection(db, 'tours'), { ...tour, index })
   await incrementNewTourIndexService(index)
   return docRef.id
 }
 
-export const updateTourService = async (id: string, tour: Partial<Tour>): Promise<void> => {
+export const updateTourService = async (id: string, tour: Partial<Tour>, email: string): Promise<void> => {
+	const userRole = await getRole(email)
+	if (userRole !== Role.Admin) {
+		throw new Error('There was an issue verifying your Admin credentials')
+	}
 	const tourRef = doc(db, 'tours', id)
 	await setDoc(tourRef, tour, { merge: true })
 }

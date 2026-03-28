@@ -1,0 +1,10 @@
+.works {
+  margin-top: var(--header-height);
+  background: url('../../assets/OptimizedBacks/substellar11080p.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  padding: 5vw 20vw;
+  @media all and (max-width: 1200px) {
+    padding: 5vw 15vw;
+  }
+}

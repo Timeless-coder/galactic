@@ -12,19 +12,12 @@ import styles from './CartPage.module.scss'
 
 export const CartPage = () => {
   const { currentUser } = useAuth()
-  const { cartItems, setCartDropdownCollapsed, clearCart } = useCart()
-  let total = 0
-
-  useEffect(() => {
-    cartItems.forEach(item => {
-      total += item.booking.people
-    })
-  }, [cartItems])
+  const { cartItems, setCartDropdownCollapsed, clearCart, total } = useCart()
 
   useEffect(() => {
     setCartDropdownCollapsed(true)
   }, [])
-
+  
   return (
     <div className={styles.cartPageContainer}>
       <div className={styles.cartPageContents}>

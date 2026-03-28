@@ -1,16 +1,19 @@
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, getAuth, updateEmail,
   updateProfile, updatePassword, sendPasswordResetEmail} from 'firebase/auth'
-import type { ActionCodeSettings } from 'firebase/auth'
+
+import type { ActionCodeSettings, User as FirebaseUser } from 'firebase/auth'
+import type { User } from '../../types/user'
+import { Role } from '../../types/user'
 
 import { auth } from '../firebase/firebaseConfig'
-import type { User } from '../../types/user'
+import { db } from './firebaseConfig'
+import { collection, getDocs, query, where } from 'firebase/firestore'
 
-const mapFirebaseUser = (firebaseUser: any): User => ({
+const mapFirebaseUser = (firebaseUser: any ) => ({
   id: firebaseUser.uid,
   name: firebaseUser.displayName || '',
   email: firebaseUser.email || '',
   photoURL: firebaseUser.photoURL || '',
-  role: firebaseUser.role || 'user', // Default role is 'user'
   providerId: firebaseUser.providerData?.[0]?.providerId || 'unknown',
 })
 
@@ -19,19 +22,35 @@ const actionCodeSettings: ActionCodeSettings = {
   handleCodeInApp: false, // typical for password reset
 }
 
-export const loginService = async (email: string, password: string): Promise<User> => {
-  const result = await signInWithEmailAndPassword(auth, email, password)
-  return mapFirebaseUser(result.user)
+export const getRole = async (email: string) => {
+  const q = query(collection(db, 'adminEmails'), where('email', '==', email));
+  const snapshot = await getDocs(q);
+  return snapshot.empty ? Role.User : Role.Admin;
+};
+
+const createUserWithRole = async (firebaseUser: FirebaseUser ): Promise<User> => {
+  if (!firebaseUser.email) throw new Error('User email is missing');
+  const userWithoutRole = mapFirebaseUser(firebaseUser)
+  const role = await getRole(firebaseUser.email!)
+  return { ...userWithoutRole, role}
 }
 
-export const signupWithEmailAndPasswordService = async (email: string, password: string): Promise<User> => {
+export const loginService = async (email: string, password: string): Promise<User> => {
+  const result = await signInWithEmailAndPassword(auth, email, password)
+  return await createUserWithRole(result.user)
+}
+
+export const signupWithEmailAndPasswordService = async (name: string, email: string, password: string, photoURL: string): Promise<User> => {
   const result = await createUserWithEmailAndPassword(auth, email, password)
-  return mapFirebaseUser(result.user)
+  if (result.user) {
+    await updateProfile(result.user, { displayName: name, photoURL })
+  }
+  return await createUserWithRole(result.user)
 }
 
 export const signinWithGoogleService = async (): Promise<User> => {
   const result = await signInWithPopup(auth, new GoogleAuthProvider())
-  return mapFirebaseUser(result.user)
+  return createUserWithRole(result.user)
 }
 
 export const logoutService = async (): Promise<void> => {
@@ -52,13 +71,7 @@ export const updatePasswordService = async (newPassword: string): Promise<void> 
 
   if (!fireAuthAccount) throw new Error('No authenticated user')
     
-  try {
-    await updatePassword(fireAuthAccount, newPassword)
-  }
-  catch (error) {
-    console.log('Password update error:', error)
-    throw error
-  }
+  await updatePassword(fireAuthAccount, newPassword)
 }
 
 export const sendPasswordResetEmailService = async (email: string): Promise<void> => {

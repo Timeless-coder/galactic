@@ -9,9 +9,12 @@ import HomePage from './pages/HomePage/HomePage'
 import CartPage from './pages/CartPage/CartPage'
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage'
 import StripeSuccessPage from './pages/StripeSuccessPage/StripeSuccessPage'
+import PrivateRoute from './routeHandlers/PrivateRoute'
 
 import './index.scss' // only for parent container
 import UserPage from './pages/UserPage/UserPage'
+import NotFound from './pages/NotFound/NotFound'
+import Works from './pages/Works/Works'
 
 function App() {
 
@@ -21,13 +24,17 @@ function App() {
       <div className='content-container'>
         <Routes>
           <Route path='/' element={<HomePage />} />
+          <Route path='/works' element={<Works />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path='/account/:userId' element={<UserPage />} />
-          <Route path='/account/:userId/checkout' element={<CheckoutPage />} />
           <Route path='/sale-complete-success' element={<StripeSuccessPage />} />
           <Route path='/tours' element={<ToursPage />} />
           <Route path='/tours/:slug' element={<TourSinglePage />} />
-          <Route path='/cart' element={<CartPage/>} />
+          
+          <Route path='/account/:userId' element={<PrivateRoute component={UserPage} />} />
+          <Route path='/account/:userId/cart' element={<PrivateRoute component={CartPage} />} />
+          <Route path='/account/:userId/checkout' element={<PrivateRoute component={CheckoutPage} />} />
+
+          <Route path='*' element={<NotFound />} />
         </Routes>
       </div>
       <Footer />

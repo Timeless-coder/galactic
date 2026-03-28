@@ -3,7 +3,7 @@ import { collection, addDoc, getDoc, doc, setDoc, where, getDocs, query } from '
 import { db } from './firebaseConfig'
 import type { Booking } from '../../types/booking'
 
-export const createNewBooking = async (booking: Omit<Booking, 'id' | 'createdAt'>): Promise<string> => {
+const createNewBooking = async (booking: Omit<Booking, 'id' | 'createdAt'>): Promise<string> => {
 	const docRef = await addDoc(collection(db, 'bookings'), {
 		createdAt: new Date(),
 		tourId: booking.tourId,
@@ -12,6 +12,11 @@ export const createNewBooking = async (booking: Omit<Booking, 'id' | 'createdAt'
 		people: booking.people,
 	})
 	return docRef.id
+}
+
+export const addBookingsFromCart = async (bookings: any): Promise<string[]> => {
+	const bookingIds: string[] = await Promise.all(bookings.map((booking:any) => createNewBooking(booking)))
+	return bookingIds
 }
 
 export const addPersonToBooking = async (bookingId: string): Promise<void> => {

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { getAuth } from 'firebase/auth'
 import toast from 'react-hot-toast'
 
 import { useAuth } from '../../../hooks/useAuth'
-import { useCart } from '../../../hooks/useCart'
+import { mapFirebaseUser } from '../../../contexts/AuthContext'
 import { deleteProfileImageIfNeeded, uploadProfileImage } from '../../../services/firebase/storageService'
 
 import styles from '../../../elements/Form.module.scss'
@@ -16,9 +17,7 @@ type UserSettingsFormData = {
 }
 
 const CurrentUserSettings = () => {
-  const { cartItems } = useCart()
-  const cart = [...cartItems]
-  const { currentUser, updateUserAccount } = useAuth()
+  const { currentUser, setCurrentUser, updateUserAccount } = useAuth()
   const { register, handleSubmit, formState: { errors }, watch } = useForm<UserSettingsFormData>({
     defaultValues: {
       newEmail: currentUser?.email ?? '',
@@ -34,16 +33,23 @@ const CurrentUserSettings = () => {
     
     try {
       let imageURL = currentUser?.photoURL || ''
+      const bufferImage = imageURL
       if (data.newFile?.[0]) {
         await deleteProfileImageIfNeeded(imageURL)
-        imageURL = await uploadProfileImage(data.newFile[0])
+        imageURL = await uploadProfileImage(data.newFile[0], bufferImage)
       }
       await updateUserAccount(data.newEmail, data.newName, imageURL)
-      window.location.reload()
+      
+      const firebaseAuth = getAuth()
+      const updatedFirebaseUser = firebaseAuth.currentUser
+      if (updatedFirebaseUser) {
+        setCurrentUser(mapFirebaseUser(updatedFirebaseUser))
+      }
     }
-    catch (err: any) {
-      console.error(err)
-      toast.error('Failed to update profile. Please try again.')
+    catch (error) {
+      const code = (error as { code?: string }).code
+      if (code === 'auth/requires-recent-login') toast.error('Please log out and back in before changing your email')
+      else toast.error('Failed to update profile. Please try again.')
     }
     finally {
       setLoading(false)

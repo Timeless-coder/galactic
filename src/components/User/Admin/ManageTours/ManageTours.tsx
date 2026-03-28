@@ -46,7 +46,7 @@ export const Tours = ({ setEditTour, setShowSection }: ManageToursProps) => {
       {loading && <Spinner />}
 
       <div className={styles.toursContainer}>
-        {tours?.map((tour: Tour) => <AdminTourCard key={tour.id} tour={tour} setEditTour={setEditTour} setShowSection={setShowSection} mode='admin' />)}
+        {tours?.map((tour: Tour) => <AdminTourCard key={tour.id} tour={tour} setEditTour={setEditTour} setShowSection={setShowSection} />)}
       </div>
     </>
   )

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import toast from 'react-hot-toast'
 import { AiOutlineGooglePlus } from 'react-icons/ai'
 
@@ -15,14 +15,17 @@ import formStyles from '../../elements/Form.module.scss'
 
 const AuthPage = () => {
   const location = useLocation()
-  const { signInWithGoogle, currentUser, logout } = useAuth()
+  const navigate = useNavigate()
+  const { signinWithGoogle, currentUser, logout } = useAuth()
   const [hasAccount, setHasAccount] = useState(false)
 
-  const signInWithGoogleAndGreet = async() => {
+  const signinWithGoogleAndGreet = async() => {
+
     try {
-      const user = await signInWithGoogle()
+      const user = await signinWithGoogle()
       const firstName = user.name.split(' ')[0]
 			toast.success(`Welcome to Galactic Tours, ${firstName}!`)
+      navigate('/')
     }
     catch(err: any) {
       console.error(err)
@@ -39,12 +42,18 @@ const AuthPage = () => {
       mounted = false
     }
   }, [location])
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/')
+    }
+  }, [currentUser])
   
   return (
     <div className={styles.authContainer}>
       <div className={formStyles.formContainer}>
 
-      <div onClick={signInWithGoogleAndGreet} className={formStyles.google}>
+      <div onClick={signinWithGoogleAndGreet} className={formStyles.google}>
         <CustomButton around between rect>
           <AiOutlineGooglePlus className={buttonStyles.icon} />
           Sign in With Google
@@ -56,8 +65,8 @@ const AuthPage = () => {
       </div> */}
 
       {hasAccount
-          ? <LoginForm setHasAccount={setHasAccount} />
-          : <SignupForm  setHasAccount={setHasAccount} />
+        ? <LoginForm setHasAccount={setHasAccount} />
+        : <SignupForm  setHasAccount={setHasAccount} />
       }
 
       </div>

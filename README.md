@@ -1,3 +1,8 @@
+Connect auth to users
+Firebase admin check
+currentUser check to do anything
+lost password email
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

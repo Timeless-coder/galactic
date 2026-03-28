@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react"
 
-import type { User } from '../types/user'
+import { Role, type User } from '../types/user'
 
 import { loginService, signupWithEmailAndPasswordService, signinWithGoogleService, logoutService, updateAuthProfileService, updatePasswordService, sendPasswordResetEmailService } from '../services/firebase/authService'
 import { auth } from '../services/firebase/firebaseConfig' // only for onAuthStateChanged listener
@@ -8,9 +8,10 @@ import { auth } from '../services/firebase/firebaseConfig' // only for onAuthSta
 export type AuthContextType = {
   currentUser: User | null
   loading: boolean
+  setCurrentUser: (user: User | null) => void
   login: (email: string, password: string) => Promise<User>
-  signUpWithEmailAndPassword: (email: string, password: string) => Promise<User>
-  signInWithGoogle: () => Promise<User>
+  signupWithEmailAndPassword: (name: string, email: string, password: string, photoURL: string) => Promise<User>
+  signinWithGoogle: () => Promise<User>
   updateUserAccount: (email: string, displayName: string, photoURL: string) => Promise<void>
   updatePassword: (newPassword: string) => Promise<void>
   logout: () => Promise<void>
@@ -20,12 +21,12 @@ export type AuthContextType = {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Helper to map Firebase user to our User type
-const mapFirebaseUser = (firebaseUser: any): User => ({
+export const mapFirebaseUser = (firebaseUser: any): User => ({
   id: firebaseUser.uid,
   name: firebaseUser.displayName || "",
   email: firebaseUser.email || "",
   photoURL: firebaseUser.photoURL || "",
-  role: firebaseUser.role || 'admin', // Default role, can be enhanced to fetch from Firestore if needed
+  role: firebaseUser.role || Role.User, // Default role, can be enhanced to fetch from Firestore if needed
 })
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -45,9 +46,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe()
   }, [])
   
-  const signupWithEmailAndPassword = async (email: string, password: string): Promise<User> => {
+  const signupWithEmailAndPassword = async (name: string, email: string, password: string, photoURL: string): Promise<User> => {
     try {
-      const user = await signupWithEmailAndPasswordService(email, password)
+      const user = await signupWithEmailAndPasswordService(name, email, password, photoURL)
       setCurrentUser(user)
       return user
     } catch (error) {
@@ -111,7 +112,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading, login, signUpWithEmailAndPassword: signupWithEmailAndPassword, signInWithGoogle: signinWithGoogle, logout, updateUserAccount, updatePassword, sendPasswordResetEmail }}>
+    <AuthContext.Provider value={{ currentUser, loading, setCurrentUser, login, signupWithEmailAndPassword, signinWithGoogle, logout, updateUserAccount, updatePassword, sendPasswordResetEmail }}>
       {children}
     </AuthContext.Provider>
   )

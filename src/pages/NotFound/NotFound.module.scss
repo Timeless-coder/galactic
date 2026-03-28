@@ -1,0 +1,23 @@
+.notFoundContainer {
+  margin-top: 75px;
+  background-image: url('../../assets/OptimizedBacks/homeworld.jpg');
+  background-size: cover;
+  background-position: fixed;
+  height: calc(100vh - 75px);
+  .notFoundText {
+    max-width: 330px;
+    color: white;
+    position: absolute;
+    left: 5vw;
+    top: 15vh;
+    color: white;
+    // font-family: Orbitron;
+    h2 {
+      font-weight: 400;
+    }
+    .link {
+      font-size: 30px;
+      color: var(--primary-blue-50);
+    }
+  }
+}

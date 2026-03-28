@@ -4,6 +4,7 @@ import { IoArrowForwardCircleOutline } from 'react-icons/io5'
 import { IoArrowDownCircleOutline } from 'react-icons/io5'
 
 import { useCart } from '../../../hooks/useCart'
+import { useAuth } from '../../../hooks/useAuth'
 
 import CartDropdownTour from '../HeaderCartDropdownTour/HeaderCartDropdownTour'
 import CustomButton from '../../../elements/CustomButton/CustomButton'
@@ -11,6 +12,7 @@ import CustomButton from '../../../elements/CustomButton/CustomButton'
 import styles from './HeaderCartDropdown.module.scss'
 
 export const HeaderCartDropdown = () => {
+  const { currentUser } = useAuth()
   const { cartItems, setCartDropdownCollapsed, cartDropdownCollapsed } = useCart()
 
   return (
@@ -33,12 +35,15 @@ export const HeaderCartDropdown = () => {
           : <div className={styles.cartMessage}>Your cart is empty</div>
         }
       </div>
-      <Link to={`/cart`}>
-        <CustomButton rect between around>
-          View Full Cart
-          <IoArrowForwardCircleOutline />
-        </CustomButton>
-      </Link>
+      {currentUser && (
+        <Link to={`/account/${currentUser!.id}/cart`}>
+          <CustomButton rect between around>
+            View Full Cart
+            <IoArrowForwardCircleOutline />
+          </CustomButton>
+        </Link>
+      )
+      }
     </div>
   )
 }

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import toast from "react-hot-toast"
 import { Link } from 'react-router'
 import { VscRocket } from 'react-icons/vsc'
 import { BsCaretDown } from 'react-icons/bs'
@@ -10,19 +9,19 @@ import { useCart } from '../../hooks/useCart'
 
 import HeaderCartDropdown from './HeaderCartDropdown/HeaderCartDropdown'
 import CartIcon from './HeaderCartIcon/HeaderCartIcon'
-import Spinner from '../../elements/Spinner/Spinner'
 
 import styles from './Header.module.scss'
 import anonymousImage from '../../assets/Anonymous.jpg'
+import HeaderUserDropdown from './HeaderUserDropdown/HeaderUserDropdown'
 
 const defaultUserImageURL = anonymousImage
 
 export const Header = () => {
-  const { currentUser, logout } = useAuth()
+  const { currentUser } = useAuth()
   const { cartDropdownCollapsed, setCartDropdownCollapsed } = useCart()
-  const [loading, setLoading] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [userImage, setUserImage] = useState(currentUser?.photoURL || defaultUserImageURL)
+  // console.table(currentUser)
 
   const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen)
 
@@ -38,29 +37,15 @@ export const Header = () => {
 
   useEffect(() => {
     setCartDropdownCollapsed(true)
+    setUserMenuOpen(false)
   }, [])
-  
-  const signOut = () => {
-    setLoading(true)
-    
-    try {
-      logout()
-    }
-    catch (err) {
-      console.error('Logout error:', err)
-      toast.error('Logout failed. Please try again')  
-    }
-    finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <div className={styles.headerContainer}>
 
         <Link to='/' className={styles.logoLinkContainer}>
           <VscRocket className={styles.rocketIcon} />
-          <p className={styles.logoLink}>GalacticTours</p>
+          <p className={styles.logoLink}>GalacticTours&#8482;</p>
         </Link>
 
         <Link className={styles.toursLinkContainer} to='/tours'>
@@ -68,9 +53,8 @@ export const Header = () => {
           <p className={styles.toursLink}>Browse All Tours</p>
         </Link>
 
-         <div className={styles.headerMenuContainer}>   
-          {loading && <Spinner />}       
-          {currentUser && !loading &&
+         <div className={styles.headerMenuContainer}>     
+          {currentUser &&
             (
               <>
                 <div className={styles.userIcons}>
@@ -84,25 +68,11 @@ export const Header = () => {
                   </div>
                 </div>
 
-                {userMenuOpen && (
-                  <div className={styles.userDropdown}>
-
-                    <Link onClick={() => setUserMenuOpen(false)}
-                      to={`/account/${currentUser.id}/checkout`}>
-                      Checkout
-                    </Link>
-
-                    <Link to={`/account/${currentUser.id}`} onClick={() => setUserMenuOpen(false)}>
-                      {currentUser.role === 'admin' ? 'Admin' : 'Account'}
-                    </Link>
-
-                    <div onClick={signOut}><p>Sign Out</p></div>                                        
-                  </div>
-                )}
+                {userMenuOpen && <HeaderUserDropdown setUserMenuOpen={setUserMenuOpen} />}
               </>
             )
           }
-          {!loading && !currentUser && <Link to='/auth'>SIGN IN/UP</Link>}
+          {!currentUser && <Link to='/auth'>SIGN IN/UP</Link>}
           
         </div>
 

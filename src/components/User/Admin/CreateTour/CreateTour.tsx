@@ -9,13 +9,15 @@ import { uploadTourImage } from '../../../../services/firebase/storageService'
 import { useAuth } from '../../../../hooks/useAuth'
 import { slugify } from '../../../../utils/slugify'
 
+import { Role } from '../../../../types/user'
+
 import Spinner from '../../../../elements/Spinner/Spinner'
 
 import styles from '../../../../elements/Form.module.scss'
 import localStyles from './CreateTour.module.scss'
 
 type CreateTourProps = {
-  setShowSection: (section: string) => void
+  setShowSection: React.Dispatch<React.SetStateAction<string>>
 }
 
 type CreateTourFormData = {
@@ -49,6 +51,8 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
     const day = now.getDate()
 
     try {
+      if (!currentUser || currentUser.role !== Role.Admin) return
+
       const currentTourIndex = await getNewTourIndexService()
 
       const imageCoverURL = await uploadTourImage(data.imageCoverFile[0], `tour-${currentTourIndex}-cover`)
@@ -70,7 +74,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
         creator: currentUser!.id,
         slug: slugify(data.name),
         startDates: ['2021 7 4', '2022 1 3', '2023 5 4']
-      })
+      }, currentUser.email)
 
       reset()
       setShowSection('manageTours')
