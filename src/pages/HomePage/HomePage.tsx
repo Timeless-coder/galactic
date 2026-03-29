@@ -3,15 +3,20 @@ import { VscRocket } from 'react-icons/vsc'
 import { GiStrikingArrows } from 'react-icons/gi'
 
 import { useAuth } from '../../hooks/useAuth'
+import { migrateReviewFields } from '../../services/firebase/reviewsService'
 
 import zik from '../../assets/AlienHead.svg'
 
 import styles from './HomePage.module.scss'
-
+import { useEffect } from 'react'
 const tourGuide = zik
 
 const Home = () => {
   const { currentUser } = useAuth()
+
+  useEffect(() => {
+    // migrateReviewFields()
+  }, [])
 
   return (
   <div className={styles.homeContainer}>

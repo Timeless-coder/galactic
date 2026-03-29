@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns/format'
-import { Link, useParams, redirect } from 'react-router'
+import { Link, useParams, useNavigate } from 'react-router'
 import { AiFillCloseCircle } from 'react-icons/ai'
 
 import type { Tour } from '../../types/tour'
@@ -14,11 +14,13 @@ import CustomButton from '../../elements/CustomButton/CustomButton'
 import TourReviews from '../../components/TourReviews/Reviews/TourReviews'
 
 import styles from './TourSinglePage.module.scss'
+import Spinner from '../../elements/Spinner/Spinner'
 
 const TourSinglePage = () => {
   const modalRef = useRef<HTMLDivElement>(null)
   const { slug } = useParams()
   const { currentUser } = useAuth()
+  const navigate = useNavigate()
   const { addItemToCart, addPersonToBooking, cartItems } = useCart()
   const [tour, setTour] = useState<Tour>()
   const dateRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -113,7 +115,7 @@ const TourSinglePage = () => {
     }
   }
  
-  const setClickFunction = (date: string) => currentUser ? handleBookingClick(date) : redirect('/auth')
+  const setClickFunction = (date: string) => currentUser ? handleBookingClick(date) : navigate('/auth')
     
   const getModalText = () => currentUser
     ? (
@@ -142,6 +144,7 @@ const TourSinglePage = () => {
       <AiFillCloseCircle className={styles.icon} onClick={() => closeInstructionsModal(0)} />      
     </div>
 
+    {loading && <Spinner />}
     {tour &&
       <div className={styles.tourSingleContainer}>
         
@@ -174,7 +177,7 @@ const TourSinglePage = () => {
                 <div className={styles.tourDetailsText} key={departureDate}>
                   <h3>{format(new Date(departureDate), 'PPPP')}</h3>
                    <div onClick={() => setClickFunction(departureDate)}>
-                    <CustomButton rect between around>
+                    <CustomButton>
                       {setButtonLabelAndPeopleText(departureDate).buttonLabel}
                     </CustomButton>
                     <p className={styles.peopleRef} ref={el => { dateRefs.current[i] = el }}>

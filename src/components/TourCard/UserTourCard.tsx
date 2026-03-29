@@ -1,4 +1,3 @@
-import { Link } from 'react-router'
 import { IoArrowForwardCircleOutline } from 'react-icons/io5'
 
 import type { Tour } from '../../types/tour'
@@ -7,9 +6,12 @@ import styles from './TourCard.module.scss'
 
 type TourCardProps = {
   tour: Tour
+  setShowSection: React.Dispatch<React.SetStateAction<string>>
+  setReviewTour: React.Dispatch<React.SetStateAction<Tour | null>>
+  hasReview?: boolean
 }
 
-export const TourCard = ({ tour }: TourCardProps) => {
+export const TourCard = ({ tour, setShowSection, setReviewTour, hasReview }: TourCardProps) => {
   
   return (
   <div className={styles.card}>
@@ -35,14 +37,22 @@ export const TourCard = ({ tour }: TourCardProps) => {
         </div>
       </div>
 
-       <div className={styles.cardDetails}>
-        <Link to={`/tours/${tour.slug}`}>
-        <div className={styles.tourLink}>
-          Click for Details
-          <IoArrowForwardCircleOutline />
+     <div className={styles.cardDetails}>
+          {hasReview ? (
+            <div className={styles.tourLink} onClick={() => setShowSection('reviews')}>
+              See my Review
+              <IoArrowForwardCircleOutline />
+            </div>
+          ) : (
+            <div className={styles.tourLink} onClick={() => {
+              setShowSection('reviewTour')
+              setReviewTour(tour)
+            }}>
+              Review this Tour
+              <IoArrowForwardCircleOutline />
+            </div>
+          )}
         </div>
-        </Link>
-      </div>    
       
       </>      
     )}

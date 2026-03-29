@@ -1,7 +1,7 @@
-Connect auth to users
-Firebase admin check
-currentUser check to do anything
-lost password email
+Firebase rules. Connect auth to users collection as part of that.
+currentUser check to do anything. (I added redirects to UserPage and CheckoutPage)
+toast
+styling
 
 # React + TypeScript + Vite
 

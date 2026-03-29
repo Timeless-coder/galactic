@@ -11,7 +11,7 @@ import Spinner from '../../elements/Spinner/Spinner'
 import styles from '../../elements/Form.module.scss'
 
 type LoginFormProps = {
-  setHasAccount: (status: boolean) => void
+  setHasAccount: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 type LoginFormData = {
@@ -30,8 +30,7 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
 
     try {
       const user = await login(data.email, data.password)
-      const firstName = user.name.split(' ')[0]
-      toast.success(`Welcome back, ${firstName}!`)
+      toast.success(`Welcome back, ${user.displayName}!`)
       reset()
       navigate('/')
     }
@@ -52,7 +51,7 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
       <div className={styles.status}>
         <p>No Account Yet?</p>
         <div onClick={() => setHasAccount(false)}>
-          <CustomButton rect around between>Sign Up</CustomButton>
+          <CustomButton>Sign Up</CustomButton>
         </div>
       </div>
       
@@ -83,9 +82,14 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
           />
         </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? <Spinner /> : "Login"}
-        </button>
+        <div className={styles.inputContainer}>
+          <input
+            type='submit'
+            name='submit'
+            value='Submit'
+            disabled={loading}
+          />
+        </div>
       </form>
     </>
   )

@@ -17,15 +17,19 @@ export const getAllUsers = async (): Promise<User[]> => {
 	return usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User))
 }
 
+export const createUserWithAuthId = async (user: User): Promise<void> => {
+	await setDoc(doc(db, 'users', user.id), user)
+}
+
 // *** ADMIN ***
-export const migrateDisplayNameToName = async (): Promise<void> => {
+export const migrateNameToDisplayname = async (): Promise<void> => {
 	const usersSnapshot = await getDocs(collection(db, 'users'))
 	for (const userDoc of usersSnapshot.docs) {
 		const data = userDoc.data()
-		if ('displayName' in data) {
+		if ('name' in data) {
 			await updateDoc(doc(db, 'users', userDoc.id), {
-				name: data.displayName,
-				displayName: deleteField(),
+				displayName: data.name,
+				name: deleteField(),
 			})
 		}
 	}

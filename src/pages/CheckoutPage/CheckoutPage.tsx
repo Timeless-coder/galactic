@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import { loadStripe } from '@stripe/stripe-js'
-import { IoArrowBackCircleOutline } from 'react-icons/io5'
 import { getFunctions, httpsCallable } from 'firebase/functions'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -19,12 +18,17 @@ type OptionsConfig = {
 
 const CheckoutPage = () => {
   const { currentUser } = useAuth()
+  const navigate = useNavigate()
   const { cartItems, total } = useCart()
   const [clientSecret, setClientSecret] = useState<string | null>(null)
 
   const options: OptionsConfig = {
     clientSecret: clientSecret!,
   }
+
+  useEffect(() => {
+    if (!currentUser) navigate('/auth')
+  }, [currentUser])
 
   useEffect(() => {
     if (total <= 0) return

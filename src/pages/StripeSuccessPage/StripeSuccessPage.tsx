@@ -55,7 +55,7 @@ const StripeSuccessPage = () => {
 
       <div className={styles.continue}>
         <Link to='/tours'>
-          <CustomButton rect around between>Continue Shopping</CustomButton>
+          <CustomButton>Continue Shopping</CustomButton>
         </Link>
       </div>
     </div>

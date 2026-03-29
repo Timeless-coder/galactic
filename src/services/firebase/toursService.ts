@@ -66,3 +66,19 @@ export const updateTourService = async (id: string, tour: Partial<Tour>, email: 
 	const tourRef = doc(db, 'tours', id)
 	await setDoc(tourRef, tour, { merge: true })
 }
+
+export const migrateTourDepartureDates = async (): Promise<void> => {
+	const toursSnap = await getDocs(collection(db, 'tours'))
+	for (const tourDoc of toursSnap.docs) {
+		const data = tourDoc.data()
+		const startDates = data.startDates
+		const newStartDates: string[] = []
+		startDates.forEach((date: string) => {
+			const parts = date.split(' ')
+			newStartDates.push(`${(Number(parts[0]) + 5).toString()} ${parts[1]} ${parts[2]}`)
+		})
+		await updateDoc(doc(db, 'tours', tourDoc.id), {
+					startDates: newStartDates
+				})
+	}
+}

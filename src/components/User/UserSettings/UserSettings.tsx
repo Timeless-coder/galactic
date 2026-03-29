@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { getAuth } from 'firebase/auth'
 import toast from 'react-hot-toast'
 
 import { useAuth } from '../../../hooks/useAuth'
-import { mapFirebaseUser } from '../../../contexts/AuthContext'
 import { deleteProfileImageIfNeeded, uploadProfileImage } from '../../../services/firebase/storageService'
 
 import styles from '../../../elements/Form.module.scss'
@@ -21,7 +19,7 @@ const CurrentUserSettings = () => {
   const { register, handleSubmit, formState: { errors }, watch } = useForm<UserSettingsFormData>({
     defaultValues: {
       newEmail: currentUser?.email ?? '',
-      newName: currentUser?.name ?? '',
+      newName: currentUser?.displayName ?? '',
     }
   })
   const [loading, setLoading] = useState(false)
@@ -40,10 +38,8 @@ const CurrentUserSettings = () => {
       }
       await updateUserAccount(data.newEmail, data.newName, imageURL)
       
-      const firebaseAuth = getAuth()
-      const updatedFirebaseUser = firebaseAuth.currentUser
-      if (updatedFirebaseUser) {
-        setCurrentUser(mapFirebaseUser(updatedFirebaseUser))
+      if (currentUser) {
+        setCurrentUser({ ...currentUser, email: data.newEmail, displayName: data.newName, photoURL: imageURL })
       }
     }
     catch (error) {
@@ -109,7 +105,7 @@ const CurrentUserSettings = () => {
                   <img
                     className={styles.icon}
                     src={currentUser?.photoURL}
-                    alt={currentUser?.name}
+                    alt={currentUser?.displayName}
                   />
                   {watchNewFile?.[0] ? 'Photo selected' : 'Choose a New Photo'}
                 </label>

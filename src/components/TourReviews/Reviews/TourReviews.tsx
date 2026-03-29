@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
+import { format } from 'date-fns/format'
 import toast from 'react-hot-toast'
 
-import type { Review } from '../../../types/review'
+import type { Review, ReviewWithUser } from '../../../types/review'
 import type { Tour } from '../../../types/tour'
 
-import { getReviewsByTourId } from '../../../services/firebase/reviewsService'
+import { fetchReviewsForTour } from '../../../services/firebase/reviewsService'
 
 import ReviewCard from '../ReviewCard/ReviewCard'
 import Spinner from '../../../elements/Spinner/Spinner'
@@ -17,7 +18,7 @@ type ReviewsProps = {
 }
 
 export const TourReviews = ({ tour, id }: ReviewsProps) => {
-  const [reviews, setReviews] = useState<Review[]>([])
+  const [reviews, setReviews] = useState<ReviewWithUser[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export const TourReviews = ({ tour, id }: ReviewsProps) => {
       setLoading(true)
       
       try {
-        const fetchedReviews = await getReviewsByTourId(id)
+        const fetchedReviews: ReviewWithUser[] = await fetchReviewsForTour(id)
         if (mounted) setReviews(fetchedReviews)
       }
       catch (err) {
@@ -51,11 +52,15 @@ export const TourReviews = ({ tour, id }: ReviewsProps) => {
   return (
     <div className={styles.reviewsContainer}>
       {loading && <Spinner />}
-      {reviews.map(review => (
+      {reviews.map(item => (
         <ReviewCard
-          key={review.id}
+          key={item.review.id}
+          rating={item.review.rating}
+          text={item.review.text}
+          userName={item.user?.displayName}
+          userPhoto={item.user?.photoURL}
+          createdAt={format(item.review.createdAt, 'PPPP')}
           tour={tour}
-          review={review}
         />
       ))}
       {reviews.length === 0 && !loading && (

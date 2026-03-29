@@ -51,7 +51,7 @@ export const ToursPage = () => {
       </div>
 
       <div className={styles.toursContainer}>
-        {tours?.map(tour => <TourCard key={tour.id} tour={tour} mode='all' />)}
+        {tours?.map(tour => <TourCard key={tour.id} tour={tour} />)}
       </div>
     </div>
   )

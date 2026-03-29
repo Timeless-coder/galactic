@@ -1,11 +1,22 @@
 import styles from './CustomButton.module.scss'
 
-const CustomButton = ({ children, around, between, rect }) => (
+export enum Layout {
+  Around = 'around',
+  Between = 'between',
+  Rect = 'rect'
+}
+
+type CustomButtonProps = {
+  children: React.ReactNode
+  layout?: Layout
+}
+
+const CustomButton = ({ children, layout }: CustomButtonProps) => (
   <div className={`
     ${styles.button}
-    ${around && styles.around}
-    ${rect && styles.rect}
-    ${between && styles.between}
+    ${layout === Layout.Around && styles.around}
+    ${layout === Layout.Rect && styles.rect}
+    ${layout === Layout.Between && styles.between}
    `}>
     {children}
   </div>

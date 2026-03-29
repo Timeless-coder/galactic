@@ -1,6 +1,7 @@
 import { setGlobalOptions } from 'firebase-functions'
 import { onCall, onRequest, HttpsError } from 'firebase-functions/v2/https'
 import * as admin from 'firebase-admin'
+import { FieldValue } from 'firebase-admin/firestore'
 import * as dotenv from 'dotenv'
 import Stripe from 'stripe'
 
@@ -81,4 +82,23 @@ export const stripeWebhook = onRequest(async (req, res) => {
 	}
 
   res.json({ received: true })
+})
+
+export const migrateNameToDisplayName = onCall({ cors: true }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Must be logged in.')
+  }
+
+  const db = admin.firestore()
+  const snapshot = await db.collection('users').get()
+  
+  const migrations = snapshot.docs
+    .filter(doc => 'name' in doc.data())
+    .map(doc => doc.ref.update({
+      displayName: doc.data().name,
+      name: FieldValue.delete(),
+    }))
+
+  await Promise.all(migrations)
+  return { migrated: migrations.length }
 })

@@ -9,7 +9,7 @@ import { getBookingsByUserId } from '../../../services/firebase/bookingsService'
 import { getTourById } from '../../../services/firebase/toursService'
 import { getReviewsByUserId } from '../../../services/firebase/reviewsService'
 
-import TourCard from '../../TourCard/TourCard'
+import UserTourCard from '../../TourCard/UserTourCard'
 import Spinner from '../../../elements/Spinner/Spinner'
 
 import styles from './UserTours.module.scss'
@@ -79,10 +79,9 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
           <h2>You can review tours you have booked but have not yet reviewed.</h2>
           <div className={styles.userToursContainer}>
             {myTours.map(tour => (
-              <TourCard
+              <UserTourCard
                 key={tour.id}
                 tour={tour}
-                mode='user'
                 setShowSection={setShowSection}
                 setReviewTour={setReviewTour}
                 hasReview={reviewedTourIds.has(tour.id)}

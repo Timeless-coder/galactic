@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth'
 
 import LoginForm from '../../components/Auth/LoginForm'
 import SignupForm from '../../components/Auth/SignupForm'
+import EmailResetPassword from '../../components/Auth/EmailResetPassword'
 import CustomButton from '../../elements/CustomButton/CustomButton'
 
 import styles from './AuthPage.module.scss'
@@ -17,14 +18,18 @@ const AuthPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { signinWithGoogle, currentUser, logout } = useAuth()
+  const [lostPassword, setLostPassword] = useState(false)
   const [hasAccount, setHasAccount] = useState(false)
 
-  const signinWithGoogleAndGreet = async() => {
+  const handleLostPassword = () => {
+    setHasAccount(false)
+    setLostPassword(true)
+  }
 
+  const signinWithGoogleAndGreet = async() => {
     try {
       const user = await signinWithGoogle()
-      const firstName = user.name.split(' ')[0]
-			toast.success(`Welcome to Galactic Tours, ${firstName}!`)
+			toast.success(`Welcome to Galactic Tours, ${user.displayName}!`)
       navigate('/')
     }
     catch(err: any) {
@@ -54,24 +59,24 @@ const AuthPage = () => {
       <div className={formStyles.formContainer}>
 
       <div onClick={signinWithGoogleAndGreet} className={formStyles.google}>
-        <CustomButton around between rect>
+        <CustomButton>
           <AiOutlineGooglePlus className={buttonStyles.icon} />
           Sign in With Google
         </CustomButton>
       </div>
 
-      {/* <div onClick={handleLostPassword} className={formStyles.password}>
-        <CustomButton rect>Lost My Password</CustomButton>
-      </div> */}
+      {!lostPassword && <div onClick={handleLostPassword} className={formStyles.password}>
+        <CustomButton>Lost My Password</CustomButton>
+      </div>}
 
-      {hasAccount
-        ? <LoginForm setHasAccount={setHasAccount} />
-        : <SignupForm  setHasAccount={setHasAccount} />
+      {lostPassword
+        ? <EmailResetPassword setHasAccount={setHasAccount} setLostPassword={setLostPassword} />
+        : hasAccount
+          ? <LoginForm  setHasAccount={setHasAccount} />
+          : <SignupForm setHasAccount={setHasAccount} />
       }
 
       </div>
-
-      <button onClick={logout}>Log out</button> 
     </div>
   )
 

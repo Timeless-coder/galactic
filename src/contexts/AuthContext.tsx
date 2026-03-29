@@ -1,9 +1,10 @@
 import React, { createContext, useEffect, useState } from "react"
 
-import { Role, type User } from '../types/user'
+import { type User } from '../types/user'
 
 import { loginService, signupWithEmailAndPasswordService, signinWithGoogleService, logoutService, updateAuthProfileService, updatePasswordService, sendPasswordResetEmailService } from '../services/firebase/authService'
-import { auth } from '../services/firebase/firebaseConfig' // only for onAuthStateChanged listener
+import { auth, db } from '../services/firebase/firebaseConfig'
+import { doc, getDoc } from 'firebase/firestore'
 
 export type AuthContextType = {
   currentUser: User | null
@@ -20,24 +21,24 @@ export type AuthContextType = {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Helper to map Firebase user to our User type
-export const mapFirebaseUser = (firebaseUser: any): User => ({
-  id: firebaseUser.uid,
-  name: firebaseUser.displayName || "",
-  email: firebaseUser.email || "",
-  photoURL: firebaseUser.photoURL || "",
-  role: firebaseUser.role || Role.User, // Default role, can be enhanced to fetch from Firestore if needed
-})
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   // Listen to Firebase auth state changes
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
-        setCurrentUser(mapFirebaseUser(firebaseUser))
+        try {
+          const userSnap = await getDoc(doc(db, 'users', firebaseUser.uid))
+          if (userSnap.exists()) {
+            setCurrentUser({ id: userSnap.id, ...userSnap.data() } as User)
+          } else {
+            setCurrentUser(null)
+          }
+        } catch {
+          setCurrentUser(null)
+        }
       } else {
         setCurrentUser(null)
       }

@@ -24,7 +24,7 @@ export const HeaderCartDropdown = () => {
             : <p />
           }                 
         </div>
-        <CustomButton rect between around>
+        <CustomButton>
           <AiFillCloseCircle />
           Close
         </CustomButton>
@@ -36,8 +36,8 @@ export const HeaderCartDropdown = () => {
         }
       </div>
       {currentUser && (
-        <Link to={`/account/${currentUser!.id}/cart`}>
-          <CustomButton rect between around>
+        <Link to={`/cart`}>
+          <CustomButton>
             View Full Cart
             <IoArrowForwardCircleOutline />
           </CustomButton>

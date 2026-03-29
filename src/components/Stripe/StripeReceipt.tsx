@@ -26,13 +26,12 @@ const StripeReceipt = () => {
     }    
   }, [])
 
-
     return (
       <>
         <div className={styles.receipt} ref={contentRef}>          
           <h1><strong><em>Thank you so much for choosing GalacticTours&#8482;</em></strong></h1>
           <h3>Date of Sale: <em><strong>{format(new Date(), 'PPPP')}</strong></em></h3>
-          <p>Traveler: <em><strong>{currentUser?.name}</strong></em></p>
+          <p>Traveler: <em><strong>{currentUser?.displayName}</strong></em></p>
           <p>Email: <em><strong>{currentUser?.email}</strong></em></p>
           <h2 className={styles.enjoy}>Tours Booked:</h2>
           {cartItems.map(cartItem => (

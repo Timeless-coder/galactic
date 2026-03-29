@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 
-import type { Review } from '../../../types/review'
+import type { ReviewWithTour } from '../../../types/review'
+
 import { useAuth } from '../../../hooks/useAuth'
+import { fetchReviewsByUser } from '../../../services/firebase/reviewsService'
+
 import Spinner from '../../../elements/Spinner/Spinner'
 import UserReviewCard from '../UserReviews/UserReviewCard'
+
 import styles from './UserReviews.module.scss'
-import { getReviewsByUserId } from '../../../services/firebase/reviewsService'
 
 const UserReviews = () => {
   const { currentUser } = useAuth()
-  const [myReviews, setReviews] = useState<Review[]>([])
+  const [myReviews, setReviews] = useState<ReviewWithTour[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -24,8 +27,8 @@ const UserReviews = () => {
           setLoading(false)
           return
         }
-        const myReviews: Review[] = await getReviewsByUserId(currentUser.id)
-        if (mounted && myReviews?.length > 0) setReviews(myReviews)
+        const myReviews: ReviewWithTour[] = await fetchReviewsByUser(currentUser.id)
+        if (mounted && myReviews.length > 0) setReviews(myReviews)
       }
     catch (err) {
         if (mounted) setReviews([])
@@ -50,9 +53,8 @@ const UserReviews = () => {
         {myReviews.length > 0 && (
           <>
           <h2>My Reviews</h2>
-          {myReviews.map(review => (<UserReviewCard key={review.id} review={review} />))}
+          {myReviews.map(item => (<UserReviewCard key={item.review.id} rating={item.review.rating} text={item.review.text} tour={item.tour} />))}
           </>
-          
         )
         }
       </div>

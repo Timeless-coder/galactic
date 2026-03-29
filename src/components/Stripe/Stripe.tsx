@@ -1,5 +1,6 @@
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js"
+import { Elements } from "@stripe/react-stripe-js"
+
 import StripePaymentForm from './StripePaymentForm'
 
 type StripeProps = {
@@ -8,12 +9,13 @@ type StripeProps = {
 }
 
 export default function Stripe({ promise, options }: StripeProps) {
+
   return (  
     <div className="App">  
       <Elements stripe={promise} options={options}>  
         <StripePaymentForm />  
       </Elements>  
     </div>  
-  );  
+  )  
 }
   

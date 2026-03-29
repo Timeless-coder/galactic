@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { IoRocketOutline } from 'react-icons/io5'
 import { IoClipboardOutline } from 'react-icons/io5'
@@ -24,9 +25,14 @@ import { Role } from '../../types/user'
 
 const UserPage = () => {
   const { currentUser } = useAuth()
+  const navigate = useNavigate()
   const [showSection, setShowSection] = useState('settings')
   const [editTour, setEditTour] = useState<Tour | null>(null)
   const [reviewTour, setReviewTour] = useState<Tour | null>(null)
+
+  useEffect(() => {
+    if (!currentUser) navigate('/auth')
+  }, [currentUser])
 
   return (
     <div className={styles.accountContainer}>

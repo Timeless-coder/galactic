@@ -7,14 +7,16 @@ import { Role } from '../../types/user'
 
 import { auth } from '../firebase/firebaseConfig'
 import { db } from './firebaseConfig'
-import { collection, getDocs, query, where } from 'firebase/firestore'
+import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore'
+import { createUserWithAuthId } from './usersService'
 
 const mapFirebaseUser = (firebaseUser: any ) => ({
   id: firebaseUser.uid,
-  name: firebaseUser.displayName || '',
+  displayName: firebaseUser.displayName || '',
   email: firebaseUser.email || '',
   photoURL: firebaseUser.photoURL || '',
   providerId: firebaseUser.providerData?.[0]?.providerId || 'unknown',
+  createdAt: firebaseUser.metadata?.creationTime || new Date().toISOString(),
 })
 
 const actionCodeSettings: ActionCodeSettings = {
@@ -28,11 +30,12 @@ export const getRole = async (email: string) => {
   return snapshot.empty ? Role.User : Role.Admin;
 };
 
-const createUserWithRole = async (firebaseUser: FirebaseUser ): Promise<User> => {
-  if (!firebaseUser.email) throw new Error('User email is missing');
-  const userWithoutRole = mapFirebaseUser(firebaseUser)
-  const role = await getRole(firebaseUser.email!)
-  return { ...userWithoutRole, role}
+const createUserWithRole = async (firebaseUser: FirebaseUser): Promise<User> => {
+  if (!firebaseUser.email) throw new Error('User email is missing')
+  const role = await getRole(firebaseUser.email)
+  const user: User = { ...mapFirebaseUser(firebaseUser), role }
+  await createUserWithAuthId(user)
+  return user
 }
 
 export const loginService = async (email: string, password: string): Promise<User> => {
@@ -50,7 +53,14 @@ export const signupWithEmailAndPasswordService = async (name: string, email: str
 
 export const signinWithGoogleService = async (): Promise<User> => {
   const result = await signInWithPopup(auth, new GoogleAuthProvider())
-  return createUserWithRole(result.user)
+  const firebaseUser = result.user
+
+  const userSnap = await getDoc(doc(db, 'users', firebaseUser.uid))
+  if (userSnap.exists()) {
+    return { id: userSnap.id, ...userSnap.data() } as User
+  }
+
+  return createUserWithRole(firebaseUser)
 }
 
 export const logoutService = async (): Promise<void> => {

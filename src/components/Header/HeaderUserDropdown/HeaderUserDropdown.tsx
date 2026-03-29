@@ -18,11 +18,11 @@ export const HeaderUserDropdown = ({ setUserMenuOpen }: HeaderUserDropdownProps)
   const { currentUser, logout } = useAuth()
 	const [loading, setLoading] = useState(false)
   
-  const signOut = () => {
+  const signOut = async() => {
     setLoading(true)
     
     try {
-      logout()
+      await logout()
       navigate('/auth')
     }
     catch (err) {

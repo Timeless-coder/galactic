@@ -23,7 +23,7 @@ export const CartPage = () => {
       <div className={styles.cartPageContents}>
 
         <div className={styles.clearCartContainer} onClick={clearCart}>
-          <CustomButton rect around between>
+          <CustomButton>
             <IoTrashOutline />
             Empty Cart
           </CustomButton>
@@ -35,7 +35,7 @@ export const CartPage = () => {
                
         <div className={styles.bottomRowContainer}>
           <Link className={styles.checkoutButton} to={`/account/${currentUser!.id}/checkout`}>
-            <CustomButton rect around between>
+            <CustomButton>
               Proceed to Checkout
               <IoArrowForwardCircleOutline />
             </CustomButton>

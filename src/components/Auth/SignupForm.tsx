@@ -6,6 +6,7 @@ import { MdAddAPhoto } from 'react-icons/md'
 import { AiOutlineCheck } from 'react-icons/ai'
 
 import { useAuth } from '../../hooks/useAuth'
+import { createUserWithAuthId } from '../../services/firebase/usersService'
 import { uploadProfileImage } from '../../services/firebase/storageService'
 
 import CustomButton from "../../elements/CustomButton/CustomButton"
@@ -13,7 +14,7 @@ import CustomButton from "../../elements/CustomButton/CustomButton"
 import styles from '../../elements/Form.module.scss'
 
 type SignupFormProps = {
-	setHasAccount: (status: boolean) => void
+  setHasAccount: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 type SignupFormData = {
@@ -42,9 +43,8 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 
 		try {
 			const photoURL = await uploadProfileImage(data.profileImage[0], `profileImages/${data.email}-profileImage`)
-			const user = await signupWithEmailAndPassword(data.name, data.email, data.password, photoURL)
-			const firstName = user.name.split(' ')[0]
-			toast.success(`Welcome to Galactic Tours, ${firstName}!`)
+			const firebaseUser = await signupWithEmailAndPassword(data.name, data.email, data.password, photoURL)
+			toast.success(`Welcome to Galactic Tours, ${firebaseUser.displayName}!`)
 			reset()
 			navigate('/')
 
@@ -68,7 +68,7 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 			<div className={styles.status}>
 				<p>Have an Account?</p>
 				<div onClick={() => setHasAccount(true)}>
-					<CustomButton around between rect>Sign In</CustomButton>
+					<CustomButton>Sign In</CustomButton>
 				</div>
 			</div>
 			
@@ -156,9 +156,14 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 					/>
 				</div>
 
-				<button type="submit" disabled={loading}>
-					{loading ? "Signing up..." : "Sign Up"}
-				</button>
+				<div className={styles.inputContainer}>
+          <input
+            type='submit'
+            name='submit'
+            value='Submit'
+						disabled={loading}
+          />
+        </div>
 			</form>
 		</>
 	)
