@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import { useAuth } from '../../hooks/useAuth'
 
@@ -18,8 +20,10 @@ type EmailResetData = {
 
 const EmailResetPassword = ({ setHasAccount, setLostPassword }: EmailResetPasswordProps) => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<EmailResetData>()
+  const navigate = useNavigate()
   const { sendPasswordResetEmail } = useAuth()
   const [email, setEmail] = useState('')
+  
   const handleFoundEmail = () => {
     setLostPassword(false)
     setHasAccount(true)
@@ -28,32 +32,33 @@ const EmailResetPassword = ({ setHasAccount, setLostPassword }: EmailResetPasswo
     try {
       await sendPasswordResetEmail(email)
       reset()
+      toast.success('Password reset email sent successfully.')
+      navigate('/auth')
     }
     catch (err: any){
-      console.error(err)
+      console.error(err.message)
+      toast.error(`${err.message} - Please try again`)
     }
   }
   return (
-    <>
+    <section>
+      <header>
+        <h2>Request Password Reset Email</h2>
+      </header>
 
-      <h2>Request Password Reset Email</h2>
-
-      <div className={styles.status}>
-          <p>Found Your Email?</p>
-          <div onClick={handleFoundEmail}>
-            <CustomButton>Sign In</CustomButton>
-          </div>
-      </div>
+      <aside className={styles.status}>
+        <p>Found Your Email?</p>
+        <button type="button" onClick={handleFoundEmail}>
+          <CustomButton>Sign In</CustomButton>
+        </button>
+      </aside>
 
       <form onSubmit={handleSubmit(formSubmit)}>
-
         <div className={styles.inputContainer}>
           <label htmlFor='email'>Email</label>
           {errors.email && <p className={styles.error}>{errors.email.message}</p>}
           <input
-             {...register('email', {
-              required: 'Email is required'
-            })}
+            {...register('email', { required: 'Email is required' })}
             type='email'
             name='email'
             value={email}
@@ -63,15 +68,10 @@ const EmailResetPassword = ({ setHasAccount, setLostPassword }: EmailResetPasswo
         </div>
 
         <div className={styles.inputContainer}>
-          <input
-            type='submit'
-            name='submit'
-            value='Submit'
-          />
+          <button type="submit" name="submit">Submit</button>
         </div>
-
       </form>
-    </>
+  </section>
   )
 }
 

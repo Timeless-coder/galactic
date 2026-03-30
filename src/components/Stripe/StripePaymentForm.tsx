@@ -26,7 +26,6 @@ const StripePaymentForm = () => {
 
     if (error) setErrorMessage(error.message!)
   }
-
  
 	return (
 		<form onSubmit={handleSubmit}>

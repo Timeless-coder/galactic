@@ -2,19 +2,20 @@ import styles from './Footer.module.scss'
 
 const Footer = () => {
   return (
-    <div className={styles.footer}>
-      <div className={styles.linksContainer}>
+    <footer className={styles.footer}>
+      <nav className={styles.linksContainer} aria-label="Attribution">
         <p>
           All planet images by:{' '}
           <a
             href='http://digitalblasphemy.com/'
             target='_blank'
-            rel='noreferrer'>
+            rel='noreferrer'
+          >
             Digital Blasphemy
           </a>
         </p>
-      </div>
-    </div>
+      </nav>
+    </footer>
   )
 }
 

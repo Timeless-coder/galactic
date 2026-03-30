@@ -4,6 +4,7 @@ import { GiStrikingArrows } from 'react-icons/gi'
 
 import { useAuth } from '../../hooks/useAuth'
 import { migrateCreatedAtFormat } from '../../services/firebase/reviewsService'
+import { migratedepartureDatesToDepartureDates } from '../../services/firebase/toursService'
 
 import zik from '../../assets/AlienHead.svg'
 
@@ -19,13 +20,13 @@ const Home = () => {
   }, [])
 
   return (
-  <div className={styles.homeContainer}>
+  <main className={styles.homeContainer}>
 
     <h1>Welcome to Galactic Tours!</h1>
 
-    <div className={styles.bottomContainer}>
+    <section className={styles.bottomContainer}>
 
-    <div className={styles.pitchContainer}>
+    <section className={styles.pitchContainer}>
       <VscRocket className={styles.icon} />
       <h2>Begin Your Interstellar Adventure Today! </h2>
       <div className={styles.text}>
@@ -55,7 +56,7 @@ const Home = () => {
       <h3>Click a Button for Details</h3>
       <GiStrikingArrows className={styles.arrows} />
       </div>
-    </div>
+    </section>
 
     <div className={styles.buttonBank}>
       <Link to='/works' className={styles.button}>
@@ -69,11 +70,11 @@ const Home = () => {
       </Link>
     </div>
 
-    </div>
+    </section>
 
      
 
-  </div>
+  </main>
   )
 }
 

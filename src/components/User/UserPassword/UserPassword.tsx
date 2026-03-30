@@ -22,34 +22,33 @@ const PasswordReset = () => {
       reset()
     }
     catch (err: any) {
-      console.error('Password update error:', err)
-      toast.error('Failed to update password. Please try again.')
+      console.error('Password update error:', err.message)
+      toast.error(err.message)
     }
   }
 
   return (
-    <div className={styles.userSettingsContainer}>
-
+    <section className={styles.userSettingsContainer}>
       {currentUser?.providerId === 'google.com' && (
-        <h1>
-          Update Google account password at{' '}
-          <a
-            className={linkStyles.link}
-            href='https://myaccount.google.com/'
-            target='_blank'
-            rel='noreferrer'>
-            Google
-          </a>{' '}
-        </h1>
+        <header>
+          <h1>
+            Update Google account password at{' '}
+            <a
+              className={linkStyles.link}
+              href='https://myaccount.google.com/'
+              target='_blank'
+              rel='noreferrer'>
+              Google
+            </a>{' '}
+          </h1>
+        </header>
       )}
-
       {currentUser?.providerId !== 'google.com' && (
         <div className={styles.formContainer}>
-
-          <form onSubmit={handleSubmit(formSubmit)}>
-
-            <h1>Update Your Password</h1>
-
+          <form onSubmit={handleSubmit(formSubmit)} aria-label="Update password form">
+            <header>
+              <h1>Update Your Password</h1>
+            </header>
             <div className={styles.inputContainer}>
               <label htmlFor='newPassword'>New Password</label>
               {errors.newPassword && <p className={styles.error}>{errors.newPassword.message}</p>}
@@ -66,7 +65,6 @@ const PasswordReset = () => {
                 placeholder='********'
               />
             </div>
-
             <div className={styles.inputContainer}>
               <label htmlFor='newPasswordConfirm'>Confirm New Password</label>
               {errors.newPasswordConfirm && <p className={styles.error}>{errors.newPasswordConfirm.message}</p>}
@@ -80,7 +78,6 @@ const PasswordReset = () => {
                 placeholder='********'
               />
             </div>
-
             <div className={styles.inputContainer}>
               <input
                 type='submit'
@@ -88,11 +85,10 @@ const PasswordReset = () => {
                 value='Update Password'
               />
             </div>
-
           </form>
         </div>
       )}
-    </div>
+    </section>
   )
 }
 

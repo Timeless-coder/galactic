@@ -6,7 +6,6 @@ import toast from "react-hot-toast"
 import { useAuth } from '../../hooks/useAuth'
 
 import CustomButton from "../../elements/CustomButton/CustomButton"
-import Spinner from '../../elements/Spinner/Spinner'
 
 import styles from '../../elements/Form.module.scss'
 
@@ -37,7 +36,7 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
     catch (error) {
       const code = (error as { code?: string }).code
       if (code === 'auth/invalid-credential') toast.error('Invalid email or password')
-      else toast.error('Login failed')
+      else toast.error(`Login failed: ${(error as Error).message}`)
     }
     finally {
       setLoading(false)
@@ -45,20 +44,22 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
   }
 
   return (
-    <>
-      <h2>LOGIN</h2>
+    <section>
+      <header>
+        <h2>LOGIN</h2>
+      </header>
 
-      <div className={styles.status}>
+      <aside className={styles.status}>
         <p>No Account Yet?</p>
-        <div onClick={() => setHasAccount(false)}>
+        <button type="button" onClick={() => setHasAccount(false)}>
           <CustomButton>Sign Up</CustomButton>
-        </div>
-      </div>
-      
-      <form onSubmit={handleSubmit(formSubmit)} className="your-glassy-styles">
+        </button>
+      </aside>
+
+      <form onSubmit={handleSubmit(formSubmit)} aria-label="Login form" className="your-glassy-styles">
         <div className={styles.inputContainer}>
           <label htmlFor="login-email">Email</label>
-          {errors.email && <p className={styles.error}>{errors.email.message}</p>}
+          {errors.email && <p className={styles.error} role="alert">{errors.email.message}</p>}
           <input
             {...register('email', {
               required: 'Email is required'
@@ -66,12 +67,14 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
             id="login-email"
             type="email"
             placeholder="Email"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'login-email-error' : undefined}
           />
         </div>
 
         <div className={styles.inputContainer}>
           <label htmlFor="login-password">Password</label>
-          {errors.password && <p className={styles.error}>{errors.password.message}</p>}
+          {errors.password && <p className={styles.error} role="alert">{errors.password.message}</p>}
           <input
             {...register('password', {
               required: 'Password is required'
@@ -79,19 +82,18 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
             id="login-password"
             type="password"
             placeholder="Password"
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? 'login-password-error' : undefined}
           />
         </div>
 
         <div className={styles.inputContainer}>
-          <input
-            type='submit'
-            name='submit'
-            value='Submit'
-            disabled={loading}
-          />
+          <button type="submit" name="submit" disabled={loading} aria-busy={loading}>
+            Submit
+          </button>
         </div>
       </form>
-    </>
+    </section>
   )
 }
 

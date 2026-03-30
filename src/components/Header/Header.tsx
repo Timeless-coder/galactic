@@ -8,17 +8,17 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
 
 import HeaderCartDropdown from './HeaderCartDropdown/HeaderCartDropdown'
+import HeaderUserDropdown from './HeaderUserDropdown/HeaderUserDropdown'
 import CartIcon from './HeaderCartIcon/HeaderCartIcon'
 
 import styles from './Header.module.scss'
 import anonymousImage from '../../assets/Anonymous.jpg'
-import HeaderUserDropdown from './HeaderUserDropdown/HeaderUserDropdown'
 
 const defaultUserImageURL = anonymousImage
 
 export const Header = () => {
   const { currentUser } = useAuth()
-  const { cartDropdownCollapsed, setCartDropdownCollapsed } = useCart()
+  const { cartDropdownCollapsed } = useCart()
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [userImage, setUserImage] = useState(currentUser?.photoURL || defaultUserImageURL)
   // console.table(currentUser)
@@ -35,48 +35,42 @@ export const Header = () => {
     }
   }, [currentUser?.photoURL])
 
-  useEffect(() => {
-    setCartDropdownCollapsed(true)
-    setUserMenuOpen(false)
-  }, [])
-
   return (
-    <div className={styles.headerContainer}>
-
+    <header className={styles.headerContainer}>
+      <nav aria-label="Main navigation">
         <Link to='/' className={styles.logoLinkContainer}>
           <VscRocket className={styles.rocketIcon} />
-          <p className={styles.logoLink}>GalacticTours&#8482;</p>
+          <span className={styles.logoLink}>GalacticTours&#8482;</span>
         </Link>
 
         <Link className={styles.toursLinkContainer} to='/tours'>
           <IoPlanetOutline className={styles.planetIcon} />
-          <p className={styles.toursLink}>Browse All Tours</p>
+          <span className={styles.toursLink}>Browse All Tours</span>
         </Link>
+      </nav>
 
-         <div className={styles.headerMenuContainer}>     
-          {currentUser &&
-            (
-              <>
-                <div className={styles.userIcons}>
-
-                  <CartIcon />
-                  {!cartDropdownCollapsed && <HeaderCartDropdown />}     
-
-                  <div className={styles.userImageContainer} onClick={toggleUserMenu}>
-                    <img src={userImage} alt='View/Update your account' />
-                    <BsCaretDown className={styles.caret} />
-                  </div>
-                </div>
-
-                {userMenuOpen && <HeaderUserDropdown setUserMenuOpen={setUserMenuOpen} />}
-              </>
-            )
-          }
-          {!currentUser && <Link to='/auth'>SIGN IN/UP</Link>}
-          
-        </div>
-
+      <div className={styles.headerMenuContainer}>     
+        {currentUser && (
+          <>
+            <div className={styles.userIcons}>
+              <CartIcon />
+              {!cartDropdownCollapsed && <HeaderCartDropdown />}     
+              <button
+                className={styles.userImageContainer}
+                onClick={toggleUserMenu}
+                aria-label="Open user menu"
+                type="button"
+              >
+                <img src={userImage} alt='View/Update your account' />
+                <BsCaretDown className={styles.caret} />
+              </button>
+            </div>
+            {userMenuOpen && <HeaderUserDropdown setUserMenuOpen={setUserMenuOpen} />}
+          </>
+        )}
+        {!currentUser && <Link to='/auth'>SIGN IN/UP</Link>}
       </div>
+    </header>
   )
 }
 

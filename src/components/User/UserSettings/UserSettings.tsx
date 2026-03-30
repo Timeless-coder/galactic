@@ -52,28 +52,29 @@ const CurrentUserSettings = () => {
   }
 
   return (
-    <div className={styles.userSettingsContainer}>
-
+    <section className={styles.userSettingsContainer} aria-labelledby="user-settings-title">
       {currentUser?.providerId === 'google.com' && (
-        <h1>
-          Update Google account settings at{' '}
-          <a
-            className={linkStyles.link}
-            href='https://myaccount.google.com/'
-            target='_blank'
-            rel='noreferrer'>
-            Google
-          </a>{' '}
-        </h1>
+        <header>
+          <h1 id="user-settings-title">
+            Update Google account settings at{' '}
+            <a
+              className={linkStyles.link}
+              href='https://myaccount.google.com/'
+              target='_blank'
+              rel='noreferrer'>
+              Google
+            </a>{' '}
+          </h1>
+        </header>
       )}
 
       {currentUser?.providerId !== 'google.com' && (
-        <div className={styles.formContainer}>
-
-          <h1>Update Your Account Settings</h1>
-
-          <form onSubmit={handleSubmit(formSubmit)}>
-
+        <section className={styles.formContainer} aria-labelledby="user-settings-title">
+          <header>
+            <h1 id="user-settings-title">Update Your Account Settings</h1>
+          </header>
+          <form onSubmit={handleSubmit(formSubmit)} aria-label="Update your account settings">
+            {/**Email */}
             <div className={styles.inputContainer}>
               <label htmlFor='newEmail'>Update Email</label>
               {errors.newEmail && <p className={styles.error}>{errors.newEmail.message}</p>}
@@ -83,9 +84,11 @@ const CurrentUserSettings = () => {
                 })}
                 id='newEmail'
                 type='email'
+                aria-invalid={!!errors.newEmail}
               />
             </div>
 
+            {/**DisplayName */}
             <div className={styles.inputContainer}>
               <label htmlFor='newName'>Update Display Name</label>
               {errors.newName && <p className={styles.error}>{errors.newName.message}</p>}
@@ -95,9 +98,11 @@ const CurrentUserSettings = () => {
                 })}
                 id='newName'
                 type='text'
+                aria-invalid={!!errors.newName}
               />
             </div>
 
+            {/**Profile Image */}
             <div className={styles.inputContainer}>
               <div className={styles.labelContainer}>
                 <label className={styles.label} htmlFor='newFile'>
@@ -123,13 +128,13 @@ const CurrentUserSettings = () => {
                 name='submit'
                 value={loading ? 'Updating...' : 'Update Profile'}
                 disabled={loading}
+                aria-busy={loading}
               />
             </div>
-
           </form>
-        </div>
+        </section>
       )}
-    </div>
+    </section>
   )
 }
 

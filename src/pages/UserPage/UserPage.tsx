@@ -26,20 +26,17 @@ import { Role } from '../../types/user'
 const UserPage = () => {
   const { currentUser } = useAuth()
   const navigate = useNavigate()
-  const [showSection, setShowSection] = useState('settings')
+  const [showSection, setShowSection] = useState('userSettings')
   const [editTour, setEditTour] = useState<Tour | null>(null)
   const [reviewTour, setReviewTour] = useState<Tour | null>(null)
-
-  console.log(showSection)
 
   useEffect(() => {
     if (!currentUser) navigate('/auth')
   }, [currentUser])
 
   return (
-    <div className={styles.accountContainer}>
-
-      <section className={styles.sideNav}>
+    <main className={styles.accountContainer} aria-labelledby="user-page-title">
+      <nav className={styles.sideNav} aria-label="User account navigation">
         <div className={styles.sideNavItem} onClick={() => setShowSection('userSettings')}>
           <IoSettingsOutline /><p>User Settings</p>
         </div>
@@ -52,20 +49,21 @@ const UserPage = () => {
         <div className={styles.sideNavItem} onClick={() => setShowSection('userReviews')}>
           <IoClipboardOutline /><p>My Reviews</p>
         </div>
-      {currentUser?.role === Role.Admin && (
-        <>
-        <h2>Administration:</h2>
-        <div className={styles.sideNavItem} onClick={() => setShowSection('createTour')}>
-          <CgMathPlus /><p>Create Tour</p>
-        </div>
-        <div className={styles.sideNavItem} onClick={() => setShowSection('manageTours')}>
-          <IoPlanetOutline /><p>Manage Tours</p>
-        </div>
-        </>
-      )}
-      </section>
+        {currentUser?.role === Role.Admin && (
+          <>
+            <h2>Administration:</h2>
+            <div className={styles.sideNavItem} onClick={() => setShowSection('createTour')}>
+              <CgMathPlus /><p>Create Tour</p>
+            </div>
+            <div className={styles.sideNavItem} onClick={() => setShowSection('manageTours')}>
+              <IoPlanetOutline /><p>Manage Tours</p>
+            </div>
+          </>
+        )}
+      </nav>
 
-      <section className={styles.accountSection}>
+      <section className={styles.accountSection} aria-labelledby="user-page-title">
+        <h1 id="user-page-title" className={styles.srOnly}>{currentUser?.role === 'admin' ? "Admin" : "User"} Dashboard</h1>
         {showSection === 'userSettings' && <UserSettings />}
         {showSection === 'userPassword' && <UserPassword />}
         {showSection === 'userReviews' && <UserReviews />}
@@ -75,8 +73,7 @@ const UserPage = () => {
         {showSection === 'createTour' && <CreateTour setShowSection={setShowSection} />}
         {showSection === 'editTour' && <EditTour setShowSection={setShowSection} editTour={editTour!} />}
       </section>
-
-    </div>
+    </main>
   )
 }
 

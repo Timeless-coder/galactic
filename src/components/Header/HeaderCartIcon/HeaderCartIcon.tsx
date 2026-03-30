@@ -8,10 +8,15 @@ export const CartIcon = () => {
   const { cartItems, setCartDropdownCollapsed, cartDropdownCollapsed } = useCart()
 
   return (
-    <div className={styles.cartIconContainer} onClick={() => setCartDropdownCollapsed(!cartDropdownCollapsed)}> 
-      <AiOutlineShoppingCart className={styles.icon} />
-      <p className={styles.count}>{cartItems.length}</p>
-    </div>
+    <button
+      className={styles.cartIconContainer}
+      onClick={() => setCartDropdownCollapsed(!cartDropdownCollapsed)}
+      aria-label="Toggle cart dropdown"
+      type="button"
+    >
+      <AiOutlineShoppingCart className={styles.icon} aria-hidden="true" />
+      <span className={styles.count} aria-label={`Cart items: ${cartItems.length}`}>{cartItems.length}</span>
+    </button>
   )
 }
 

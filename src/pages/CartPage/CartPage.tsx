@@ -24,22 +24,22 @@ export const CartPage = () => {
   }, [currentUser])
   
   return (
-    <div className={styles.cartPageContainer}>
+    <section className={styles.cartPageContainer} aria-labelledby="cart-page-title">
       <div className={styles.cartPageContents}>
-
+        <header>
+          <h1 id="cart-page-title">Your Cart</h1>
+        </header>
         <div className={styles.clearCartContainer} onClick={clearCart}>
-          <CustomButton>
+          <CustomButton aria-label="Empty Cart">
             <IoTrashOutline />
             Empty Cart
           </CustomButton>
         </div>
-
         <div className={styles.cartTours}>
           {cartItems?.map(item => <CartTour key={item.booking.id} cartPageItem={item} />)}
         </div>
-               
         <div className={styles.bottomRowContainer}>
-          <Link className={styles.checkoutButton} to={`/account/${currentUser!.id}/checkout`}>
+          <Link className={styles.checkoutButton} to={`/account/${currentUser!.id}/checkout`} aria-label="Proceed to Checkout">
             <CustomButton>
               Proceed to Checkout
               <IoArrowForwardCircleOutline />
@@ -47,12 +47,11 @@ export const CartPage = () => {
           </Link>
           <div className={styles.totalContainer}>
             <h3>Tours: <span>{cartItems.length}</span></h3>
-            <h3>Total: <span>${total}</span></h3>          
+            <h3>Total: <span>${total}</span></h3>
           </div>
-          
-        </div>      
-      </div>      
-    </div>
+        </div>
+      </div>
+    </section>
   )
 }
 

@@ -23,3 +23,7 @@ const functions = getFunctions(app)
 if (import.meta.env.DEV) {
   connectFunctionsEmulator(functions, 'localhost', 5001)
 }
+
+export const createRandomNumber = (lowest: number, highest: number) => {
+  return Math.floor(Math.random() * (highest - lowest + 1)) + lowest
+}

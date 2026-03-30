@@ -24,8 +24,8 @@ const EmailResetPassword = () => {
       reset()
     }
     catch (err: any) {
-      console.error(err)
-      toast.error('Failed to send reset email. Please check the address and try again.')
+      console.error(err.message)
+      toast.error(`${err.message} - Please try again`)
     }
     finally {
       setLoading(false)
@@ -33,11 +33,11 @@ const EmailResetPassword = () => {
   }
 
   return (
-    <>
-      <h2>Request Password Reset Email</h2>
-
-      <form onSubmit={handleSubmit(formSubmit)}>
-
+    <section>
+      <header>
+        <h2>Request Password Reset Email</h2>
+      </header>
+      <form onSubmit={handleSubmit(formSubmit)} aria-label="Password reset form">
         <div className={styles.inputContainer}>
           <label htmlFor='email'>Email</label>
           {errors.email && <p className={styles.error}>{errors.email.message}</p>}
@@ -50,13 +50,11 @@ const EmailResetPassword = () => {
             placeholder='example@xyz.com'
           />
         </div>
-
         <div className={styles.inputContainer}>
           <input type='submit' value={loading ? 'Sending...' : 'Submit'} disabled={loading} />
         </div>
-
       </form>
-    </>
+    </section>
   )
 }
 

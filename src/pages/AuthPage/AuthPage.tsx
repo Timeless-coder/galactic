@@ -17,7 +17,7 @@ import formStyles from '../../elements/Form.module.scss'
 const AuthPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { signinWithGoogle, currentUser, logout } = useAuth()
+  const { signinWithGoogle, currentUser } = useAuth()
   const [lostPassword, setLostPassword] = useState(false)
   const [hasAccount, setHasAccount] = useState(false)
 
@@ -33,7 +33,7 @@ const AuthPage = () => {
       navigate('/')
     }
     catch(err: any) {
-      console.error(err)
+      console.error(err.message)
       toast.error(`Unable to sign in with Google: ${err.message}`)
     }
   }

@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react'
-
 import type { Tour } from '../../types/tour'
 
 import { getAllToursService } from '../../services/firebase/toursService'
@@ -7,53 +5,30 @@ import { getAllToursService } from '../../services/firebase/toursService'
 import TourCard from '../../components/TourCard/TourCard'
 
 import styles from './ToursPage.module.scss'
-import toast from 'react-hot-toast'
+import { useFirestoreReadService } from '../../hooks/useFirestoreReadService'
+import Spinner from '../../elements/Spinner/Spinner'
+
+const firestoreServiceOptions = {
+  silent: true
+}
 
 export const ToursPage = () => {
-  const [loading, setLoading] = useState(false)
-  const [tours, setTours] = useState<Tour[]>([])
-
-  useEffect(() => {
-    let mounted = true
-
-    const getAllTours = async() => {
-      setLoading(true)
-
-      try {
-        const fetchedTours = await getAllToursService()
-        if (mounted) setTours(fetchedTours)
-      }
-      catch(err: any) {
-        console.log(`Error fetching tours: ${err.message}`)
-        setTours([])
-        toast.error(`Failed to fetch tours: ${err.message}`)
-      }
-      finally {
-        setLoading(false)
-      }      
-    }
-
-    getAllTours()
-
-    return () => {
-      mounted = false
-    }
-    
-  }, [])
+  const { data: tours, loading } = useFirestoreReadService<Tour[] | null>(getAllToursService, firestoreServiceOptions)
 
   return (
-    <div className={styles.toursPageContainer}>
-
-      <div className={styles.toursPageTop}>
-        <h2>Our Tours:</h2>
-        <p>We currently offer {tours.length} tours.</p>
+    <main className={styles.toursPageContainer} aria-labelledby="tours-page-title">
+      <header className={styles.toursPageTop}>
+        <h1 id="tours-page-title">Our Tours:</h1>
+        <p>We currently offer {tours?.length || 0} tours.</p>
         <p>Hit a "Click for Details" button for more information about a particular tour.</p>
-      </div>
-
-      <div className={styles.toursContainer}>
+      </header>
+      
+      <section className={styles.toursContainer} aria-label="Tours List">
+        {loading && <Spinner />}
+        {!loading && (!tours || tours.length === 0) && <h2>We have no tours. Something has gone horrible wrong.</h2>}
         {tours?.map(tour => <TourCard key={tour.id} tour={tour} />)}
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }
 

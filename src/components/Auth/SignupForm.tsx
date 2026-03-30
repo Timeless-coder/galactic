@@ -61,21 +61,24 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 	}
 
 	return (
-		<>
-			<h2>SIGN UP</h2>
+		<section>
+			<header>
+				<h2>SIGN UP</h2>
+			</header>
 
-			<div className={styles.status}>
+			<aside className={styles.status}>
 				<p>Have an Account?</p>
-				<div onClick={() => setHasAccount(true)}>
+				<button type="button" onClick={() => setHasAccount(true)}>
 					<CustomButton>Sign In</CustomButton>
-				</div>
-			</div>
-			
-			<form onSubmit={handleSubmit(formSubmit)} className="your-glassy-styles">
+				</button>
+			</aside>
+      
+			<form onSubmit={handleSubmit(formSubmit)} aria-label="Signup form" className="your-glassy-styles">
 
+				{/* Email */}
 				<div className={styles.inputContainer}>
 					<label htmlFor="signup-email">Email</label>
-					{errors.email && <p className={styles.error}>{errors.email.message}</p>}
+					{errors.email && <p className={styles.error} role="alert">{errors.email.message}</p>}
 					<input
 						{...register('email', {
 							required: 'Email is required'
@@ -83,12 +86,15 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 						id="signup-email"
 						type="email"
 						placeholder="Email"
+						aria-invalid={!!errors.email}
+						aria-describedby={errors.email ? 'signup-email-error' : undefined}
 					/>
 				</div>
 
+				{/* Name */}
 				<div className={styles.inputContainer}>
 					<label htmlFor='name'>Name</label>
-					{errors.name && <p className={styles.error}>{errors.name.message}</p>}
+					{errors.name && <p className={styles.error} role="alert">{errors.name.message}</p>}
 					<input
 						{...register('name', {
 							required: 'Your name is required',
@@ -100,12 +106,15 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 						id='name'
 						type='text'
 						placeholder='Your name'
+						aria-invalid={!!errors.name}
+						aria-describedby={errors.name ? 'signup-name-error' : undefined}
 					/>
 				</div>
-
+        
+				{/* Password */}
 				<div className={styles.inputContainer}>
 					<label htmlFor="signup-password">Password</label>
-					{errors.password && <p className={styles.error}>{errors.password.message}</p>}
+					{errors.password && <p className={styles.error} role="alert">{errors.password.message}</p>}
 					<input
 						{...register('password', {
 							required: 'Password is required',
@@ -117,12 +126,15 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 						id="signup-password"
 						type="password"
 						placeholder="Password"
+						aria-invalid={!!errors.password}
+						aria-describedby={errors.password ? 'signup-password-error' : undefined}
 					/>
 				</div>
 
+				{/* Confirm Password */}
 				<div className={styles.inputContainer}>
 					<label htmlFor="signup-password-confirm">Confirm Password</label>
-					{errors.passwordConfirm && <p className={styles.error}>{errors.passwordConfirm.message}</p>}
+					{errors.passwordConfirm && <p className={styles.error} role="alert">{errors.passwordConfirm.message}</p>}
 					<input
 						{...register('passwordConfirm', {
 							required: 'Please confirm your password',
@@ -131,9 +143,12 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 						id="signup-password-confirm"
 						type="password"
 						placeholder="Confirm Password"
+						aria-invalid={!!errors.passwordConfirm}
+						aria-describedby={errors.passwordConfirm ? 'signup-password-confirm-error' : undefined}
 					/>
 				</div>
 
+				{/* Profile Image */}
 				<div className={styles.inputContainer}>
 					<div className={styles.labelContainer}>
 						<label className={styles.label} htmlFor='profileImage'>
@@ -144,27 +159,31 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 							Profile Image
 						</label>
 					</div>
-					{errors.profileImage && <p className={styles.error}>{errors.profileImage.message as string}</p>}
+					{errors.profileImage && <p className={styles.error} role="alert">{errors.profileImage.message as string}</p>}
 					<input
 						{...register('profileImage', {
-							
+							required: 'Profile image is required'
 						})}
 						id='profileImage'
 						type='file'
 						accept='image/jpeg'
+						aria-invalid={!!errors.profileImage}
+						aria-describedby={errors.profileImage ? 'signup-profileImage-error' : undefined}
 					/>
 				</div>
 
 				<div className={styles.inputContainer}>
-          <input
-            type='submit'
-            name='submit'
-            value='Submit'
+					<button
+						type='submit'
+						name='submit'
 						disabled={loading}
-          />
-        </div>
+						aria-busy={loading}
+					>
+						Submit
+					</button>
+				</div>
 			</form>
-		</>
+		</section>
 	)
 }
 

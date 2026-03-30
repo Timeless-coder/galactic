@@ -37,10 +37,9 @@ const CheckoutPage = () => {
     localStorage.setItem('galacticCartReceiptTotal', JSON.stringify(total))
 
     const functions = getFunctions()
-    const createPaymentIntent = httpsCallable<
-      { amount: number; userId: string; cartItems: { tourId: string; departureDate: string; people: number }[] },
-      { clientSecret: string }
-    >(functions, 'createPaymentIntent')
+    const createPaymentIntent =
+      httpsCallable<{ amount: number; userId: string; cartItems: { tourId: string; departureDate: string; people: number }[] }, { clientSecret: string }>(functions, 'createPaymentIntent')
+      
     createPaymentIntent({
       amount: Math.round(total * 100),
       userId: currentUser!.id,
@@ -53,23 +52,24 @@ const CheckoutPage = () => {
   }, [total])
 
   return (
-      <div className={styles.checkoutContainer}>
-        <div className={styles.checkoutContents}>
-          <h2>Thank you so much for choosing GalacticTours!</h2>
-          {total > 0
-            ? <h3>Review your payment amount of:<span>${total}</span></h3>
-            : <h3>Please add at least one tour before checking out.</h3> }
+    <section className={styles.checkoutContainer} aria-labelledby="checkout-page-title">
+      <div className={styles.checkoutContents}>
+        <header>
+          <h1 id="checkout-page-title">Thank you so much for choosing GalacticTours!</h1>
+        </header>
+        {total > 0
+          ? <h3>Review your payment amount of:<span>${total}</span></h3>
+          : <h3>Please add at least one tour before checking out.</h3>}
 
-          {clientSecret && <Stripe promise={stripePromise} options={options} />}   
-      
-          <div className={styles.warningContainer}>
-            *Please use the following test credit card for payments*
-            <br />
-            4242 4242 4242 4242 - Exp: 05/28 - CVV: 586
-          </div>
+        {clientSecret && <Stripe promise={stripePromise} options={options} />}
+
+        <div className={styles.warningContainer} role="alert" aria-live="polite">
+          *Please use the following test credit card for payments*
+          <br />
+          4242 4242 4242 4242 - Exp: 05/28 - CVV: 586
         </div>
-      
       </div>
+    </section>
   )
 }
 

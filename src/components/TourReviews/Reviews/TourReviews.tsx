@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
 import { format } from 'date-fns/format'
-import toast from 'react-hot-toast'
 
-import type { Review, ReviewWithUser } from '../../../types/review'
+import type { ReviewWithUser } from '../../../types/review'
 import type { Tour } from '../../../types/tour'
 
 import { fetchReviewsForTour } from '../../../services/firebase/reviewsService'
+import { useFirestoreReadService } from '../../../hooks/useFirestoreReadService'
 
 import ReviewCard from '../ReviewCard/ReviewCard'
 import Spinner from '../../../elements/Spinner/Spinner'
@@ -14,45 +13,26 @@ import styles from './TourReviews.module.scss'
 
 type ReviewsProps = {
   tour: Tour
-  id: string
 }
 
-export const TourReviews = ({ tour, id }: ReviewsProps) => {
-  const [reviews, setReviews] = useState<ReviewWithUser[]>([])
-  const [loading, setLoading] = useState(false)
+const firestoreServiceOptions = {
+  silent: true
+}
 
-  useEffect(() => {
-    let mounted = true
-
-    const fetchTourReviews = async () => {
-      setLoading(true)
-      
-      try {
-        const fetchedReviews: ReviewWithUser[] = await fetchReviewsForTour(id)
-        if (mounted) setReviews(fetchedReviews)
-      }
-      catch (err) {
-        console.error(err)
-        toast.error('Failed to fetch reviews for this tour')
-        if (mounted) setReviews([])
-      }
-      finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    fetchTourReviews()
-
-    return () => {
-      mounted = false
-    }
-  }, [id])
-
+export const TourReviews = ({ tour }: ReviewsProps) => {
+  const { data: reviews, loading } = useFirestoreReadService<ReviewWithUser[] | null>(() => fetchReviewsForTour(tour.id), firestoreServiceOptions)
 
   return (
-    <div className={styles.reviewsContainer}>
+    <section className={styles.reviewsContainer} aria-label="Tour reviews">
       {loading && <Spinner />}
-      {reviews.map(item => (
+      {!loading && (!reviews || reviews?.length === 0) && (
+        <header>
+          <h3 className={styles.empty}>
+            No reviews for this tour yet.
+          </h3>
+        </header>
+      )}
+      {reviews?.map(item => (
         <ReviewCard
           key={item.review.id}
           rating={item.review.rating}
@@ -63,12 +43,7 @@ export const TourReviews = ({ tour, id }: ReviewsProps) => {
           tour={tour}
         />
       ))}
-      {reviews.length === 0 && !loading && (
-        <h3 className={styles.empty}>
-          No reviews for this tour yet.
-        </h3>
-      )}
-    </div>
+    </section>
   )
 }
 

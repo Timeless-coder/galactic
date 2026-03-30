@@ -91,7 +91,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const updateUserAccount = async (email: string, displayName: string, photoURL: string) => {
-    await updateAuthProfileService(email, displayName, photoURL)
+    try {
+      await updateAuthProfileService(email, displayName, photoURL)
+    }
+    catch(error) {
+      console.error(error)
+      throw error
+    }
+    
   }
 
   const updatePassword = async (newPassword: string) => {

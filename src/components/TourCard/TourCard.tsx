@@ -12,41 +12,41 @@ type TourCardProps = {
 export const TourCard = ({ tour }: TourCardProps) => {
   
   return (
-  <div className={styles.card}>
-    {tour && (
-      <>
-      <div className={styles.cardHeader}>
-        <div className={styles.cardPicture}>
-          <img src={tour.imageCover} alt={tour.name} />
-        </div>
-        <h1>{tour.planet}</h1>
-      </div>
+    <article className={styles.card}>
+      {tour && (
+        <>
+          {/* Header */}
+          <header className={styles.cardHeader}>
+            <div className={styles.cardPicture}>
+              <img src={tour.imageCover} alt={tour.name} />
+            </div>
+            <h1>{tour.planet}</h1>
+          </header>
 
-      <div className={`${styles.cardDetails} ${styles.one}`}>
-        <h2>{tour.name}</h2>
-        <div className={styles.cardDetailsText}>
-          <h3>Difficulty:</h3> <h3>{tour.difficulty} / 100</h3>
-        </div>
-        <div className={styles.cardDetailsText}>
-          <h3>Average Rating:</h3> <h3>{tour.averageRating} / 100</h3>
-        </div>
-        <div className={styles.cardDetailsText}>
-          <h3>Total Reviews:</h3> <h3>{tour.reviews}</h3>
-        </div>
-      </div>
+          {/* Details */}
+          <section className={`${styles.cardDetails} ${styles.one}`}>
+            <h2>{tour.name}</h2>
+            <div className={styles.cardDetailsText}>
+              <h3>Difficulty:</h3> <h3>{tour.difficulty} / 100</h3>
+            </div>
+            <div className={styles.cardDetailsText}>
+              <h3>Average Rating:</h3> <h3>{tour.averageRating} / 100</h3>
+            </div>
+            <div className={styles.cardDetailsText}>
+              <h3>Total Reviews:</h3> <h3>{tour.reviews}</h3>
+            </div>
+          </section>
 
-       <div className={styles.cardDetails}>
-        <Link to={`/tours/${tour.slug}`}>
-        <div className={styles.tourLink}>
-          Click for Details
-          <IoArrowForwardCircleOutline />
-        </div>
-        </Link>
-      </div>    
-      
-      </>      
-    )}
-  </div>
+          {/* Button */}
+          <section className={styles.cardDetails}>
+            <Link to={`/tours/${tour.slug}`} className={styles.tourLink}>
+              Click for Details
+              <IoArrowForwardCircleOutline />
+            </Link>
+          </section>
+        </>
+      )}
+    </article>
   )
 }
 

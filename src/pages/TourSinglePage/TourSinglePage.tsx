@@ -70,20 +70,18 @@ const TourSinglePage = () => {
   // ANYTIME cartItems CHANGES, THIS CHECKS THE 3 dateRefs AGAINST THE CART FOR MATCHING BOOKINGS,
   // AND CHANGES display TO 'block' FOR ANY WITH MATCHES IN CART.
   useEffect(() => {
-    if (!tour?.startDates) return
+    if (!tour?.departureDates) return
 
     dateRefs.current.forEach((ref, i) => {
       if (!ref) return
-      const hasCartItem = cartItems.some(item => item.tour.id === tour.id && item.booking.departureDate === tour.startDates[i])
+      const hasCartItem = cartItems.some(item => item.tour.id === tour.id && item.booking.departureDate === tour.departureDates[i])
       ref.style.display = hasCartItem ? 'block' : 'none'
     })
   }, [cartItems, tour])
 
   useEffect(() => {
     closeInstructionsModal(15_000)
-  }, [])
-   
-  
+  }, [])  
 
   const handleBookingClick = (selectedDepartureDate: string) => {
     const existingCartItem = cartItems.find(item => item.booking.tourId === tour!.id && item.booking.departureDate === selectedDepartureDate)
@@ -139,118 +137,93 @@ const TourSinglePage = () => {
 
   return (
     <>
+      <aside className={styles.tourSingleInstructions} id='modal' ref={modalRef} aria-live="polite">
+        {getModalText()}
+        <AiFillCloseCircle className={styles.icon} onClick={() => closeInstructionsModal(0)} />
+      </aside>
 
-    <div className={styles.tourSingleInstructions} id='modal' ref={modalRef}>
-      {getModalText()}
-      <AiFillCloseCircle className={styles.icon} onClick={() => closeInstructionsModal(0)} />      
-    </div>
-
-    {loading && <Spinner />}
-    {tour &&
-      <div className={styles.tourSingleContainer}>
-        
-        {/**Header */}
-        <div className={styles.tourHeader}>
-          <div className={styles.tourPicture}>
-            <img src={tour.imageCover} alt={tour.name} />
-          </div>
-          <h1>{tour.planet}</h1>
-        </div>
-
-        <div className={styles.main}>
-          <div className={styles.mainLeft} id='book'>
-
-            {/**Basic Information */}
-            <div className={`${styles.tourDetails} ${styles.one}`}>    
-              <h2>{tour.name}</h2>
-              <div className={styles.tourDetailsText}>
-                <h3>Difficulty:</h3> <h3>{tour.difficulty} / 100</h3>
-              </div>
-              <div className={styles.tourDetailsText}>
-                <h3>Average Rating:</h3> <h3>{tour.averageRating} / 100</h3>
-              </div>
-              <div className={styles.tourDetailsText}>
-                <h3>Total Reviews:</h3> <h3>{tour.reviews}</h3>
-              </div>
+      {loading && <Spinner />}
+      {tour && (
+        <main className={styles.tourSingleContainer} aria-labelledby="tour-single-title">
+          {/* Header */}
+          <header className={styles.tourHeader}>
+            <div className={styles.tourPicture}>
+              <img src={tour.imageCover} alt={tour.name} />
             </div>
+            <h1 id="tour-single-title">{tour.planet}</h1>
+          </header>
 
-            {/**Start Dates */}
-            <div className={styles.tourDetails}>              
-              <h2>Start Dates:</h2>
-              {tour.startDates?.map((departureDate, i) => (
-                <div className={styles.tourDetailsText} key={departureDate}>
-                  <div className={styles.tourDetailsTextLeft}>
-                    <h3>{format(new Date(departureDate), 'PPPP')}</h3>
-                    <p className={styles.peopleRef} ref={el => { dateRefs.current[i] = el }}>
-                      {setButtonLabelAndPeopleText(departureDate).peopleText} booked
-                    </p>
-                  </div>
-                   <div onClick={() => setClickFunction(departureDate)}>
-                    <CustomButton>
-                      {setButtonLabelAndPeopleText(departureDate).buttonLabel}
-                    </CustomButton>                   
-                  </div>             
+          <section className={styles.main}>
+            <div className={styles.mainLeft} id='book'>
+              {/* Basic Information */}
+              <section className={`${styles.tourDetails} ${styles.one}`}>    
+                <h2>{tour.name}</h2>
+                <div className={styles.tourDetailsText}>
+                  <h3>Difficulty:</h3> <h3>{tour.difficulty} / 100</h3>
                 </div>
-              ))}
+                <div className={styles.tourDetailsText}>
+                  <h3>Average Rating:</h3> <h3>{tour.averageRating} / 100</h3>
+                </div>
+                <div className={styles.tourDetailsText}>
+                  <h3>Total Reviews:</h3> <h3>{tour.reviews}</h3>
+                </div>
+              </section>
+
+              {/* Departure Dates */}
+              <section className={styles.tourDetails} aria-labelledby="departure-dates-title">              
+                <h2 id="departure-dates-title">Departure Dates:</h2>
+                {tour.departureDates?.map((departureDate, i) => (
+                  <div className={styles.tourDetailsText} key={departureDate}>
+                    <div className={styles.tourDetailsTextLeft}>
+                      <h3>{format(new Date(departureDate), 'PPPP')}</h3>
+                      <p className={styles.peopleRef} ref={el => { dateRefs.current[i] = el }}>
+                        {setButtonLabelAndPeopleText(departureDate).peopleText} booked
+                      </p>
+                    </div>
+                    <div onClick={() => setClickFunction(departureDate)}>
+                      <CustomButton>
+                        {setButtonLabelAndPeopleText(departureDate).buttonLabel}
+                      </CustomButton>
+                    </div>
+                  </div>
+                ))}
+              </section>
             </div>
 
-          </div>
+            {/* Summary */}
+            <aside className={styles.mainRight}>
+              <h2>{tour.summary}</h2>
+              <p>{tour.description}</p>
+            </aside>
+          </section>
 
-            {/**Summary */}
-          <div className={styles.mainRight}>
-            <h2>{tour.summary}</h2>
-            <p>{tour.description}</p>
-          </div>
-        </div>
+          {/* Images */}
+          <section className={styles.images} aria-label="Tour Images">
+            {tour.images?.map((image) => (
+              <div className={styles.tourImageContainer} key={image}>
+                <img src={image} alt={tour.name}/>
+              </div>
+            ))}
+          </section>
 
-          {/**Images */}
-        <div className={styles.images}>
-          {tour.images?.map((image) => (
-            <div className={styles.tourImageContainer} key={image}>
-              <img src={image} alt={tour.name}/>
-            </div>
-          ))}
-        </div>
-        
-        {/**Reviews */}
-        <h2 className={styles.reviewsTitle}>Reviews:</h2>
-        <TourReviews tour={tour} id={tour.id} />
+          {/* Reviews */}
+          <section aria-labelledby="reviews-title">
+            <h2 id="reviews-title" className={styles.reviewsTitle}>Reviews:</h2>
+            <TourReviews tour={tour} />
+          </section>
 
-        <div className={styles.worksContainer}>
-          <HowThisWorks />
-        </div>
+          <section className={styles.worksContainer} aria-label="How This Works">
+            <HowThisWorks />
+          </section>
 
-        <div className={styles.book}>
-          <p>Click one of the <strong><a href='#book'>Book Date</a></strong> buttons above to start your adventure.</p>
-          <p>Click the button additional times to add more people to your tour.</p>
-        </div>      
-    
-      </div>
-    }
+          <nav className={styles.book} aria-label="Booking Instructions">
+            <p>Click one of the <strong><a href='#book'>Book Date</a></strong> buttons above to start your adventure.</p>
+            <p>Click the button additional times to add more people to your tour.</p>
+          </nav>
+        </main>
+      )}
     </>
   )
 }
 
 export default TourSinglePage
-
-
-
-// THIS WAS ALSO WORKING FOR ME, BUT IT WAS A BIT WONKY
-  // const setButtonLabelAndPeopleText = (selectedDepartureDate: string, selectedIndex: number) => {
-  //   if (!tour || !tour.startDates) return
-
-  //   const finalTextObject = { buttonLabel: "Book Date", peopleText: "" }
-
-  //   dateRefs.current.forEach((ref, i) => {
-  //     const existingCartItem = cartItems.find(item => item.tour.id === tour.id && item.booking.departureDate === selectedDepartureDate)
-  //     if (ref && existingCartItem && selectedIndex === i) {
-  //       ref.style.display = 'block'
-  //       finalTextObject.buttonLabel = "Add Person"
-  //       const peoplePerson = existingCartItem.booking.people === 1 ? "person" : 'people'
-  //       finalTextObject.peopleText = `${existingCartItem.booking.people} ${peoplePerson}`
-  //     }
-  //   })
-
-  //   return finalTextObject
-
-  // }

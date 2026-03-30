@@ -1,6 +1,6 @@
 import { doc, getDoc, collection, query, where, getDocs, addDoc, setDoc, deleteDoc, updateDoc, deleteField } from 'firebase/firestore'
 
-import { db } from './firebaseConfig'
+import { db, createRandomNumber } from './firebaseConfig'
 import { getRole } from './authService'
 import type { Tour } from '../../types/tour'
 import { Role } from '../../types/user'
@@ -30,12 +30,13 @@ export const getTourBySlug = async (slug: string): Promise<Tour> => {
 
 // *** ADMIN ***
 // Omit the secondary 'id' property - see note in type.
-export const createTourService = async (tour: Omit<Tour, 'id' | 'index'>, email: string): Promise<string> => {
+export const createTourService = async (tour: Omit<Tour, 'id' | 'departureDates'>, email: string): Promise<string> => {
 	const userRole = await getRole(email)
 	if (userRole !== Role.Admin) {
 		throw new Error('There was an issue verifying your Admin credentials')
 	}
-  const docRef = await addDoc(collection(db, 'tours'), { ...tour })
+	const departureDates: string[] = Array.from({ length: 3 }, () => (`${createRandomNumber(2027, 2029)} ${createRandomNumber(1, 12)} ${createRandomNumber(1, 28)}`))
+  const docRef = await addDoc(collection(db, 'tours'), { ...tour, departureDates })
   return docRef.id
 }
 
@@ -59,14 +60,14 @@ export const migrateTourDepartureDates = async (): Promise<void> => {
 	const toursSnap = await getDocs(collection(db, 'tours'))
 	for (const tourDoc of toursSnap.docs) {
 		const data = tourDoc.data()
-		const startDates = data.startDates
-		const newStartDates: string[] = []
-		startDates.forEach((date: string) => {
+		const departureDates = data.departureDates
+		const newDepartureDates: string[] = []
+		departureDates.forEach((date: string) => {
 			const parts = date.split(' ')
-			newStartDates.push(`${(Number(parts[0]) + 5).toString()} ${parts[1]} ${parts[2]}`)
+			newDepartureDates.push(`${(Number(parts[0]) + 5).toString()} ${parts[1]} ${parts[2]}`)
 		})
 		await updateDoc(doc(db, 'tours', tourDoc.id), {
-					startDates: newStartDates
+					departureDates: newDepartureDates
 				})
 	}
 }
@@ -78,6 +79,19 @@ export const removeFieldFromTour = async (fieldLabel: string): Promise<void> => 
 		if (fieldLabel in data) {
 			await updateDoc(doc(db, 'tours', tourDoc.id), {
 				[fieldLabel]: deleteField(),
+			})
+		}
+	}
+}
+
+export const migratedepartureDatesToDepartureDates = async (): Promise<void> => {
+	const toursSnap = await getDocs(collection(db, 'tours'))
+	for (const tourDoc of toursSnap.docs) {
+		const data = tourDoc.data()
+		if ('departureDates' in data) {
+			await updateDoc(doc(db, 'tours', tourDoc.id), {
+				departureDates: data.departureDates,
+				startDates: deleteField(),
 			})
 		}
 	}

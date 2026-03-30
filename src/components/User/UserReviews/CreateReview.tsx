@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from "react-hot-toast"
 
 import type { Tour } from '../../../types/tour'
 
 import { createReviewService } from '../../../services/firebase/reviewsService'
 import { useAuth } from '../../../hooks/useAuth'
+import { useFirestoreMutateService } from '../../../hooks/useFirestoreMutateService'
 
 import Spinner from '../../../elements/Spinner/Spinner'
 
 import styles from '../../../elements/Form.module.scss'
+import type { Review } from '../../../types/review'
 
 type CreateReviewProps = {
 	reviewTour: Tour | null
@@ -23,30 +24,37 @@ type CreateReviewFormData = {
 	userId: string
 }
 
+const firestoreServiceOptions = {
+	successMessage: 'Review created successfully!'
+}
+
 const CreateReview = ({ reviewTour, setShowSection }: CreateReviewProps) => {
 	const { currentUser } = useAuth()
 	const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateReviewFormData>()
 	const [loading, setLoading] = useState(false)
 
+	const { loading: creating, mutate: createReview } =
+		useFirestoreMutateService((reviewObject: Omit<Review, 'id' | 'createdAt'>) => createReviewService(reviewObject), firestoreServiceOptions)
+
 	const formSubmit = async (data: CreateReviewFormData) => {
+		if (!reviewTour || !currentUser) return
 		setLoading(true)
 
-		if (!reviewTour || !currentUser) return
-
-		try {
-			await createReviewService({
+			const reviewObject: Omit<Review, 'id' | 'createdAt'> = {
 				rating: data.rating,
 				text: data.text,
 				tourId: reviewTour.id,
 				userId: currentUser.id
-			})
+			}
+
+		try {
+			await createReview(reviewObject)
 
 			reset()
 			setShowSection('userReviews')
 		}
 		catch (err: any) {
-			console.error(err)
-			toast.error(`Error creating review: ${err.message || err}`)
+			console.error(err.message)
 		}
 		finally {
 			setLoading(false)
@@ -54,14 +62,14 @@ const CreateReview = ({ reviewTour, setShowSection }: CreateReviewProps) => {
 	}
 
 	return (
-		<>
-			{loading && <Spinner />}
+		<section>
+			{loading || creating && <Spinner />}
 			<div>
 				<div className={styles.formContainer}>
-					<h2>Create New Tour</h2>
-
-					<form onSubmit={handleSubmit(formSubmit)}>
-
+					<header>
+						<h2>Review this Tour</h2>
+					</header>
+					<form onSubmit={handleSubmit(formSubmit)} aria-label="Create review form">
 						<div className={styles.inputContainer}>
 							<label htmlFor='difficulty'>Rating</label>
 							{errors.rating && <p className={styles.error}>{errors.rating.message}</p>}
@@ -82,7 +90,6 @@ const CreateReview = ({ reviewTour, setShowSection }: CreateReviewProps) => {
 								type='number'
 							/>
 						</div>
-
 						<div className={styles.inputContainer}>
 							<label htmlFor='description'>Review</label>
 							{errors.text && <p className={styles.error}>{errors.text.message}</p>}
@@ -95,7 +102,6 @@ const CreateReview = ({ reviewTour, setShowSection }: CreateReviewProps) => {
 								placeholder='Create a full review'
 							/>
 						</div>
-
 						<div className={styles.inputContainer}>
 							<input
 								type='submit'
@@ -103,11 +109,10 @@ const CreateReview = ({ reviewTour, setShowSection }: CreateReviewProps) => {
 								value='Create Review'
 							/>
 						</div>
-
 					</form>
 				</div>
 			</div>
-		</>
+		</section>
 	)
 }
 

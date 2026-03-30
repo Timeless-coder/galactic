@@ -8,45 +8,58 @@ type CheckoutTourProps = {
   cartPageItem: CartItem
 }
 
+
 export const CartTour = ({ cartPageItem }: CheckoutTourProps) => {
   const { removePersonOrBooking, addPersonToBooking, removeItemFromCart } = useCart()
 
   return (
-    <div className={styles.checkoutTourContainer}>
-      <div className={styles.imageContainer}>
+    <article className={styles.checkoutTourContainer}>
+      <figure className={styles.imageContainer}>
         <img src={cartPageItem.tour.imageCover} alt={cartPageItem.tour.planet} />
-      </div>
+      </figure>
 
-      <div className={styles.textContainer}>
-        {cartPageItem.tour.planet}
+      <section className={styles.textContainer} aria-label="Tour details">
+        <h3>{cartPageItem.tour.planet}</h3>
         <p className={styles.departureDate}>
           {cartPageItem.booking.departureDate}
         </p>
-      </div>
+      </section>
 
-      <div className={styles.peopleContainer}>
+      <section className={styles.peopleContainer} aria-label="People selector">
         <div className={styles.carets}>
-          <div onClick={() => removePersonOrBooking(cartPageItem)}>
+          <button
+            type="button"
+            aria-label="Remove person or booking"
+            onClick={() => removePersonOrBooking(cartPageItem)}
+          >
             &#10094;
-          </div>
+          </button>
           <span>{cartPageItem.booking.people}</span>
-          <div onClick={() => addPersonToBooking(cartPageItem)}>
+          <button
+            type="button"
+            aria-label="Add person to booking"
+            onClick={() => addPersonToBooking(cartPageItem)}
+          >
             &#10095;
-          </div>
+          </button>
         </div>
         <p>{cartPageItem.booking.people === 1 ? 'Person' : 'People'}</p>
-      </div>
+      </section>
 
-      <div className={styles.textContainer}>{cartPageItem.booking.people}</div>
+      <section className={styles.textContainer} aria-label="People count">
+        {cartPageItem.booking.people}
+      </section>
 
-      <div
+      <button
         className={styles.removeButtonContainer}
-        onClick={() => removeItemFromCart(cartPageItem)}>
+        onClick={() => removeItemFromCart(cartPageItem)}
+        aria-label="Remove item from cart"
+        type="button"
+      >
         &#10005;
-        <p>Remove</p>
-      </div>
-      
-    </div>
+        <span>Remove</span>
+      </button>
+    </article>
   )
 }
 

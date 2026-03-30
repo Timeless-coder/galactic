@@ -17,18 +17,22 @@ type ReviewCardProps = {
 const ReviewCard = ({ rating, text, userName, userPhoto, createdAt, tour }: ReviewCardProps) => {
 
   return (
-    <div className={styles.reviewCard}>
-     <img className={styles.backgroundImage} src={tour.imageCover} alt={tour.planet}/>
-      <div className={styles.content}>
-        <div className={styles.userImage}>
-          <img src={userPhoto || defaultUserImageURL} alt={userName} />
-        </div>            
-        <h3>{userName || 'Anonymous'}</h3>
-        <p style={{  fontSize: '12px' }}>Reviewed: <em>{createdAt}</em></p>
+    <article className={styles.reviewCard}>
+      <figure>
+        <img className={styles.backgroundImage} src={tour.imageCover} alt={tour.planet} />
+      </figure>
+      <section className={styles.content}>
+        <header>
+          <figure className={styles.userImage}>
+            <img src={userPhoto || defaultUserImageURL} alt={userName} />
+          </figure>
+          <h3>{userName || 'Anonymous'}</h3>
+          <p style={{ fontSize: '12px' }}>Reviewed: <em>{createdAt}</em></p>
+        </header>
         <p>{text}</p>
         <h2>{rating} / 100</h2>
-      </div>
-    </div>
+      </section>
+    </article>
   )
 }
 

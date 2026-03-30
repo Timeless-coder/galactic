@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs, addDoc, getDoc, doc, orderBy, serverTimestamp, updateDoc, deleteField, Timestamp } from 'firebase/firestore'
 
-import { db } from './firebaseConfig'
+import { db, createRandomNumber } from './firebaseConfig'
 import type { Review, ReviewWithUser, ReviewWithTour } from '../../types/review'
 import type { User } from '../../types/user'
 import type { Tour } from '../../types/tour'
@@ -91,21 +91,23 @@ export async function fetchReviewsByUser(userId: string): Promise<ReviewWithTour
 }
 
 export const createReviewService = async (review: Omit<Review, 'id' | 'createdAt'>): Promise<string> => {
-	const docRef = await addDoc(collection(db, 'reviews'), {
-		rating: review.rating,
-		text: review.text,
-		tourId: review.tourId,
-		userId: review.userId,
-		createdAt: serverTimestamp(),
-	})
-	return docRef.id
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const createdAt = `${year} ${month} ${day}`;
+
+  const docRef = await addDoc(collection(db, 'reviews'), {
+    rating: review.rating,
+    text: review.text,
+    tourId: review.tourId,
+    userId: review.userId,
+    createdAt,
+  });
+  return docRef.id
 }
 
 // *** Migrations ***
-
-const createRandomNumber = (lowest: number, highest: number) => {
-  return Math.floor(Math.random() * (highest - lowest + 1)) + lowest
-}
 
 export const addCreatedAtToReviews = async (): Promise<void> => {
   const reviewsSnap = await getDocs(collection(db, 'reviews'))

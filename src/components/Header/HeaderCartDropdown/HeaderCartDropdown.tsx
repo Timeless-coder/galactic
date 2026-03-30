@@ -16,25 +16,35 @@ export const HeaderCartDropdown = () => {
   const { cartItems, setCartDropdownCollapsed, cartDropdownCollapsed } = useCart()
 
   return (
-    <div className={styles.cartContainer}>
-      <div className={styles.closeDropdown} onClick={() => setCartDropdownCollapsed(!cartDropdownCollapsed)}>        
+    <aside className={styles.cartContainer} aria-label="Cart dropdown">
+      <div className={styles.closeDropdown}>
         <div className={styles.scroll}>
           {cartItems.length > 3
             ? <><p>Scroll</p> <IoArrowDownCircleOutline /></>
             : <p />
-          }                 
+          }
         </div>
-        <CustomButton>
-          <AiFillCloseCircle />
-          Close
-        </CustomButton>
+        <button
+          type="button"
+          onClick={() => setCartDropdownCollapsed(!cartDropdownCollapsed)}
+          aria-label="Close cart dropdown"
+        >
+          <CustomButton>
+            <AiFillCloseCircle />
+            Close
+          </CustomButton>
+        </button>
       </div>
-      <div className={styles.cartTours}>
+      <nav className={styles.cartTours} aria-label="Cart items">
         {cartItems.length > 0
           ? cartItems.map(item => <CartDropdownTour key={item.booking.id} booking={item.booking} tour={item.tour} />)
-          : <div className={styles.cartMessage}>Your cart is empty</div>
+          : (
+              <div className={styles.cartMessage}>
+                Your cart is empty
+              </div>
+            )
         }
-      </div>
+      </nav>
       {currentUser && (
         <Link to={`/account/${currentUser?.id}/cart`}>
           <CustomButton>
@@ -42,9 +52,8 @@ export const HeaderCartDropdown = () => {
             <IoArrowForwardCircleOutline />
           </CustomButton>
         </Link>
-      )
-      }
-    </div>
+      )}
+    </aside>
   )
 }
 

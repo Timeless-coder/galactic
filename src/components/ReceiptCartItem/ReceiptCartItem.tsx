@@ -10,15 +10,17 @@ type ReceiptTourProps = {
 
 const ReceiptTour = ({ cartItem }: ReceiptTourProps) => {
   return (
-    <div className={styles.receiptContainer}>
-      <h3>{cartItem.tour.name}</h3>
-      <div className={styles.tourDetailsText}>
+    <article className={styles.receiptContainer}>
+      <header>
+        <h3>{cartItem.tour.name}</h3>
+      </header>
+      <section className={styles.tourDetailsText}>
         <h4>Departure Date: <strong><em>{format(cartItem.booking.departureDate, 'PPPP')}</em></strong></h4>
-      </div>
-        <div className={styles.tourDetailsText}>
-          <h4>People:</h4> <h5><strong><em>{cartItem.booking.people}</em></strong></h5>
-        </div>
-    </div>
+      </section>
+      <section className={styles.tourDetailsText}>
+        <h4>People:</h4> <h5><strong><em>{cartItem.booking.people}</em></strong></h5>
+      </section>
+    </article>
   );
 }
  

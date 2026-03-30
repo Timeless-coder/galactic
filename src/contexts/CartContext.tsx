@@ -27,7 +27,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 		const stored = localStorage.getItem('galacticCart')
 		return stored ? JSON.parse(stored) : []
 	})
-	const [cartDropdownCollapsed, setCartDropdownCollapsed] = useState(false)
+	const [cartDropdownCollapsed, setCartDropdownCollapsed] = useState(true)
 
 	const addItemToCart = (item: CartItem) => {
 		item.booking.people= 1

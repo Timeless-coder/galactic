@@ -6,7 +6,6 @@
 export type Tour = {
 	id: string
 	createdAt: string
-	index: number
 	name: string
 	summary: string
 	description: string
@@ -18,5 +17,5 @@ export type Tour = {
 	difficulty: number
 	imageCover: string
 	images: string[]
-	startDates: string[]
+	departureDates: string[]
 }

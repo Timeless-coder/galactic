@@ -14,7 +14,7 @@ import PrivateRoute from './routeHandlers/PrivateRoute'
 import './index.scss' // only for parent container
 import UserPage from './pages/UserPage/UserPage'
 import NotFound from './pages/NotFound/NotFound'
-import Works from './pages/Works/Works'
+import Works from './pages/WorksPage/WorksPage'
 
 function App() {
 
