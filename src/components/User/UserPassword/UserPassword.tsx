@@ -43,7 +43,7 @@ const PasswordReset = () => {
         </h1>
       )}
 
-      {!currentUser?.providerId && (
+      {currentUser?.providerId !== 'google.com' && (
         <div className={styles.formContainer}>
 
           <form onSubmit={handleSubmit(formSubmit)}>

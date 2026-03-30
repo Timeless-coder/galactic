@@ -31,10 +31,9 @@ const CurrentUserSettings = () => {
     
     try {
       let imageURL = currentUser?.photoURL || ''
-      const bufferImage = imageURL
       if (data.newFile?.[0]) {
         await deleteProfileImageIfNeeded(imageURL)
-        imageURL = await uploadProfileImage(data.newFile[0], bufferImage)
+        imageURL = await uploadProfileImage(data.newFile[0], `${data.newEmail}-profileImage`)
       }
       await updateUserAccount(data.newEmail, data.newName, imageURL)
       

@@ -12,6 +12,7 @@ import { getTourBySlug } from '../../services/firebase/toursService'
 
 import CustomButton from '../../elements/CustomButton/CustomButton'
 import TourReviews from '../../components/TourReviews/Reviews/TourReviews'
+import HowThisWorks from '../../components/HowThisWorks/HowThisWorks'
 
 import styles from './TourSinglePage.module.scss'
 import Spinner from '../../elements/Spinner/Spinner'
@@ -148,6 +149,7 @@ const TourSinglePage = () => {
     {tour &&
       <div className={styles.tourSingleContainer}>
         
+        {/**Header */}
         <div className={styles.tourHeader}>
           <div className={styles.tourPicture}>
             <img src={tour.imageCover} alt={tour.name} />
@@ -158,6 +160,7 @@ const TourSinglePage = () => {
         <div className={styles.main}>
           <div className={styles.mainLeft} id='book'>
 
+            {/**Basic Information */}
             <div className={`${styles.tourDetails} ${styles.one}`}>    
               <h2>{tour.name}</h2>
               <div className={styles.tourDetailsText}>
@@ -171,18 +174,21 @@ const TourSinglePage = () => {
               </div>
             </div>
 
+            {/**Start Dates */}
             <div className={styles.tourDetails}>              
               <h2>Start Dates:</h2>
               {tour.startDates?.map((departureDate, i) => (
                 <div className={styles.tourDetailsText} key={departureDate}>
-                  <h3>{format(new Date(departureDate), 'PPPP')}</h3>
-                   <div onClick={() => setClickFunction(departureDate)}>
-                    <CustomButton>
-                      {setButtonLabelAndPeopleText(departureDate).buttonLabel}
-                    </CustomButton>
+                  <div className={styles.tourDetailsTextLeft}>
+                    <h3>{format(new Date(departureDate), 'PPPP')}</h3>
                     <p className={styles.peopleRef} ref={el => { dateRefs.current[i] = el }}>
                       {setButtonLabelAndPeopleText(departureDate).peopleText} booked
                     </p>
+                  </div>
+                   <div onClick={() => setClickFunction(departureDate)}>
+                    <CustomButton>
+                      {setButtonLabelAndPeopleText(departureDate).buttonLabel}
+                    </CustomButton>                   
                   </div>             
                 </div>
               ))}
@@ -190,12 +196,14 @@ const TourSinglePage = () => {
 
           </div>
 
+            {/**Summary */}
           <div className={styles.mainRight}>
             <h2>{tour.summary}</h2>
             <p>{tour.description}</p>
           </div>
         </div>
 
+          {/**Images */}
         <div className={styles.images}>
           {tour.images?.map((image) => (
             <div className={styles.tourImageContainer} key={image}>
@@ -204,8 +212,13 @@ const TourSinglePage = () => {
           ))}
         </div>
         
+        {/**Reviews */}
         <h2 className={styles.reviewsTitle}>Reviews:</h2>
         <TourReviews tour={tour} id={tour.id} />
+
+        <div className={styles.worksContainer}>
+          <HowThisWorks />
+        </div>
 
         <div className={styles.book}>
           <p>Click one of the <strong><a href='#book'>Book Date</a></strong> buttons above to start your adventure.</p>

@@ -12,7 +12,12 @@ type TourCardProps = {
 }
 
 export const TourCard = ({ tour, setShowSection, setReviewTour, hasReview }: TourCardProps) => {
-  
+
+  const handleClickToCreateReview = () => {
+    setReviewTour(tour)
+    setShowSection('createReview')              
+  }
+
   return (
   <div className={styles.card}>
     {tour && (
@@ -39,15 +44,12 @@ export const TourCard = ({ tour, setShowSection, setReviewTour, hasReview }: Tou
 
      <div className={styles.cardDetails}>
           {hasReview ? (
-            <div className={styles.tourLink} onClick={() => setShowSection('reviews')}>
+            <div className={styles.tourLink} onClick={() => setShowSection('userReviews')}>
               See my Review
               <IoArrowForwardCircleOutline />
             </div>
           ) : (
-            <div className={styles.tourLink} onClick={() => {
-              setShowSection('reviewTour')
-              setReviewTour(tour)
-            }}>
+            <div className={styles.tourLink} onClick={handleClickToCreateReview}>
               Review this Tour
               <IoArrowForwardCircleOutline />
             </div>

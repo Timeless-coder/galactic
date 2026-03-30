@@ -1,93 +1,78 @@
-
-// // 'resource': the existing document that rule is evaluating.
-// // 'request.resource': the document as it would be after write/create/update.
-
-// rules_version = '2';
-// service cloud.firestore {
-//   match /databases/{database}/documents {
-
-//     // ------------------------
-//     // Helper Functions
-//     // ------------------------
-//     function signedIn() {
-//       return request.auth != null;
-//     }
-
-//     function isAdmin() {
-//       return signedIn() 
-//         && get(/databases/$(database)/documents/users/$(request.auth.uid)).exists()
-//         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-//     }
-
-//     function isOwner(userId) {
-//       return signedIn() && request.auth.uid == userId;
-//     }
-
-//     // ------------------------
-//     // Admin Emails (whitelist for automatic admin assignment)
-//     // ------------------------
-//     match /adminEmails/{adminEmailId} {
-//       allow read: if true;          // optional, only if you want clients to read
-//       allow create, update, delete: if false; // only backend/admin writes
-//     }
-
-//     // ------------------------
-//     // Tours
-//     // ------------------------
-//     match /tours/{tourId} {
-//       allow read: if true;           // public read
-//       allow create, update: if isAdmin();
-//       allow delete: if false;        // delete only via backend scripts
-//     }
-
-//     // ------------------------
-//     // Users
-//     // ------------------------
-//     match /users/{userId} {
-//       allow read, update: if isOwner(userId) || isAdmin();
-//       allow create: if isOwner(userId); // user creates their own document
-//       allow delete: if isAdmin();
-//     }
-
-//     // ------------------------
-//     // Bookings
-//     // ------------------------
-//     match /bookings/{bookingId} {
-//       allow read, update: if isOwner(resource.data.userId) || isAdmin();
-//       allow create: if isOwner(request.resource.data.userId); // consistent ownership check
-//       allow delete: if isAdmin();
-//     }
-
-//     // ------------------------
-//     // Reviews
-//     // ------------------------
-//     match /reviews/{reviewId} {
-//       allow read: if true; // public read (optional, can restrict to owner+admin)
-      
-//       // Create: only owner
-//       allow create: if isOwner(request.resource.data.userId)
-//         && request.resource.data.rating is number
-//         && request.resource.data.rating >= 1
-//         && request.resource.data.rating <= 5; // validate rating
-
-//       // Update: only owner with valid rating
-//       allow update: if isOwner(resource.data.userId)
-//         && request.resource.data.rating is number
-//         && request.resource.data.rating >= 1
-//         && request.resource.data.rating <= 5;
-
-//       // Delete: only admin for moderation
-//       allow delete: if isAdmin();
-//     }
-
-//   }
-// }
+// 'resource': the existing document that rule is evaluating.
+// 'request.resource': the document as it would be after write/create/update.
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+
+    // ------------------------
+    // Helper Functions
+    // ------------------------
+    function signedIn() {
+      return request.auth != null;
     }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    // ------------------------
+    // Admin Emails (whitelist for automatic admin assignment)
+    // ------------------------
+    match /adminEmails/{adminEmailId} {
+      allow read: if true;          // optional, only if you want clients to read
+      allow create, update, delete: if false; // only backend/admin writes
+    }
+
+    // ------------------------
+    // Tours
+    // ------------------------
+    match /tours/{tourId} {
+      allow read: if true;           // public read
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ------------------------
+    // Users
+    // ------------------------
+    match /users/{userId} {
+      allow read: if true;
+      allow update: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId); // user creates their own document
+      allow delete: if isAdmin();
+    }
+
+    // ------------------------
+    // Bookings
+    // ------------------------
+    match /bookings/{bookingId} {
+      allow read: if true;
+      allow create: if signedIn(); // consistent ownership check
+      allow update, delete: if isAdmin();
+    }
+
+    // ------------------------
+    // Reviews
+    // ------------------------
+    match /reviews/{reviewId} {
+      allow read, create: if true; // public read (optional, can restrict to owner+admin)
+      allow update, delete: if isAdmin();
+    }
+
   }
 }
+
+// rules_version = '2';
+// service cloud.firestore {
+//   match /databases/{database}/documents {
+//     match /{document=**} {
+//       allow read, write: if true;
+//     }
+//   }
+// }

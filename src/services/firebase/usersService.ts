@@ -21,7 +21,7 @@ export const createUserWithAuthId = async (user: User): Promise<void> => {
 	await setDoc(doc(db, 'users', user.id), user)
 }
 
-// *** ADMIN ***
+// *** Migrations ***
 export const migrateNameToDisplayname = async (): Promise<void> => {
 	const usersSnapshot = await getDocs(collection(db, 'users'))
 	for (const userDoc of usersSnapshot.docs) {
@@ -30,6 +30,18 @@ export const migrateNameToDisplayname = async (): Promise<void> => {
 			await updateDoc(doc(db, 'users', userDoc.id), {
 				displayName: data.name,
 				name: deleteField(),
+			})
+		}
+	}
+}
+
+export const removeFieldFromUser = async (fieldLabel: string): Promise<void> => {
+	const usersSnapshot = await getDocs(collection(db, 'users'))
+	for (const userDoc of usersSnapshot.docs) {
+		const data = userDoc.data()
+		if (fieldLabel in data) {
+			await updateDoc(doc(db, 'users', userDoc.id), {
+				[fieldLabel]: deleteField(),
 			})
 		}
 	}

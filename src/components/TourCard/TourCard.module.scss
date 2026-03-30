@@ -69,25 +69,25 @@
       overflow: hidden;
       transition: all .3s ease-in-out;
       &::before {
-      content: '';
-      position: absolute;
-      left: -50px;
-      width: 15px;
-      height: 50px;
-      background-color: hsla(0, 0%, 100%, 0.6);
-      box-shadow: 0 0 10px 10px hsla(0, 0%, 100%, 0.5);
-      transform: skewX(-30deg);
-      transition: transform .5s;
-      opacity: 0;
+        content: '';
+        position: absolute;
+        left: -50px;
+        width: 15px;
+        height: 50px;
+        background-color: hsla(0, 0%, 100%, 0.6);
+        box-shadow: 0 0 10px 10px hsla(0, 0%, 100%, 0.5);
+        transform: skewX(-30deg);
+        transition: transform .5s;
+        opacity: 0;
       }
       &:hover {
-      outline: 1px solid var(--primary-blue-50);
-      box-shadow: 10px 10px 10px rgba(0, 0, 0, 1);
-      transform: scale(1.01);
-      &::before {
-        transform: skewX(-30deg) translateX(500px);
-        opacity: 1;
-      }
+        outline: 1px solid var(--primary-blue-50);
+        box-shadow: 10px 10px 10px rgba(0, 0, 0, 1);
+        transform: scale(1.01);
+        &::before {
+          transform: skewX(-30deg) translateX(500px);
+          opacity: 1;
+        }
       }
     }  
   }  

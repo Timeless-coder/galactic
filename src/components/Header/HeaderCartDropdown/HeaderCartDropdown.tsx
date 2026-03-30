@@ -36,7 +36,7 @@ export const HeaderCartDropdown = () => {
         }
       </div>
       {currentUser && (
-        <Link to={`/cart`}>
+        <Link to={`/account/${currentUser?.id}/cart`}>
           <CustomButton>
             View Full Cart
             <IoArrowForwardCircleOutline />

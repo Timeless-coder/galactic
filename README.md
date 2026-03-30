@@ -1,5 +1,4 @@
-Firebase rules. Connect auth to users collection as part of that.
-currentUser check to do anything. (I added redirects to UserPage and CheckoutPage)
+Firebase rules
 toast
 styling
 

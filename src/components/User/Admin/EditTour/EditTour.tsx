@@ -58,16 +58,16 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
     setLoading(true)
     try {
       const imageCoverURL = data.imageCoverFile?.[0]
-        ? await uploadTourImage(data.imageCoverFile[0], `tour-${editTour.index}-cover`)
+        ? await uploadTourImage(data.imageCoverFile[0], `tour-${editTour.slug}-cover`)
         : editTour.imageCover
       const image1URL = data.image1File?.[0]
-        ? await uploadTourImage(data.image1File[0], `tour-${editTour.index}-1`)
+        ? await uploadTourImage(data.image1File[0], `tour-${editTour.slug}-1`)
         : editTour.images[0]
       const image2URL = data.image2File?.[0]
-        ? await uploadTourImage(data.image2File[0], `tour-${editTour.index}-2`)
+        ? await uploadTourImage(data.image2File[0], `tour-${editTour.slug}-2`)
         : editTour.images[1]
       const image3URL = data.image3File?.[0]
-        ? await uploadTourImage(data.image3File[0], `tour-${editTour.index}-3`)
+        ? await uploadTourImage(data.image3File[0], `tour-${editTour.slug}-3`)
         : editTour.images[2]
 
       await updateTourService(editTour.id, {

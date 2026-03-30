@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router'
 import toast from 'react-hot-toast'
 
 import type { Booking } from '../../../types/booking'
@@ -26,49 +27,45 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    let mounted = true
+  if (!currentUser) return
+  setLoading(true)
 
-    if (!currentUser?.id) {
-      setMyTours([])
+  const fetchData = async () => {
+    try {
+      // 1. Get all bookings for the current user
+      const bookings = await getBookingsByUserId(currentUser.id) || []
+      // 2. Get all tours for these bookings, ensuring uniqueness
+      const tours = await Promise.all(
+        bookings.map(b => getTourById(b.tourId))
+      )
+      // Use a Map to ensure unique tours by id
+      const uniqueToursMap = new Map<string, Tour>()
+      tours.forEach(tour => {
+        if (tour && tour.id) uniqueToursMap.set(tour.id, tour)
+      })
+      setMyTours(Array.from(uniqueToursMap.values()))
+
+      // 3. Get all reviews by the current user
+      const reviews = await getReviewsByUserId(currentUser.id)
+      // 4. Get the set of tourIds that have been reviewed
+      const reviewedIds = new Set(reviews.map(r => r.tourId))
+      // console.log('UserTours debug', {
+      //   currentUserId: currentUser.id,
+      //   bookings,
+      //   tourIds: tours.map(t => t.id),
+      //   reviews,
+      //   reviewedIds: Array.from(reviewedIds),
+      // })
+      setReviewedTourIds(reviewedIds)
+    } catch (err) {
+      toast.error("Failed to load your tours or reviews.")
+    } finally {
       setLoading(false)
-      return
     }
+  }
 
-    const getMyBookings = async () => {
-      setLoading(true)
-
-      try {
-        const myBookings: Booking[] = await getBookingsByUserId(currentUser!.id)
-        const uniqueTourMap = new Map<string, Tour>()
-        for (const booking of myBookings) {
-          if (!uniqueTourMap.has(booking.tourId)) {
-            const tourData = await getTourById(booking.tourId)
-            if (tourData) uniqueTourMap.set(booking.tourId, tourData)
-          }
-        }
-        const myReviews = await getReviewsByUserId(currentUser!.id)
-        const reviewed = new Set(myReviews.map(r => r.tourId))
-        if (mounted) {
-          setMyTours(Array.from(uniqueTourMap.values()))
-          setReviewedTourIds(reviewed)
-        }
-      }
-      catch (err) {
-        console.error(err)
-        toast.error('Failed to fetch your tours. Please try again.')
-        if (mounted) setMyTours([])
-      }
-      finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    getMyBookings()
-
-    return () => {
-      mounted = false
-    }
-  }, [currentUser?.id])
+  fetchData()
+}, [currentUser])
 
   return (
     <>

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 
-import type { ReviewWithTour } from '../../../types/review'
+import type { ReviewWithTour, Review } from '../../../types/review'
 
 import { useAuth } from '../../../hooks/useAuth'
-import { fetchReviewsByUser } from '../../../services/firebase/reviewsService'
+import { fetchReviewsByUser, getReviewsByUserId } from '../../../services/firebase/reviewsService'
 
 import Spinner from '../../../elements/Spinner/Spinner'
 import UserReviewCard from '../UserReviews/UserReviewCard'
@@ -17,25 +17,25 @@ const UserReviews = () => {
 
   useEffect(() => {
     let mounted = true
+    
+    if (!currentUser?.id) {
+      console.log('no user')
+      return
+    }
 
     const getReviews = async () => {
       setLoading(true)
 
       try {
-        if (!currentUser?.id) {
-          setReviews([])
-          setLoading(false)
-          return
+          const myReviews: ReviewWithTour[] = await fetchReviewsByUser(currentUser.id)
+          if (mounted && myReviews.length > 0) setReviews(myReviews)
+      }
+      catch (err: any) {
+          console.log(err.message)
         }
-        const myReviews: ReviewWithTour[] = await fetchReviewsByUser(currentUser.id)
-        if (mounted && myReviews.length > 0) setReviews(myReviews)
-      }
-    catch (err) {
-        if (mounted) setReviews([])
-      }
-    finally {
-        if (mounted) setLoading(false)
-      }
+      finally {
+          if (mounted) setLoading(false)
+        }
     }
 
     getReviews()

@@ -5,7 +5,6 @@ import styles from './NotFound.module.scss'
 const NotFound = () => {
   return ( 
     <div className={styles.notFoundContainer}>
-      <img src="" alt="" />
       <div className={styles.notFoundText}>
         <h2>Of the countless universes and timelines you could have explored...you chose one that does not exist.</h2>
         <br />

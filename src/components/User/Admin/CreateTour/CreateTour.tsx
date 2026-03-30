@@ -4,7 +4,7 @@ import toast from "react-hot-toast"
 import { MdAddAPhoto } from 'react-icons/md'
 import { AiOutlineCheck } from 'react-icons/ai'
 
-import { createTourService, getNewTourIndexService } from '../../../../services/firebase/toursService'
+import { createTourService } from '../../../../services/firebase/toursService'
 import { uploadTourImage } from '../../../../services/firebase/storageService'
 import { useAuth } from '../../../../hooks/useAuth'
 import { slugify } from '../../../../utils/slugify'
@@ -53,12 +53,12 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
     try {
       if (!currentUser || currentUser.role !== Role.Admin) return
 
-      const currentTourIndex = await getNewTourIndexService()
+      const slug = slugify(data.name)
 
-      const imageCoverURL = await uploadTourImage(data.imageCoverFile[0], `tour-${currentTourIndex}-cover`)
-      const image1URL = await uploadTourImage(data.image1File[0], `tour-${currentTourIndex}-1`)
-      const image2URL = await uploadTourImage(data.image2File[0], `tour-${currentTourIndex}-2`)
-      const image3URL = await uploadTourImage(data.image3File[0], `tour-${currentTourIndex}-3`)
+      const imageCoverURL = await uploadTourImage(data.imageCoverFile[0], `tour-${slug}-cover`)
+      const image1URL = await uploadTourImage(data.image1File[0], `tour-${slug}-1`)
+      const image2URL = await uploadTourImage(data.image2File[0], `tour-${slug}-2`)
+      const image3URL = await uploadTourImage(data.image3File[0], `tour-${slug}-3`)
 
       await createTourService({
         planet: data.planet,
@@ -72,7 +72,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
         reviews: 0,
         createdAt: `${year} ${month + 1} ${day}`,
         creator: currentUser!.id,
-        slug: slugify(data.name),
+        slug,
         startDates: ['2021 7 4', '2022 1 3', '2023 5 4']
       }, currentUser.email)
 

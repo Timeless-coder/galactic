@@ -29,7 +29,10 @@ export const addPersonToBooking = async (bookingId: string): Promise<void> => {
 	await setDoc(bookingRef, { people: bookingData.people + 1 }, { merge: true })
 }
 
-export const getBookingsByUserId = async (userId: string): Promise<Booking[]> => {
+export const getBookingsByUserId = async (userId: string): Promise<Booking[] | undefined> => {
 	const bookingsQuery = await getDocs(query(collection(db, 'bookings'), where('bookingUserId', '==', userId)))
+	if (bookingsQuery.empty) {
+		return undefined;
+	}
 	return bookingsQuery.docs.map(doc => ({ id: doc.id, ...doc.data() } as Booking))
 }

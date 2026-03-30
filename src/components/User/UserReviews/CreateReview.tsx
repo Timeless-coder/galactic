@@ -31,16 +31,18 @@ const CreateReview = ({ reviewTour, setShowSection }: CreateReviewProps) => {
 	const formSubmit = async (data: CreateReviewFormData) => {
 		setLoading(true)
 
+		if (!reviewTour || !currentUser) return
+
 		try {
 			await createReviewService({
 				rating: data.rating,
 				text: data.text,
-				tourId: reviewTour!.id,
-				userId: currentUser!.id
+				tourId: reviewTour.id,
+				userId: currentUser.id
 			})
 
 			reset()
-			setShowSection('reviews')
+			setShowSection('userReviews')
 		}
 		catch (err: any) {
 			console.error(err)

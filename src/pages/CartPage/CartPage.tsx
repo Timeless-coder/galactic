@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { IoArrowForwardCircleOutline, IoTrashOutline } from 'react-icons/io5'
 
 import { useAuth } from '../../hooks/useAuth'
@@ -12,11 +12,16 @@ import styles from './CartPage.module.scss'
 
 export const CartPage = () => {
   const { currentUser } = useAuth()
+  const navigate = useNavigate()
   const { cartItems, setCartDropdownCollapsed, clearCart, total } = useCart()
 
   useEffect(() => {
     setCartDropdownCollapsed(true)
   }, [])
+
+  useEffect(() => {
+    if (!currentUser) navigate('/auth')
+  }, [currentUser])
   
   return (
     <div className={styles.cartPageContainer}>

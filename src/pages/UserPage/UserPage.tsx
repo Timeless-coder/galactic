@@ -30,6 +30,8 @@ const UserPage = () => {
   const [editTour, setEditTour] = useState<Tour | null>(null)
   const [reviewTour, setReviewTour] = useState<Tour | null>(null)
 
+  console.log(showSection)
+
   useEffect(() => {
     if (!currentUser) navigate('/auth')
   }, [currentUser])
@@ -38,16 +40,16 @@ const UserPage = () => {
     <div className={styles.accountContainer}>
 
       <section className={styles.sideNav}>
-        <div className={styles.sideNavItem} onClick={() => setShowSection('settings')}>
+        <div className={styles.sideNavItem} onClick={() => setShowSection('userSettings')}>
           <IoSettingsOutline /><p>User Settings</p>
         </div>
-        <div className={styles.sideNavItem} onClick={() => setShowSection('password')}>
+        <div className={styles.sideNavItem} onClick={() => setShowSection('userPassword')}>
           <RiLockPasswordLine /><p>Update Password</p>
         </div>
         <div className={styles.sideNavItem} onClick={() => setShowSection('userTours')}>
           <IoRocketOutline /><p>My Booked Tours</p>
         </div>
-        <div className={styles.sideNavItem} onClick={() => setShowSection('reviews')}>
+        <div className={styles.sideNavItem} onClick={() => setShowSection('userReviews')}>
           <IoClipboardOutline /><p>My Reviews</p>
         </div>
       {currentUser?.role === Role.Admin && (
@@ -64,12 +66,12 @@ const UserPage = () => {
       </section>
 
       <section className={styles.accountSection}>
-        {showSection === 'settings' && <UserSettings />}
+        {showSection === 'userSettings' && <UserSettings />}
+        {showSection === 'userPassword' && <UserPassword />}
+        {showSection === 'userReviews' && <UserReviews />}
         {showSection === 'userTours' && <UserTours setShowSection={setShowSection} setReviewTour={setReviewTour} />}
-        {showSection === 'reviewTour' && <CreateReview setShowSection={setShowSection} reviewTour={reviewTour} />}
-        {showSection === 'reviews' && <UserReviews />}
+        {showSection === 'createReview' && <CreateReview setShowSection={setShowSection} reviewTour={reviewTour} />}
         {showSection === 'manageTours' && <ManageTours setShowSection={setShowSection} setEditTour={setEditTour} />}
-        {showSection === 'password' && <UserPassword />}
         {showSection === 'createTour' && <CreateTour setShowSection={setShowSection} />}
         {showSection === 'editTour' && <EditTour setShowSection={setShowSection} editTour={editTour!} />}
       </section>

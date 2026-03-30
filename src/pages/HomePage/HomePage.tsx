@@ -3,7 +3,7 @@ import { VscRocket } from 'react-icons/vsc'
 import { GiStrikingArrows } from 'react-icons/gi'
 
 import { useAuth } from '../../hooks/useAuth'
-import { migrateReviewFields } from '../../services/firebase/reviewsService'
+import { migrateCreatedAtFormat } from '../../services/firebase/reviewsService'
 
 import zik from '../../assets/AlienHead.svg'
 
@@ -15,7 +15,7 @@ const Home = () => {
   const { currentUser } = useAuth()
 
   useEffect(() => {
-    // migrateReviewFields()
+    // migrateCreatedAtFormat()
   }, [])
 
   return (

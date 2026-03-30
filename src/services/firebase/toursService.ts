@@ -1,20 +1,9 @@
-import { doc, getDoc, collection, query, where, getDocs, addDoc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, collection, query, where, getDocs, addDoc, setDoc, deleteDoc, updateDoc, deleteField } from 'firebase/firestore'
 
 import { db } from './firebaseConfig'
 import { getRole } from './authService'
 import type { Tour } from '../../types/tour'
 import { Role } from '../../types/user'
-
-const TOUR_INDEX_DOC = 'qiiJ5kJFuSM32hXW6Z1g'
-
-export const getNewTourIndexService = async (): Promise<number> => {
-	const snap = await getDoc(doc(db, 'newTourIndex', TOUR_INDEX_DOC))
-	return (snap.data() as { index: number }).index
-}
-
-export const incrementNewTourIndexService = async (current: number): Promise<void> => {
-	await updateDoc(doc(db, 'newTourIndex', TOUR_INDEX_DOC), { index: current + 1 })
-}
 
 export const getAllToursService = async (): Promise<Tour[]> => {
 	const toursSnapshot = await getDocs(collection(db, 'tours'))
@@ -39,12 +28,6 @@ export const getTourBySlug = async (slug: string): Promise<Tour> => {
 	return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Tour
 }
 
-export const deleteTourService = async (id: string): Promise<void> => {
-	const tourRef = doc(db, 'tours', id)
-	await getDoc(tourRef) // Check if the document exists
-	await deleteDoc(tourRef)
-}
-
 // *** ADMIN ***
 // Omit the secondary 'id' property - see note in type.
 export const createTourService = async (tour: Omit<Tour, 'id' | 'index'>, email: string): Promise<string> => {
@@ -52,9 +35,7 @@ export const createTourService = async (tour: Omit<Tour, 'id' | 'index'>, email:
 	if (userRole !== Role.Admin) {
 		throw new Error('There was an issue verifying your Admin credentials')
 	}
-  const index = await getNewTourIndexService()
-  const docRef = await addDoc(collection(db, 'tours'), { ...tour, index })
-  await incrementNewTourIndexService(index)
+  const docRef = await addDoc(collection(db, 'tours'), { ...tour })
   return docRef.id
 }
 
@@ -67,6 +48,13 @@ export const updateTourService = async (id: string, tour: Partial<Tour>, email: 
 	await setDoc(tourRef, tour, { merge: true })
 }
 
+export const deleteTourService = async (id: string): Promise<void> => {
+	const tourRef = doc(db, 'tours', id)
+	await getDoc(tourRef) // Check if the document exists
+	await deleteDoc(tourRef)
+}
+
+// *** Migrations ***
 export const migrateTourDepartureDates = async (): Promise<void> => {
 	const toursSnap = await getDocs(collection(db, 'tours'))
 	for (const tourDoc of toursSnap.docs) {
@@ -80,5 +68,17 @@ export const migrateTourDepartureDates = async (): Promise<void> => {
 		await updateDoc(doc(db, 'tours', tourDoc.id), {
 					startDates: newStartDates
 				})
+	}
+}
+
+export const removeFieldFromTour = async (fieldLabel: string): Promise<void> => {
+	const toursSnapshot = await getDocs(collection(db, 'tours'))
+	for (const tourDoc of toursSnapshot.docs) {
+		const data = tourDoc.data()
+		if (fieldLabel in data) {
+			await updateDoc(doc(db, 'tours', tourDoc.id), {
+				[fieldLabel]: deleteField(),
+			})
+		}
 	}
 }

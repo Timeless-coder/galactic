@@ -6,7 +6,6 @@ import { MdAddAPhoto } from 'react-icons/md'
 import { AiOutlineCheck } from 'react-icons/ai'
 
 import { useAuth } from '../../hooks/useAuth'
-import { createUserWithAuthId } from '../../services/firebase/usersService'
 import { uploadProfileImage } from '../../services/firebase/storageService'
 
 import CustomButton from "../../elements/CustomButton/CustomButton"
@@ -42,7 +41,7 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 		setLoading(true)
 
 		try {
-			const photoURL = await uploadProfileImage(data.profileImage[0], `profileImages/${data.email}-profileImage`)
+			const photoURL = await uploadProfileImage(data.profileImage[0], `${data.email}-profileImage`)
 			const firebaseUser = await signupWithEmailAndPassword(data.name, data.email, data.password, photoURL)
 			toast.success(`Welcome to Galactic Tours, ${firebaseUser.displayName}!`)
 			reset()
