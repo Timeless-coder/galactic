@@ -3,6 +3,8 @@ import { IoArrowForwardCircleOutline } from 'react-icons/io5'
 
 import type { Tour } from '../../types/tour'
 
+import CustomButton from '../../elements/CustomButton/CustomButton'
+
 import styles from './TourCard.module.scss'
 
 type TourCardProps = {
@@ -39,9 +41,11 @@ export const TourCard = ({ tour }: TourCardProps) => {
 
           {/* Button */}
           <section className={styles.cardDetails}>
-            <Link to={`/tours/${tour.slug}`} className={styles.tourLink}>
-              Click for Details
-              <IoArrowForwardCircleOutline />
+            <Link to={`/tours/${tour.slug}`}>
+              <CustomButton width='100%'>
+                Click for Details
+                <IoArrowForwardCircleOutline />
+              </CustomButton>
             </Link>
           </section>
         </>

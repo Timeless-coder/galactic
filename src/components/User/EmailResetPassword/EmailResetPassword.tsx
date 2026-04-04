@@ -25,7 +25,7 @@ const EmailResetPassword = () => {
     }
     catch (err: any) {
       console.error(err.message)
-      toast.error(`${err.message} - Please try again`)
+      toast.error(`${err.message ?? err} - Please try again`)
     }
     finally {
       setLoading(false)
@@ -40,7 +40,7 @@ const EmailResetPassword = () => {
       <form onSubmit={handleSubmit(formSubmit)} aria-label="Password reset form">
         <div className={styles.inputContainer}>
           <label htmlFor='email'>Email</label>
-          {errors.email && <p className={styles.error}>{errors.email.message}</p>}
+          {errors.email && <p id='reset-email-error' className={styles.error}>{errors.email.message}</p>}
           <input
             {...register('email', {
               required: 'Email is required'
@@ -48,6 +48,7 @@ const EmailResetPassword = () => {
             id='email'
             type='email'
             placeholder='example@xyz.com'
+            aria-describedby='reset-email-error'
           />
         </div>
         <div className={styles.inputContainer}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -22,22 +22,23 @@ const EmailResetPassword = ({ setHasAccount, setLostPassword }: EmailResetPasswo
   const { register, handleSubmit, reset, formState: { errors } } = useForm<EmailResetData>()
   const navigate = useNavigate()
   const { sendPasswordResetEmail } = useAuth()
-  const [email, setEmail] = useState('')
   
   const handleFoundEmail = () => {
     setLostPassword(false)
     setHasAccount(true)
   }
-  const formSubmit = async() => {
+
+  const formSubmit = async({ email }: EmailResetData) => {
     try {
       await sendPasswordResetEmail(email)
-      reset()
       toast.success('Password reset email sent successfully.')
+      
+      reset()
       navigate('/auth')
     }
     catch (err: any){
       console.error(err.message)
-      toast.error(`${err.message} - Please try again`)
+      toast.error(`${err.message ?? err ?? 'An error occurred'} - Please try again`)
     }
   }
   return (
@@ -48,9 +49,7 @@ const EmailResetPassword = ({ setHasAccount, setLostPassword }: EmailResetPasswo
 
       <aside className={styles.status}>
         <p>Found Your Email?</p>
-        <button type="button" onClick={handleFoundEmail}>
-          <CustomButton>Sign In</CustomButton>
-        </button>
+        <CustomButton onClick={handleFoundEmail} layout='center'>Sign In</CustomButton>
       </aside>
 
       <form onSubmit={handleSubmit(formSubmit)}>
@@ -60,15 +59,12 @@ const EmailResetPassword = ({ setHasAccount, setLostPassword }: EmailResetPasswo
           <input
             {...register('email', { required: 'Email is required' })}
             type='email'
-            name='email'
-            value={email}
-            onChange={e => setEmail(e.target.value)}
             placeholder='example@xyz.com'
           />
         </div>
 
         <div className={styles.inputContainer}>
-          <button type="submit" name="submit">Submit</button>
+          <CustomButton type="submit" name="submit" layout='center' width='100%'>Submit</CustomButton>
         </div>
       </form>
   </section>

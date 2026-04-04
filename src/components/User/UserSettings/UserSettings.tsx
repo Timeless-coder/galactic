@@ -8,6 +8,10 @@ import { deleteProfileImageIfNeeded, uploadProfileImage } from '../../../service
 import styles from '../../../elements/Form.module.scss'
 import linkStyles from './UserSettings.module.scss'
 
+import anonymousImage from '../../../assets/Anonymous.jpg'
+
+const defaultUserImageURL = anonymousImage
+
 type UserSettingsFormData = {
   newEmail: string
   newName: string
@@ -30,7 +34,7 @@ const CurrentUserSettings = () => {
     setLoading(true)
     
     try {
-      let imageURL = currentUser?.photoURL || ''
+      let imageURL = currentUser?.photoURL || defaultUserImageURL
       if (data.newFile?.[0]) {
         await deleteProfileImageIfNeeded(imageURL)
         imageURL = await uploadProfileImage(data.newFile[0], `${data.newEmail}-profileImage`)
@@ -40,11 +44,14 @@ const CurrentUserSettings = () => {
       if (currentUser) {
         setCurrentUser({ ...currentUser, email: data.newEmail, displayName: data.newName, photoURL: imageURL })
       }
+
+      toast.success("User Profile Updated")
     }
-    catch (error) {
-      const code = (error as { code?: string }).code
+    catch (err: any) {
+      console.error(err.message)
+      const code = (err as { code?: string }).code
       if (code === 'auth/requires-recent-login') toast.error('Please log out and back in before changing your email')
-      else toast.error('Failed to update profile. Please try again.')
+      else toast.error(`Failed to update profile: ${err.message ?? err} Please try again.`)
     }
     finally {
       setLoading(false)
@@ -52,10 +59,12 @@ const CurrentUserSettings = () => {
   }
 
   return (
-    <section className={styles.userSettingsContainer} aria-labelledby="user-settings-title">
+    <section className={styles.userSettingsContainer}>
+
+      {!currentUser && <h2>Log in change settings</h2>}
       {currentUser?.providerId === 'google.com' && (
         <header>
-          <h1 id="user-settings-title">
+          <p style={{ fontSize: '20px' }} id="google-settings-title">
             Update Google account settings at{' '}
             <a
               className={linkStyles.link}
@@ -64,7 +73,7 @@ const CurrentUserSettings = () => {
               rel='noreferrer'>
               Google
             </a>{' '}
-          </h1>
+          </p>
         </header>
       )}
 

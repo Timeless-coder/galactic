@@ -4,9 +4,7 @@
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  background-image: url('../../../assets/OptimizedBacks/crucibleplanet.jpg');
-  background-size: cover;
-  background-attachment: fixed;
+  background: transparent;
   .sideNav {
   position: fixed;
   top: var(--header-height);
@@ -22,6 +20,9 @@
     color: white;
     transition: all 0.2s;
     margin-bottom: 20px;
+    background-color: transparent;
+    border: none;
+    outline: none;
     svg {
     width: 20px;
     height: 20px;

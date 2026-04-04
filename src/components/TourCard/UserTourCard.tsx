@@ -1,12 +1,14 @@
 import { IoArrowForwardCircleOutline } from 'react-icons/io5'
 
 import type { Tour } from '../../types/tour'
+import { UserComponent } from '../../pages/UserPage/UserPage'
+import CustomButton from '../../elements/CustomButton/CustomButton'
 
 import styles from './TourCard.module.scss'
 
 type TourCardProps = {
   tour: Tour
-  setShowSection: React.Dispatch<React.SetStateAction<string>>
+  setShowSection: React.Dispatch<React.SetStateAction<UserComponent>>
   setReviewTour: React.Dispatch<React.SetStateAction<Tour | null>>
   hasReview?: boolean
 }
@@ -15,7 +17,7 @@ export const TourCard = ({ tour, setShowSection, setReviewTour, hasReview }: Tou
 
   const handleClickToCreateReview = () => {
     setReviewTour(tour)
-    setShowSection('createReview')              
+    setShowSection(UserComponent.CreateReview)              
   }
 
   return (
@@ -47,25 +49,25 @@ export const TourCard = ({ tour, setShowSection, setReviewTour, hasReview }: Tou
           {/* Button */}
           <section className={styles.cardDetails}>
             {hasReview ? (
-              <button
-                className={styles.tourLink}
+              <CustomButton
                 type="button"
-                onClick={() => setShowSection('userReviews')}
+                onClick={() => setShowSection(UserComponent.UserReviews)}
                 aria-label="See my review"
+                width='100%'
               >
                 See my Review
                 <IoArrowForwardCircleOutline />
-              </button>
+              </CustomButton>
             ) : (
-              <button
-                className={styles.tourLink}
+              <CustomButton
                 type="button"
                 onClick={handleClickToCreateReview}
                 aria-label="Review this tour"
+                width='100%'
               >
                 Review this Tour
                 <IoArrowForwardCircleOutline />
-              </button>
+              </CustomButton>
             )}
           </section>
         </>

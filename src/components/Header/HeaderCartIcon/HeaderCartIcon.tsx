@@ -4,13 +4,15 @@ import { useCart } from '../../../hooks/useCart'
 
 import styles from './HeaderCartIcon.module.scss'
 
-export const CartIcon = () => {
-  const { cartItems, setCartDropdownCollapsed, cartDropdownCollapsed } = useCart()
+export const HeaderCartIcon = () => {
+  const { cartItems, setCartDropdownOpen } = useCart()
+
+  const toggleCartDropdown = () => setCartDropdownOpen(prev => !prev)
 
   return (
     <button
       className={styles.cartIconContainer}
-      onClick={() => setCartDropdownCollapsed(!cartDropdownCollapsed)}
+      onClick={toggleCartDropdown}
       aria-label="Toggle cart dropdown"
       type="button"
     >
@@ -20,4 +22,4 @@ export const CartIcon = () => {
   )
 }
 
-export default CartIcon
+export default HeaderCartIcon

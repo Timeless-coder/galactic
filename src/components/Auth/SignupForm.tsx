@@ -6,7 +6,7 @@ import { MdAddAPhoto } from 'react-icons/md'
 import { AiOutlineCheck } from 'react-icons/ai'
 
 import { useAuth } from '../../hooks/useAuth'
-import { uploadProfileImage } from '../../services/firebase/storageService'
+import { uploadProfileImage, deleteProfileImageIfNeeded } from '../../services/firebase/storageService'
 
 import CustomButton from "../../elements/CustomButton/CustomButton"
 
@@ -27,33 +27,33 @@ type SignupFormData = {
 const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 	const navigate = useNavigate()
 	const { signupWithEmailAndPassword } = useAuth()
-	const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<SignupFormData>()
+	const { register, handleSubmit, formState: { errors }, watch, reset, trigger } = useForm<SignupFormData>()
 	const [loading, setLoading] = useState(false)
 
 	const watchProfileImage = watch('profileImage')
 
-	const formSubmit = async (data: SignupFormData) => {
-		if (data.password !== data.passwordConfirm) {
-			toast.error("Please make sure Password and Confirm Password match.")
-			return
-		}
-		
+	const formSubmit = async (data: SignupFormData) => {		
 		setLoading(true)
+		
+		const profileImageFileName = `${data.email}-profileImage`
 
 		try {
-			const photoURL = await uploadProfileImage(data.profileImage[0], `${data.email}-profileImage`)
+			const photoURL = await uploadProfileImage(data.profileImage[0], profileImageFileName)
 			const firebaseUser = await signupWithEmailAndPassword(data.name, data.email, data.password, photoURL)
 			toast.success(`Welcome to Galactic Tours, ${firebaseUser.displayName}!`)
+			
 			reset()
 			navigate('/')
-
 		}
-		catch (error) {
-			const code = (error as { code?: string }).code
-			if (code === 'auth/email-already-in-use') toast.error('Email is already in use')
-			else if (code === 'auth/weak-password') toast.error('Password should be at least 8 characters')
-			else if (code === 'auth/invalid-email') toast.error('Please include a valid email address')
-			else toast.error('Sign Up failed')
+		catch (err: any) {
+			await deleteProfileImageIfNeeded(profileImageFileName) // any errors deleting are ignored within storageService.
+
+			console.error(err.message)
+			if (err.code === 'auth/email-already-in-use') toast.error('Email is already in use')
+			else if (err.code === 'auth/weak-password') toast.error('Password should be at least 6 characters')
+			else if (err.code === 'auth/invalid-email') toast.error('Please include a valid email address')
+
+			else toast.error(`Sign Up failed - ${err.message ?? err}`)
 		}
 		finally {
 			setLoading(false)
@@ -68,17 +68,15 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 
 			<aside className={styles.status}>
 				<p>Have an Account?</p>
-				<button type="button" onClick={() => setHasAccount(true)}>
-					<CustomButton>Sign In</CustomButton>
-				</button>
+				<CustomButton onClick={() => setHasAccount(true)} layout="center">Sign In</CustomButton>
 			</aside>
       
-			<form onSubmit={handleSubmit(formSubmit)} aria-label="Signup form" className="your-glassy-styles">
+			<form onSubmit={handleSubmit(formSubmit)} aria-label="Signup form">
 
 				{/* Email */}
 				<div className={styles.inputContainer}>
 					<label htmlFor="signup-email">Email</label>
-					{errors.email && <p className={styles.error} role="alert">{errors.email.message}</p>}
+					{errors.email && <p id="signup-email-error" className={styles.error} role="alert">{errors.email.message}</p>}
 					<input
 						{...register('email', {
 							required: 'Email is required'
@@ -93,8 +91,8 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 
 				{/* Name */}
 				<div className={styles.inputContainer}>
-					<label htmlFor='name'>Name</label>
-					{errors.name && <p className={styles.error} role="alert">{errors.name.message}</p>}
+					<label htmlFor='signup-name'>Name</label>
+					{errors.name && <p id="signup-name-error" className={styles.error} role="alert">{errors.name.message}</p>}
 					<input
 						{...register('name', {
 							required: 'Your name is required',
@@ -103,7 +101,7 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 								message: 'Your name can be a maximum of 50 characters'
 							}
 						})}
-						id='name'
+						id='signup-name'
 						type='text'
 						placeholder='Your name'
 						aria-invalid={!!errors.name}
@@ -114,14 +112,12 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 				{/* Password */}
 				<div className={styles.inputContainer}>
 					<label htmlFor="signup-password">Password</label>
-					{errors.password && <p className={styles.error} role="alert">{errors.password.message}</p>}
+					{errors.password && <p id="signup-password-error" className={styles.error} role="alert">{errors.password.message}</p>}
 					<input
 						{...register('password', {
 							required: 'Password is required',
-							minLength: {
-								value: 6,
-								message: 'Password should be at least 6 characters'
-							}
+							minLength: { value: 6, message: 'Password should be at least 6 characters' },
+							onChange: () => trigger('passwordConfirm') // trigger the passwordConfirm 'validate' rule.
 						})}
 						id="signup-password"
 						type="password"
@@ -134,11 +130,11 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 				{/* Confirm Password */}
 				<div className={styles.inputContainer}>
 					<label htmlFor="signup-password-confirm">Confirm Password</label>
-					{errors.passwordConfirm && <p className={styles.error} role="alert">{errors.passwordConfirm.message}</p>}
+					{errors.passwordConfirm && <p id="signup-password-confirm-error" className={styles.error} role="alert">{errors.passwordConfirm.message}</p>}
 					<input
 						{...register('passwordConfirm', {
 							required: 'Please confirm your password',
-							validate: value => value === watch('password') || 'Passwords do not match'
+							validate: value => value === watch('password') || 'Passwords do not match' // sets rule that 'trigger' checks, plus the response.
 						})}
 						id="signup-password-confirm"
 						type="password"
@@ -151,7 +147,7 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 				{/* Profile Image */}
 				<div className={styles.inputContainer}>
 					<div className={styles.labelContainer}>
-						<label className={styles.label} htmlFor='profileImage'>
+						<label className={styles.label} htmlFor='signup-profileImage'>
 							{watchProfileImage?.[0]
 								? <AiOutlineCheck className={styles.icon} />
 								: <MdAddAPhoto className={styles.icon} />
@@ -159,28 +155,30 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 							Profile Image
 						</label>
 					</div>
-					{errors.profileImage && <p className={styles.error} role="alert">{errors.profileImage.message as string}</p>}
+					{errors.profileImage && <p id="signup-profileImage-error" className={styles.error} role="alert">{errors.profileImage.message as string}</p>}
 					<input
 						{...register('profileImage', {
 							required: 'Profile image is required'
 						})}
-						id='profileImage'
+						id='signup-profileImage'
 						type='file'
-						accept='image/jpeg'
+						accept='image/jpeg,image/jpg,image/png'
 						aria-invalid={!!errors.profileImage}
 						aria-describedby={errors.profileImage ? 'signup-profileImage-error' : undefined}
 					/>
 				</div>
 
 				<div className={styles.inputContainer}>
-					<button
+					<CustomButton
 						type='submit'
 						name='submit'
 						disabled={loading}
 						aria-busy={loading}
+						width="100%"
+						layout="center"
 					>
 						Submit
-					</button>
+					</CustomButton>
 				</div>
 			</form>
 		</section>

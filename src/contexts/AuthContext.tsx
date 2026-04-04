@@ -1,10 +1,11 @@
-import React, { createContext, useEffect, useState } from "react"
+import React, { createContext, useEffect, useMemo, useState } from "react"
 
 import { type User } from '../types/user'
 
 import { loginService, signupWithEmailAndPasswordService, signinWithGoogleService, logoutService, updateAuthProfileService, updatePasswordService, sendPasswordResetEmailService } from '../services/firebase/authService'
 import { auth, db } from '../services/firebase/firebaseConfig'
 import { doc, getDoc } from 'firebase/firestore'
+import toast from "react-hot-toast"
 
 export type AuthContextType = {
   currentUser: User | null
@@ -36,7 +37,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           } else {
             setCurrentUser(null)
           }
-        } catch {
+        }
+        catch(err: any) {
+          console.error(err.message)
+          toast.error(err.message ?? err ?? "Something went")
           setCurrentUser(null)
         }
       } else {
@@ -49,33 +53,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   
   const signupWithEmailAndPassword = async (name: string, email: string, password: string, photoURL: string): Promise<User> => {
     try {
-      const user = await signupWithEmailAndPasswordService(name, email, password, photoURL)
-      setCurrentUser(user)
-      return user
-    } catch (error) {
-      console.log('Sign up error:', error)
+      return await signupWithEmailAndPasswordService(name, email, password, photoURL)
+    }
+    catch (error) {
+      console.error('Sign up error:', error)
       throw error
     }
   }
 
   const login = async (email: string, password: string): Promise<User> => {
     try {
-      const user = await loginService(email, password)
-      setCurrentUser(user)
-      return user
-    } catch (error) {
-      console.log('Login error:', error)
+      return await loginService(email, password)
+    }
+    catch (error) {
+      console.error('Login error:', error)
       throw error
     }
   }
 
   const signinWithGoogle = async (): Promise<User> => {
     try {
-      const user = await signinWithGoogleService()
-      setCurrentUser(user)
-      return user
-    } catch (error) {
-      console.log('Google sign-in error:', error)
+      return await signinWithGoogleService()
+    }
+    catch (error) {
+      console.error('Google sign-in error:', error)
       throw error
     }
   }
@@ -84,8 +85,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await logoutService()
       setCurrentUser(null)
-    } catch (error) {
-      console.log('Logout error:', error)
+    }
+    catch (error) {
+      console.error('Logout error:', error)
       throw error
     }
   }
@@ -104,8 +106,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const updatePassword = async (newPassword: string) => {
     try {
       await updatePasswordService(newPassword)
-    } catch (error) {
-      console.log('Password update error:', error)
+    }
+    catch (error) {
+      console.error('Password update error:', error)
       throw error
     }
   }
@@ -113,14 +116,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const sendPasswordResetEmail = async (email: string) => {
     try {
       await sendPasswordResetEmailService(email)
-    } catch (error) {
-      console.log('Password reset email error:', error)
+    }
+    catch (error) {
+      console.error('Password reset email error:', error)
       throw error
     }
   }
 
+  const contextValue = useMemo(() => ({
+    currentUser, loading, setCurrentUser, login, signupWithEmailAndPassword,
+    signinWithGoogle, logout, updateUserAccount, updatePassword, sendPasswordResetEmail
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [currentUser, loading])
+
   return (
-    <AuthContext.Provider value={{ currentUser, loading, setCurrentUser, login, signupWithEmailAndPassword, signinWithGoogle, logout, updateUserAccount, updatePassword, sendPasswordResetEmail }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   )

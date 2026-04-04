@@ -1,9 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
 
 export type FirestoreMutateServiceOptions = {
-	successMessage?: string
-	errorMessage?: string
 	silent?: boolean
 }
 
@@ -11,41 +8,35 @@ const defaultFirestoreCreateServiceOptions: FirestoreMutateServiceOptions = {
 	silent: false
 }
 
-type FirestoreCreateServiceResult<T> = {
+type FirestoreCreateServiceResult<T, TArgs extends any[]> = {
 	error: Error | null
 	loading: boolean
-	mutate: (...args: any[]) => Promise<T | void>
+	mutate: (...args: TArgs) => Promise<T | void>
 }
 
-export const useFirestoreMutateService = <T>(service: (...args: any[]) => Promise<T>,	options: FirestoreMutateServiceOptions = defaultFirestoreCreateServiceOptions): FirestoreCreateServiceResult<T> => {
-	const { successMessage, errorMessage, silent = false } = options
+export const useFirestoreMutateService = <T, TArgs extends any[]>(service: (...args: TArgs) => Promise<T>, options: FirestoreMutateServiceOptions = defaultFirestoreCreateServiceOptions): FirestoreCreateServiceResult<T, TArgs> => {
+	const { silent = false } = options
 	const [error, setError] = useState<Error | null>(null)
 	const [loading, setLoading] = useState<boolean>(false)
 
-	const isMounted = useRef(true)
+	const serviceRef = useRef(service)
+	
+	useEffect(() => { serviceRef.current = service })
 
-	useEffect(() => {
-		isMounted.current = true
-		return () => { isMounted.current = false }
-	}, [])
-
-	const mutate = useCallback(async (...args: any[]) => {
+	const mutate = useCallback(async (...args: TArgs) => {
 		setLoading(true)
 		setError(null)
 
 		try {
-			const result = await service(...args)
-			if (successMessage && !silent && isMounted.current) toast.success(successMessage)
-			return result
+			return await serviceRef.current(...args)
 		}
 		catch (err: any) {
-			if (isMounted.current) setError(err.message)
-			if (!silent && isMounted.current) toast.error(errorMessage || err.message || 'An error occurred')
+			setError(err instanceof Error ? err : new Error(String(err)))
 		}
 		finally {
-			if (isMounted.current) setLoading(false)
+			setLoading(false)
 		}
-	}, [service, successMessage, errorMessage, silent])
+	}, [silent])
 
 	return { error, loading, mutate }
 }

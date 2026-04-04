@@ -10,9 +10,11 @@
   align-items: center;
   background-image: url('../../../assets/OptimizedBacks/BlackBack.jpg');
   color: white;
-  padding: 15px 15px 5px 15px;
-  box-shadow: inset 3px 3px 1px rgba(255, 255, 255, 0.3),
-    inset -3px -3px 1px rgba(0, 0, 0, 0.3), 3px 3px 1px rgba(0, 0, 0, 1);
+  border-radius: var(--form-button-border-radius);
+  padding: 8px;
+  box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.4),
+      0 0 1px 1px var(--primary-blue-50);
   z-index: 2;
   .closeDropdown {
     align-self: flex-end;

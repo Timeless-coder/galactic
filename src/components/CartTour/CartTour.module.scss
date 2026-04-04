@@ -22,6 +22,7 @@
   .peopleContainer {
     .carets {
       display: flex;
+      align-items: center;
       span {
         margin: 0 10px;
       }  
@@ -39,6 +40,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    background: transparent;
+    border: none;
+    
     p {
       font-size: clamp(12px, 3vw, 20px);
       text-align: center;

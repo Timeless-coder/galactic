@@ -1,10 +1,11 @@
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
 
-export const deleteProfileImageIfNeeded = async (photoURL: string): Promise<void> => {
-  if (!photoURL || photoURL.includes('Anonymous.jpg')) return
+export const deleteProfileImageIfNeeded = async (fileName: string): Promise<void> => {
+  if (!fileName || fileName.includes('Anonymous.jpg')) return
+
   try {
     const storage = getStorage()
-    await deleteObject(ref(storage, photoURL))
+    await deleteObject(ref(storage, `profileImages/${fileName}`))
   }
   catch {
     // Ignore if image doesn't exist or can't be deleted

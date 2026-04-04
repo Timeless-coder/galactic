@@ -6,47 +6,43 @@
     background-size: cover;
     height: var(--header-height);
     width: 100%;
-    padding: 0 2vh;
+    padding: 0 2vw;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 1);
     background-image: url('../../assets/OptimizedBacks/outpost.jpg');
+    background-size: cover;
+    box-shadow: 
+      0 0 10px 2px var(--primary-blue-50),
+      0 15px 20px rgb(114, 116, 192);
     a {
-        color: white;
-        background-color: transparent;
+        color: var(--primary-blue-50);
+        text-shadow: 0 0 5px white;
         white-space: nowrap;
         transition: all 0.2s ease-in-out;
-        font-size: 18px;
-        &:hover {
-            color: var(--primary-blue-50);
-        }
+        cursor: pointer;
     }
     .logoLinkContainer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        cursor: pointer;
-        .rocketIcon {
-            margin-right: 10px;
-            width: 2.7vh;
-            height: 2.7vh;
-            transition: all .3s cubic-bezier(0.39, 0.575, 0.565, 1);
-        }
+        flex-shrink: 1;
         .logoLink {
             font-family: 'Orbitron', sans-serif;
-            font-weight: 400;
-            font-size: 2.7vh;
-            mix-blend-mode: difference;
+            font-size: clamp(1rem, 2.7vw, 30px);
+        }
+        .rocketIcon {
+            margin-right: 10px;
+            width: clamp(1rem, 2.7vw, 30px);
+            height: clamp(1rem, 2.7vw, 30px);
+            transition: all .3s cubic-bezier(0.39, 0.575, 0.565, 1);
+            filter: drop-shadow(0 0 2px white);
+            filter: drop-shadow(0 0 4px whtie);
+            filter: drop-shadow(0 0 6px white);
         }
         &:hover {
             transform: scale(1.1);
-            .logoLink {
-              text-shadow: 5px 5px 5px rgba(3, 169, 244, .2);
-              color: var(--primary-blue-50);
-            }
             .rocketIcon {
-                color: var(--primary-blue-50);
                 transform: rotate(-45deg);
             }
         }
@@ -55,49 +51,53 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 1;
       .toursLink {
-          font-family: 'Orbitron', sans-serif;
-          font-size: 2.4vh;
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(1rem, 2.7vw, 30px);
       }
       .planetIcon {
-          color: white;
-          width: 2.4vh;
-          height: 2.4vh;
+          color: var(--primary-blue-50);
+          filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+          width: clamp(1rem, 2.7vw, 30px);
+          height: clamp(1rem, 2.7vw, 30px);
           margin-right: 10px;
           transition: all .3s cubic-bezier(0.39, 0.575, 0.565, 1);
+            filter: drop-shadow(0 0 2px white);
+            filter: drop-shadow(0 0 4px whtie);
+            filter: drop-shadow(0 0 6px white);
       }
       &:hover {
           transform: scale(1.1);
-          text-shadow: 5px 5px 5px rgba(3, 169, 244, .2);
-          color: var(--primary-blue-50);
           .planetIcon {
-              color: var(--primary-blue-50);
               transform: scale(1.1) rotate(90deg);
           }
       }
     }
     .headerMenuContainer {
         z-index: 2;
-        mix-blend-mode: difference;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 10px;
-        .userIcons {
+        flex-shrink: 1;
+        .headerRightIcons {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             gap: 10px;
             .cartIcon {
-              width: 2vh;
-              height: 2vh;
+              width: 1.7vw;
+              height: 1.7vw;
             }
             .userImageContainer {
+                width: clamp(37px, 4vw, 50px);
+                height: 4vw;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 cursor: pointer;
+                background-color: transparent;
+                border: none;
                 img {
-                    width: 5vh;
-                    height: 5vh;
+                    width: 100%;
+                    height: auto;
                     object-fit: cover;
                     border-radius: 50%;
                     &:hover {
@@ -112,37 +112,44 @@
             }            
         }
         .userDropdown {
-            z-index: 2;
+            z-index: 3;
             position: absolute;
-            top: 105%;
-            right: -130px;
-            width: 200px;
+            top: 115%;
+            right: -20px;
             transform: translateX(-25%);
-            background: url('../../assets/OptimizedBacks/BlackBack.jpg');
-            a, p {
+            border-radius: var(--form-button-border-radius);
+            background-image: url('../../assets/OptimizedBacks/substellar11080p.jpg');
+            color: white;
+            padding: 8px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                0 0 1px 1px var(--primary-blue-50);
+            button {
+                border: none;
+                font-family: "Rajdhani", sans-serif;
+            }
+            a, p, button {
                 display: block;
                 white-space: nowrap;
                 width: 100%;
                 color: white;
                 background-color: transparent;
-                padding: 10px;
+                padding: 8px;
                 font-size: 18px;
                 &:hover {
-                    background-color: white;
                     color: var(--primary-blue-50);
-                    font-weight: bold;
                 }
             }
         }
     }
-  @media all and (max-width: 600px) {
+  @media all and (max-width: 462px) {
     .logoLinkContainer {
       .logoLink {
         display: none;
       }
       .rocketIcon {
-          width: 4vh;
-          height: 4vh;
+          width: 24px;
+          height: 24px;
       }
     }
     .toursLinkContainer {
@@ -150,9 +157,9 @@
         display: none;
       }
       .planetIcon {
-          width: 4vh;
-          height: 4vh;
-          font-size: 4vh;
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
       }
     } 
   }

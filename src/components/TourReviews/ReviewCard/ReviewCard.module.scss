@@ -1,37 +1,45 @@
 .reviewCard {
-  background: black;
-  position: relative;
-  height: 250px;
+  height: 230px;
+  border-radius: 8px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    0 0 1px 1px var(--primary-blue-50);
   overflow: hidden;
-  .backgroundImage {
-  width: 130%;
-  opacity: .2;
-  }
+  background-size: cover;
   .content {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  padding: 20px;
-  .userImage {    
-    width: 75px;
-    height: 75px;
-    margin-bottom: 10px;
-    img {
+    background-color: rgba(0, 0, 0, .7);
+    left: 0;
+    top: 0;
     width: 100%;
-    border-radius: 50%;
+    height: 100%;
+    padding: 2vw;
+    .headerContainer {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .userContainer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap:10px;
+        .userImage {    
+          width: clamp(35px, 2vw, 75px);
+          height: clamp(35px, 2vw, 75px);
+          margin-bottom: 10px;
+          border-radius: 50%;
+          img {
+            width: 100%;
+          }
     }
-  }
+      }
+    }
+    
   h3 {
     margin-bottom: 5px;
   }
   p {
-    font-size: 18px;
+    font-size: 1rem;
   }
-  h2 {
-    position: absolute;
-    top: 20px;
-    right: 20px;
   }
-  } 
 }

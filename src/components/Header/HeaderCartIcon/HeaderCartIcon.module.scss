@@ -1,27 +1,33 @@
 .cartIconContainer {
   position: relative;
-  width: 5vh;
-  height: 5vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: clamp(25px, 5vw, 40px);
+  height: clamp(25px, 5vw, 40px);
+  background: transparent;
+  border: none;
+  transition: all 0.2s ease-in-out;
+   &:hover {
+      transform: scale(1.2);
+      transition: all 0.2s ease-in-out;
+    }
   cursor: pointer;
-  .icon {
-  width: 5vh;
-  height: 5vh;
-  color: white;
-  transition: .2s ease-in;
-  &:hover {
-    color: var(--primary-blue-50);
-    transform: scale(1.1, 1.1);
+  .icon,
+  .count {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s ease-in;
   }
+  .icon {
+    color: var(--primary-blue-50);    
+    filter: drop-shadow(0 0 2px white);
+    filter: drop-shadow(0 0 4px whtie);
+    filter: drop-shadow(0 0 6px white);
   }
   .count {
-  position: absolute;
-  font-size: 2vh;
-  font-weight: bold;
-  bottom: 1.8vh;
-  left: 2.2vh;
-  color: var(--primary-blue-50);
+    font-size: clamp(11x, 2vw, 15px);
+    color: white;
   }
 }

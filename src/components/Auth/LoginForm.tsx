@@ -30,13 +30,14 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
     try {
       const user = await login(data.email, data.password)
       toast.success(`Welcome back, ${user.displayName}!`)
+
       reset()
       navigate('/')
     }
-    catch (error) {
-      const code = (error as { code?: string }).code
-      if (code === 'auth/invalid-credential') toast.error('Invalid email or password')
-      else toast.error(`Login failed: ${(error as Error).message}`)
+    catch (err: any) {
+      console.error(err.message)
+      if (err.code === 'auth/invalid-credential') toast.error('Invalid email or password')
+      else toast.error(`Login failed: ${err.message ?? err} - Please contact customer service.`)
     }
     finally {
       setLoading(false)
@@ -51,15 +52,13 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
 
       <aside className={styles.status}>
         <p>No Account Yet?</p>
-        <button type="button" onClick={() => setHasAccount(false)}>
-          <CustomButton>Sign Up</CustomButton>
-        </button>
+        <CustomButton onClick={() => setHasAccount(false)} layout="center">Sign Up</CustomButton>
       </aside>
 
-      <form onSubmit={handleSubmit(formSubmit)} aria-label="Login form" className="your-glassy-styles">
+      <form onSubmit={handleSubmit(formSubmit)} aria-label="Login form">
         <div className={styles.inputContainer}>
           <label htmlFor="login-email">Email</label>
-          {errors.email && <p className={styles.error} role="alert">{errors.email.message}</p>}
+          {errors.email && <p id="login-email-error" className={styles.error} role="alert">{errors.email.message}</p>}
           <input
             {...register('email', {
               required: 'Email is required'
@@ -74,7 +73,7 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
 
         <div className={styles.inputContainer}>
           <label htmlFor="login-password">Password</label>
-          {errors.password && <p className={styles.error} role="alert">{errors.password.message}</p>}
+          {errors.password && <p id="login-password-error" className={styles.error} role="alert">{errors.password.message}</p>}
           <input
             {...register('password', {
               required: 'Password is required'
@@ -88,9 +87,9 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
         </div>
 
         <div className={styles.inputContainer}>
-          <button type="submit" name="submit" disabled={loading} aria-busy={loading}>
+          <CustomButton type="submit" name="submit" disabled={loading} layout="center" width="100%" aria-busy={loading}>
             Submit
-          </button>
+          </CustomButton>
         </div>
       </form>
     </section>

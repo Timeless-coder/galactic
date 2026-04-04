@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
 const StripePaymentForm = () => {
   const stripe = useStripe()
   const elements = useElements()
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleSubmit = async (event: React.SubmitEvent) => {
     event.preventDefault()
@@ -12,10 +11,7 @@ const StripePaymentForm = () => {
     if (elements == null)  return
 
     const {error: submitError} = await elements.submit()
-    if (submitError) {
-      setErrorMessage(submitError.message!)
-      return
-    }
+    if (submitError) return toast.error(submitError.message!)
 
     const {error} = await stripe!.confirmPayment({
       elements,
@@ -24,7 +20,7 @@ const StripePaymentForm = () => {
       },
     })
 
-    if (error) setErrorMessage(error.message!)
+    if (error) toast.error(error.message!)
   }
  
 	return (
@@ -34,7 +30,6 @@ const StripePaymentForm = () => {
 				Pay
 			</button>
 			{/* Show error message to your customers */}
-			{errorMessage && <div>{errorMessage}</div>}
 		</form>
 	)
 }

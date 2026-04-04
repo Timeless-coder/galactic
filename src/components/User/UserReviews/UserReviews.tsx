@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 import type { ReviewWithTour } from '../../../types/review'
 
@@ -10,18 +10,24 @@ import UserReviewCard from '../UserReviews/UserReviewCard'
 
 import styles from './UserReviews.module.scss'
 import { useFirestoreReadService } from '../../../hooks/useFirestoreReadService'
+import { useEffect } from 'react'
 
 const UserReviews = () => {
   const { currentUser } = useAuth()
-  const { data: myReviews, loading } =
+  const { data: myReviews, loading, error } =
     useFirestoreReadService<ReviewWithTour[]>(() => fetchReviewsByUser(currentUser?.id || ''))
+  
+  useEffect(() => {
+    if (error) toast.error(`Error fetching reviews: ${error.message}`)
+  }, [error])
 
   return (
     <section aria-labelledby="my-reviews-title" className={styles.reviewsContainer}>
       {loading && <Spinner />}
-      {!loading && (!myReviews || myReviews?.length === 0) && (
+      {error && <h2>Unable to fetch reviews</h2>}
+      {!loading && !error && (!myReviews || myReviews?.length === 0) && (
         <header>
-          <h2 id="my-reviews-title">You have not reviewed any tours yet.</h2>
+          <h2>You have not reviewed any tours yet.</h2>
         </header>
       )}
       {myReviews && myReviews.length > 0 && (

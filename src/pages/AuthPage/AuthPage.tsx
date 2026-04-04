@@ -34,40 +34,36 @@ const AuthPage = () => {
     }
     catch(err: any) {
       console.error(err.message)
-      toast.error(`Unable to sign in with Google: ${err.message}`)
+      toast.error(`Unable to sign in with Google: ${err.message ?? err}`)
     }
   }
 
   useEffect(() => {
-    let mounted = true
-
-    if (mounted) setHasAccount(Boolean(currentUser))
-
-    return () => {
-      mounted = false
-    }
-  }, [location])
+    setHasAccount(Boolean(currentUser))
+  }, [location, currentUser])
 
   useEffect(() => {
     if (currentUser) {
       navigate('/')
     }
-  }, [currentUser])
+  }, [currentUser, navigate])
   
   return (
     <div className={styles.authContainer}>
       <div className={formStyles.formContainer}>
 
-      <div onClick={signinWithGoogleAndGreet} className={formStyles.google}>
-        <CustomButton>
+      <div className={formStyles.google}>
+        <CustomButton onClick={signinWithGoogleAndGreet}>
           <AiOutlineGooglePlus className={buttonStyles.icon} />
           Sign in With Google
         </CustomButton>
       </div>
 
-      {!lostPassword && <div onClick={handleLostPassword} className={formStyles.password}>
-        <CustomButton>Lost My Password</CustomButton>
-      </div>}
+      {!lostPassword &&
+        <div className={formStyles.password}>
+          <CustomButton onClick={handleLostPassword} layout='center'>Lost My Password</CustomButton>
+        </div>
+      }
 
       {lostPassword
         ? <EmailResetPassword setHasAccount={setHasAccount} setLostPassword={setLostPassword} />

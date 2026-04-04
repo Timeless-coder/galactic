@@ -1,13 +1,13 @@
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import type { Tour } from '../../../../types/tour'
 import { Role } from '../../../../types/user'
+import { UserComponent } from '../../../../pages/UserPage/UserPage'
 
 import { updateTourService } from '../../../../services/firebase/toursService'
 import { uploadTourImage } from '../../../../services/firebase/storageService'
 import { useAuth } from '../../../../hooks/useAuth'
-import type { FirestoreMutateServiceOptions } from '../../../../hooks/useFirestoreMutateService'
 import { useFirestoreMutateService } from '../../../../hooks/useFirestoreMutateService' 
 import { slugify } from '../../../../utils/slugify'
 
@@ -18,7 +18,7 @@ import localStyles from './EditTour.module.scss'
 
 type EditTourProps = {
   editTour: Tour
-  setShowSection: React.Dispatch<React.SetStateAction<string>>
+  setShowSection: React.Dispatch<React.SetStateAction<UserComponent>>
 }
 
 type EditTourFormData = {
@@ -33,12 +33,6 @@ type EditTourFormData = {
   image3File: FileList
 }
 
-const firestoreMutateServiceOptions: FirestoreMutateServiceOptions = {
-  successMessage: 'Tour updated successfully!',
-  errorMessage: 'Failed to update tour',
-  silent: false
-}
-
 const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
   const { currentUser } = useAuth()
   const { register, handleSubmit, formState: { errors }, watch } = useForm<EditTourFormData>({
@@ -50,10 +44,9 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
       difficulty: editTour.difficulty,
     }
   })
-  const [loading, setLoading] = useState(false)
 
-  const { loading: updating, mutate: updateTour } =
-    useFirestoreMutateService((id: string, tour: Partial<Tour>, email: string) => updateTourService(id, tour, email), firestoreMutateServiceOptions)
+  const { loading, mutate: updateTour, error } =
+    useFirestoreMutateService((id: string, tour: Partial<Tour>, email: string) => updateTourService(id, tour, email))
 
   const watchImageCover = watch('imageCoverFile')
   const watchImage1 = watch('image1File')
@@ -63,7 +56,6 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
   const formSubmit = async (data: EditTourFormData) => {
     if (!currentUser || currentUser.role !== Role.Admin) return
 
-    setLoading(true)
     try {
       const imageCoverURL = data.imageCoverFile?.[0]
         ? await uploadTourImage(data.imageCoverFile[0], `tour-${editTour.slug}-cover`)
@@ -93,27 +85,27 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
         currentUser.email
       )
 
-      setShowSection('manageTours')
+      toast.success("Tour updated successfully")
+      setShowSection(UserComponent.ManageTours)
     }
     catch (err: any) {
-      console.error(err)
-    }
-    finally {
-      setLoading(false)
+      console.error(err.message)
+      toast.error(`Error updating tour - ${error?.message ?? err.message}`)
     }
   }
 
   return (
     <section aria-labelledby="edit-tour-heading">
-      {(loading || updating) && <Spinner />}
+      {(loading) && <Spinner />}
       <main className={localStyles.editTourContainer}>
         <article className={styles.formContainer}>
+
           <header>
             <h2 id="edit-tour-heading">Edit this Tour</h2>
           </header>
+
           <form onSubmit={handleSubmit(formSubmit)} aria-label="Edit tour form">
-            <fieldset>
-              <legend className="sr-only">Tour Details</legend>
+
               {/* Planet */}
               <div className={styles.inputContainer}>
                 <label htmlFor='planet'>Planet</label>
@@ -133,6 +125,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
                   aria-invalid={!!errors.planet}
                 />
               </div>
+
               {/* Name */}
               <div className={styles.inputContainer}>
                 <label htmlFor='name'>Name</label>
@@ -152,6 +145,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
                   aria-invalid={!!errors.name}
                 />
               </div>
+
               {/* Summary */}
               <div className={styles.inputContainer}>
                 <label htmlFor='summary'>Summary</label>
@@ -171,6 +165,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
                   aria-invalid={!!errors.summary}
                 />
               </div>
+
               {/* Description */}
               <div className={styles.inputContainer}>
                 <label htmlFor='description'>Description</label>
@@ -185,6 +180,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
                   aria-invalid={!!errors.description}
                 />
               </div>
+
               {/* Difficulty */}
               <div className={styles.inputContainer}>
                 <label htmlFor='difficulty'>Difficulty</label>
@@ -208,6 +204,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
                   aria-invalid={!!errors.difficulty}
                 />
               </div>
+
               {/* ImageCover */}
               <div className={styles.inputContainer}>
                 <div className={styles.labelContainer}>
@@ -228,6 +225,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
                   aria-label="Upload a new cover image"
                 />
               </div>
+
               {/* Image 1 */}
               <div className={styles.inputContainer}>
                 <div className={styles.labelContainer}>
@@ -248,6 +246,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
                   aria-label="Upload a new image 1"
                 />
               </div>
+
               {/* Image 2 */}
               <div className={styles.inputContainer}>
                 <div className={styles.labelContainer}>
@@ -268,6 +267,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
                   aria-label="Upload a new image 2"
                 />
               </div>
+
               {/* Image 3 */}
               <div className={styles.inputContainer}>
                 <div className={styles.labelContainer}>
@@ -289,16 +289,13 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
                 />
               </div>
               <div className={styles.inputContainer}>
-                <button
-                  type='submit'
-                  name='submit'
-                  disabled={loading || updating}
-                  aria-label="Update Tour"
-                >
-                  Update Tour
-                </button>
-              </div>
-            </fieldset>
+							<input
+								type='submit'
+								name='submit'
+								value='Update Tour'
+								disabled={loading}
+							/>
+						</div>
           </form>
         </article>
       </main>

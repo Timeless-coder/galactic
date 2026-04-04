@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { loadStripe } from '@stripe/stripe-js'
 import { getFunctions, httpsCallable } from 'firebase/functions'
+import toast from 'react-hot-toast'
 
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
@@ -19,37 +20,51 @@ type OptionsConfig = {
 const CheckoutPage = () => {
   const { currentUser } = useAuth()
   const navigate = useNavigate()
-  const { cartItems, total } = useCart()
+  const { cartItems, totalCostForPurchase } = useCart()
   const [clientSecret, setClientSecret] = useState<string | null>(null)
 
-  const options: OptionsConfig = {
+  const options = useMemo<OptionsConfig>(() => ({
     clientSecret: clientSecret!,
-  }
+  }), [clientSecret])
 
   useEffect(() => {
     if (!currentUser) navigate('/auth')
-  }, [currentUser])
+  }, [currentUser, navigate])
 
   useEffect(() => {
-    if (total <= 0) return
+  if (totalCostForPurchase <= 0) return
 
-    localStorage.setItem('galacticCartReceiptItems', JSON.stringify(cartItems)) // only for receipt
-    localStorage.setItem('galacticCartReceiptTotal', JSON.stringify(total))
+  localStorage.setItem('galacticCartReceiptItems', JSON.stringify(cartItems))
+  localStorage.setItem('galacticCartReceiptTotal', JSON.stringify(totalCostForPurchase))
 
-    const functions = getFunctions()
-    const createPaymentIntent =
-      httpsCallable<{ amount: number; userId: string; cartItems: { tourId: string; departureDate: string; people: number }[] }, { clientSecret: string }>(functions, 'createPaymentIntent')
+  const fetchClientSecret = async () => {
+    if (!currentUser) return toast.error('Please log in to proceed')
       
-    createPaymentIntent({
-      amount: Math.round(total * 100),
-      userId: currentUser!.id,
-      cartItems: cartItems.map(item => ({
-        tourId: item.booking.tourId,
-        departureDate: item.booking.departureDate,
-        people: item.booking.people,
-      })),
-    }).then(result => setClientSecret(result.data.clientSecret))
-  }, [total])
+    else {
+       try {
+          const functions = getFunctions()
+          const createPaymentIntent = httpsCallable<{ amount: number; userId: string; cartItems: { tourId: string; departureDate: string; people: number }[] }, { clientSecret: string }>(functions, 'createPaymentIntent')
+          const result = await createPaymentIntent({
+            amount: Math.round(totalCostForPurchase * 100),
+            userId: currentUser.id,
+            cartItems: cartItems.map(item => ({
+              tourId: item.booking.tourId,
+              departureDate: item.booking.departureDate,
+              people: item.booking.people,
+            })),
+          })
+          setClientSecret(result.data.clientSecret)
+        }
+        catch (err: any) {
+          console.error(err.message)
+          toast.error(`Unable to initialize payment: ${err.message ?? err}`)
+        }
+    }
+   
+  }
+
+  fetchClientSecret()
+}, [totalCostForPurchase, cartItems, currentUser, navigate])
 
   return (
     <section className={styles.checkoutContainer} aria-labelledby="checkout-page-title">
@@ -57,8 +72,8 @@ const CheckoutPage = () => {
         <header>
           <h1 id="checkout-page-title">Thank you so much for choosing GalacticTours!</h1>
         </header>
-        {total > 0
-          ? <h3>Review your payment amount of:<span>${total}</span></h3>
+        {totalCostForPurchase > 0
+          ? <h3>Review your payment amount of:<span>${totalCostForPurchase}</span></h3>
           : <h3>Please add at least one tour before checking out.</h3>}
 
         {clientSecret && <Stripe promise={stripePromise} options={options} />}

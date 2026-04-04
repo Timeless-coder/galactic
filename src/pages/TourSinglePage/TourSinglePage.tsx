@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import toast from 'react-hot-toast'
-import { format } from 'date-fns/format'
+import { format } from 'date-fns'
 import { Link, useParams, useNavigate } from 'react-router'
 import { AiFillCloseCircle } from 'react-icons/ai'
 
@@ -27,6 +27,10 @@ const TourSinglePage = () => {
   const dateRefs = useRef<(HTMLDivElement | null)[]>([])
   const [loading, setLoading] = useState(false)
 
+  const formatDate = (departureDate: string) => {
+    return format(departureDate, 'PPPP')
+  }
+
   const closeInstructionsModal = (time: number) => {
     const modal = modalRef.current  // read at call time
     if (modal) {
@@ -42,29 +46,26 @@ const TourSinglePage = () => {
 
   // THIS JUST GETS THE TOUR FOR THIS PAGE
   useEffect(() => {
-    let mounted = true
-
     const getTour = async () => {
       setLoading(true)
 
       try {
-        const tourData = await getTourBySlug(slug!)
-        if (mounted) setTour(tourData)
+        if (slug) {
+          const tourData = await getTourBySlug(slug)
+          if (tourData) setTour(tourData)
+        }
+        
       }
-      catch (error: any) {
-        console.error(error)
-        toast.error(`Failed to fetch the tour: ${error.message}`)
+      catch (err: any) {
+        console.error(err)
+        toast.error(`Failed to fetch the tour: ${err.message ?? err}`)
       }
       finally {
-        if (mounted) setLoading(false)
+        setLoading(false)
       }
     }
 
     getTour()
-    
-    return () => {
-      mounted = false
-    }
   }, [slug])
 
   // ANYTIME cartItems CHANGES, THIS CHECKS THE 3 dateRefs AGAINST THE CART FOR MATCHING BOOKINGS,
@@ -79,26 +80,28 @@ const TourSinglePage = () => {
     })
   }, [cartItems, tour])
 
-  useEffect(() => {
-    closeInstructionsModal(15_000)
-  }, [])  
+  // useEffect(() => {
+  //   closeInstructionsModal(15_000)
+  // }, [])  
 
   const handleBookingClick = (selectedDepartureDate: string) => {
-    const existingCartItem = cartItems.find(item => item.booking.tourId === tour!.id && item.booking.departureDate === selectedDepartureDate)
+    if (!tour || !currentUser) return
+
+    const existingCartItem = cartItems.find(item => item.booking.tourId === tour.id && item.booking.departureDate === selectedDepartureDate)
 
     if (existingCartItem) {
       addPersonToBooking(existingCartItem)            
     }
     else {
       const booking = {
-        id: `${tour!.id} - ${selectedDepartureDate}`,
+        id: `${tour.id} - ${selectedDepartureDate}`,
         createdAt: new Date().toISOString(),
-        tourId: tour!.id,
-        bookingUserId: currentUser!.id,
+        tourId: tour.id,
+        bookingUserId: currentUser.id,
         departureDate: selectedDepartureDate,
         people: 1
       }
-      addItemToCart({booking, tour: tour! })
+      addItemToCart({ booking, tour })
     }    
   }
 
@@ -137,15 +140,17 @@ const TourSinglePage = () => {
 
   return (
     <>
+      {/**Modal */}
       <aside className={styles.tourSingleInstructions} id='modal' ref={modalRef} aria-live="polite">
         {getModalText()}
-        <AiFillCloseCircle className={styles.icon} onClick={() => closeInstructionsModal(0)} />
+       <AiFillCloseCircle className={styles.icon} onClick={() => closeInstructionsModal(0)} role='button'/>
       </aside>
 
       {loading && <Spinner />}
       {tour && (
         <main className={styles.tourSingleContainer} aria-labelledby="tour-single-title">
-          {/* Header */}
+
+          {/**Header */}
           <header className={styles.tourHeader}>
             <div className={styles.tourPicture}>
               <img src={tour.imageCover} alt={tour.name} />
@@ -155,38 +160,42 @@ const TourSinglePage = () => {
 
           <section className={styles.main}>
             <div className={styles.mainLeft} id='book'>
+              
               {/* Basic Information */}
               <section className={`${styles.tourDetails} ${styles.one}`}>    
                 <h2>{tour.name}</h2>
                 <div className={styles.tourDetailsText}>
-                  <h3>Difficulty:</h3> <h3>{tour.difficulty} / 100</h3>
+                  <p>Difficulty:</p> <p>{tour.difficulty} / 100</p>
                 </div>
                 <div className={styles.tourDetailsText}>
-                  <h3>Average Rating:</h3> <h3>{tour.averageRating} / 100</h3>
+                  <p>Average Rating:</p> <p>{tour.averageRating} / 100</p>
                 </div>
                 <div className={styles.tourDetailsText}>
-                  <h3>Total Reviews:</h3> <h3>{tour.reviews}</h3>
+                  <p>Total Reviews:</p> <p>{tour.reviews}</p>
                 </div>
               </section>
 
               {/* Departure Dates */}
               <section className={styles.tourDetails} aria-labelledby="departure-dates-title">              
                 <h2 id="departure-dates-title">Departure Dates:</h2>
-                {tour.departureDates?.map((departureDate, i) => (
-                  <div className={styles.tourDetailsText} key={departureDate}>
-                    <div className={styles.tourDetailsTextLeft}>
-                      <h3>{format(new Date(departureDate), 'PPPP')}</h3>
-                      <p className={styles.peopleRef} ref={el => { dateRefs.current[i] = el }}>
-                        {setButtonLabelAndPeopleText(departureDate).peopleText} booked
-                      </p>
+                {tour.departureDates?.map((departureDate, i) => {
+                  const { buttonLabel, peopleText } = setButtonLabelAndPeopleText(departureDate)
+                  return (
+                    <div className={styles.tourDetailsText} key={departureDate}>
+                      <div className={styles.tourDetailsTextLeft}>
+                        <p>{formatDate(departureDate)}</p>
+                        <p className={styles.peopleRef} ref={el => { dateRefs.current[i] = el }}>
+                          {peopleText} booked
+                        </p>
+                      </div>
+                      <div>
+                        <CustomButton onClick={() => setClickFunction(departureDate)} layout='center'>
+                          {buttonLabel}
+                        </CustomButton>
+                      </div>
                     </div>
-                    <div onClick={() => setClickFunction(departureDate)}>
-                      <CustomButton>
-                        {setButtonLabelAndPeopleText(departureDate).buttonLabel}
-                      </CustomButton>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </section>
             </div>
 
@@ -207,12 +216,12 @@ const TourSinglePage = () => {
           </section>
 
           {/* Reviews */}
-          <section aria-labelledby="reviews-title">
+          <section aria-labelledby="reviews">
             <h2 id="reviews-title" className={styles.reviewsTitle}>Reviews:</h2>
             <TourReviews tour={tour} />
           </section>
 
-          <section className={styles.worksContainer} aria-label="How This Works">
+          <section aria-label="How This Works">
             <HowThisWorks />
           </section>
 

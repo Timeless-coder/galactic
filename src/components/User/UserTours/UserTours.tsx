@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 import type { Tour } from '../../../types/tour'
+import { UserComponent } from '../../../pages/UserPage/UserPage'
 
 import { useAuth } from '../../../hooks/useAuth'
 import { getBookingsByUserId } from '../../../services/firebase/bookingsService'
@@ -14,7 +15,7 @@ import Spinner from '../../../elements/Spinner/Spinner'
 import styles from './UserTours.module.scss'
 
 type UserToursProps = {
-  setShowSection: React.Dispatch<React.SetStateAction<string>>
+  setShowSection: React.Dispatch<React.SetStateAction<UserComponent>>
   setReviewTour: React.Dispatch<React.SetStateAction<Tour | null>>
 }
 
@@ -31,7 +32,10 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
   const fetchData = async () => {
     try {
       const myBookings = await getBookingsByUserId(currentUser.id) || []
-      const myBookedTours = await Promise.all(myBookings.map(b => getTourById(b.tourId)))
+      const tourResults = await Promise.allSettled(myBookings.map(b => getTourById(b.tourId)))
+      const myBookedTours = tourResults
+        .filter((r): r is PromiseFulfilledResult<Tour> => r.status === 'fulfilled')
+        .map(r => r.value)
 
       const uniqueToursMap = new Map<string, Tour>()
       myBookedTours.forEach(tour => {
@@ -44,8 +48,8 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
       setReviewedTourIds(myReviewedTourIds)
     }
     catch (err: any) {
-      console.log(err.message)
-      toast.error(`${err.message}`)
+      console.error(err.message)
+      toast.error(`${err.message ?? err}`)
     }
     finally {
       setLoading(false)
@@ -53,12 +57,12 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
   }
 
   fetchData()
-}, [currentUser])
+}, [currentUser?.id])
 
   return (
-    <section aria-labelledby="user-tours-title">
+    <section>
       {loading && <Spinner />}
-      {!loading && (!myTours || myTours?.length === 0) && (
+      {!loading && (myTours.length === 0) && (
         <header>
           <h2 id="user-tours-title">You have not booked any tours yet.</h2>
         </header>
@@ -66,7 +70,7 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
       {myTours.length > 0 && (
         <>
           <header>
-            <h2 id="user-tours-title">You can review tours you have booked but have not yet reviewed.</h2>
+            <h3 style={{ marginBottom: "10px" }} id="user-tours-title">You can review tours you have booked but have not yet reviewed.</h3>
           </header>
           <div className={styles.userToursContainer}>
             {myTours.map(tour => (

@@ -3,7 +3,7 @@ import styles from './HowThisWorks.module.scss'
 const HowThisWorks = () => {
   return (
     <section className={styles.howThisWorks}>
-      <header>
+      <header className={styles.headerContainer}>
         <h2>How It Works:</h2>
         <h3>And how can it only cost a dollar?</h3>
       </header>

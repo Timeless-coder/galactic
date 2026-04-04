@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import type { Tour } from '../../../../types/tour'
 import { Role } from '../../../../types/user'
+
 
 import { createTourService } from '../../../../services/firebase/toursService'
 import { uploadTourImage } from '../../../../services/firebase/storageService'
@@ -12,12 +14,13 @@ import { slugify } from '../../../../utils/slugify'
 import { useImagePreviewUrl } from '../../../../hooks/useImagePreview'
 
 import Spinner from '../../../../elements/Spinner/Spinner'
+import { UserComponent } from '../../../../pages/UserPage/UserPage'
 
 import styles from '../../../../elements/Form.module.scss'
 import localStyles from './CreateTour.module.scss'
 
 type CreateTourProps = {
-	setShowSection: React.Dispatch<React.SetStateAction<string>>
+	setShowSection: React.Dispatch<React.SetStateAction<UserComponent>>
 }
 
 type CreateTourFormData = {
@@ -32,18 +35,13 @@ type CreateTourFormData = {
 	image3File: FileList
 }
 
-const firestoreCreateServiceOptions = {
-	successMessage: 'Tour created successfully!'
-}
-
-
 const CreateTour = ({ setShowSection }: CreateTourProps) => {
 	const { currentUser } = useAuth()
-	const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<CreateTourFormData>()
-	const [loading, setLoading] = useState(false)
+	const [formLoading, setFormLoading] = useState(false)
+	const { register, handleSubmit, formState: { errors: formErrors }, watch, reset } = useForm<CreateTourFormData>()
 
-	const { loading: creating, mutate: createTour } =
-		useFirestoreMutateService((tourObject: Omit<Tour, 'id' | 'departureDates'>) => createTourService(tourObject, currentUser!.email), firestoreCreateServiceOptions)
+	const { loading: firestoreHookLoading, mutate: createTour, error: firestoreHookError } =
+		useFirestoreMutateService((tourObject: Omit<Tour, 'id' | 'departureDates'>) => createTourService(tourObject, currentUser!.email))
 
 	const watchImageCover = watch('imageCoverFile')
 	const watchImage1 = watch('image1File')
@@ -57,16 +55,18 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
 	const image3PreviewUrl = useImagePreviewUrl(watchImage3)
 
 	const formSubmit = async (data: CreateTourFormData) => {
-		setLoading(true)
-
-		const now = new Date()
-		const year = now.getFullYear()
-		const month = now.getMonth()
-		const day = now.getDate()
 
 		try {
-			if (!currentUser || currentUser.role !== Role.Admin) return
+			if (!currentUser || currentUser.role !== Role.Admin) {
+				return toast.error("Please log in as Admin to create a tour")
+			}
 
+			setFormLoading(true)
+
+			const now = new Date()
+			const year = now.getFullYear()
+			const month = now.getMonth()
+			const day = now.getDate()
 			const slug = slugify(data.name)
 
 			const imageCoverURL = await uploadTourImage(data.imageCoverFile[0], `tour-${slug}-cover`)
@@ -90,20 +90,23 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
 			}
 
 			await createTour(tourObject)
+			toast.success(`${tourObject.name} created successfully!`)
+			
 			reset()
-			setShowSection('manageTours')
+			setShowSection(UserComponent.ManageTours)
 		}
 		catch (err: any) {
 			console.error(err.message)
+			toast.error(`Error creating tour: ${firestoreHookError?.message ?? err.message}`)
 		}
 		finally {
-			setLoading(false)
+			setFormLoading(false)
 		}
 	}
 
 	return (
 		<section>
-			{(loading || creating) && <Spinner />}
+			{(formLoading || firestoreHookLoading) && <Spinner />}
 			<div className={localStyles.createTourContainer}>
 				<div className={styles.formContainer}>
 					<header>
@@ -115,7 +118,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
 						{/* Planet */}
 						<div className={styles.inputContainer}>
 							<label htmlFor='planet'>Planet</label>
-							{errors.planet && <p className={styles.error}>{errors.planet.message}</p>}
+							{formErrors.planet && <p className={styles.error}>{formErrors.planet.message}</p>}
 							<input
 								{...register('planet', {
 									required: 'Planet name is required',
@@ -133,7 +136,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
 						{/* Tour Name */}
 						<div className={styles.inputContainer}>
 							<label htmlFor='name'>Name</label>
-							{errors.name && <p className={styles.error}>{errors.name.message}</p>}
+							{formErrors.name && <p className={styles.error}>{formErrors.name.message}</p>}
 							<input
 								{...register('name', {
 									required: 'Tour name is required',
@@ -151,7 +154,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
 						{/* Summary */}
 						<div className={styles.inputContainer}>
 							<label htmlFor='summary'>Summary</label>
-							{errors.summary && <p className={styles.error}>{errors.summary.message}</p>}
+							{formErrors.summary && <p className={styles.error}>{formErrors.summary.message}</p>}
 							<input
 								{...register('summary', {
 									required: 'Summary is required',
@@ -169,13 +172,12 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
 						{/* Description */}
 						<div className={styles.inputContainer}>
 							<label htmlFor='description'>Description</label>
-							{errors.description && <p className={styles.error}>{errors.description.message}</p>}
-							<input
+							{formErrors.description && <p className={styles.error}>{formErrors.description.message}</p>}
+							<textarea
 								{...register('description', {
 									required: 'Description is required'
 								})}
 								id='description'
-								type='text'
 								placeholder='Create a full description'
 							/>
 						</div>
@@ -183,7 +185,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
 						{/* Difficulty */}
 						<div className={styles.inputContainer}>
 							<label htmlFor='difficulty'>Difficulty</label>
-							{errors.difficulty && <p className={styles.error}>{errors.difficulty.message}</p>}
+							{formErrors.difficulty && <p className={styles.error}>{formErrors.difficulty.message}</p>}
 							<input
 								{...register('difficulty', {
 									required: 'Difficulty level is required',
@@ -211,10 +213,10 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
                     src={coverPreviewUrl}
                     alt={`😊`}
                   />
-                  {watchImage1?.[0] ? 'Cover image selected' : 'Select cover image'}
+                  {watchImageCover?.[0] ? 'Cover image selected' : 'Select cover image'}
                 </label>
 							</div>
-							{errors.imageCoverFile && <p className={styles.error}>{errors.imageCoverFile.message as string}</p>}
+							{formErrors.imageCoverFile && <p className={styles.error}>{formErrors.imageCoverFile.message as string}</p>}
 							<input
 								{...register('imageCoverFile', {
 									required: 'A cover image is required'
@@ -237,7 +239,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
                   {watchImage1?.[0] ? 'Image 1 selected' : 'Select image 1'}
                 </label>
 							</div>
-							{errors.image1File && <p className={styles.error}>{errors.image1File.message as string}</p>}
+							{formErrors.image1File && <p className={styles.error}>{formErrors.image1File.message as string}</p>}
 							<input
 								{...register('image1File', {
 									required: 'Image 1 is required'
@@ -260,7 +262,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
                   {watchImage2?.[0] ? 'Image 2 selected' : 'Select image 2'}
                 </label>
 							</div>
-							{errors.image2File && <p className={styles.error}>{errors.image2File.message as string}</p>}
+							{formErrors.image2File && <p className={styles.error}>{formErrors.image2File.message as string}</p>}
 							<input
 								{...register('image2File', {
 									required: 'Image 2 is required'
@@ -283,7 +285,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
                   {watchImage3?.[0] ? 'Image 3 selected' : 'Select image 3'}
                 </label>
 							</div>
-							{errors.image3File && <p className={styles.error}>{errors.image3File.message as string}</p>}
+							{formErrors.image3File && <p className={styles.error}>{formErrors.image3File.message as string}</p>}
 							<input
 								{...register('image3File', {
 									required: 'Image 3 is required'
@@ -293,12 +295,13 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
 								accept='image/jpeg,image/jpg,image/png'
 							/>
 						</div>
+						
 						<div className={styles.inputContainer}>
 							<input
 								type='submit'
 								name='submit'
 								value='Create Tour'
-								disabled={creating || loading}
+								disabled={formLoading || firestoreHookLoading}
 							/>
 						</div>
 					</form>

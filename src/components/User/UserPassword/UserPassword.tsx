@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
@@ -5,17 +6,20 @@ import { useAuth } from '../../../hooks/useAuth'
 
 import styles from '../../../elements/Form.module.scss'
 import linkStyles from '../UserSettings/UserSettings.module.scss'
+import { Link } from 'react-router'
 
-type UserPasswordFormData = {
+type UserPasswordResetFormData = {
   newPassword: string
   newPasswordConfirm: string
 }
 
-const PasswordReset = () => {
+const UserPasswordReset = () => {
   const { currentUser, updatePassword } = useAuth()
-  const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<UserPasswordFormData>()
+  const [loading, setLoading] = useState(false)
+  const { register, handleSubmit, formState: { errors }, watch, reset, trigger } = useForm<UserPasswordResetFormData>()
 
-  const formSubmit = async (data: UserPasswordFormData) => {
+  const formSubmit = async (data: UserPasswordResetFormData) => {
+    setLoading(true)
     try {
       await updatePassword(data.newPassword)
       toast.success('Password updated successfully!')
@@ -23,15 +27,19 @@ const PasswordReset = () => {
     }
     catch (err: any) {
       console.error('Password update error:', err.message)
-      toast.error(err.message)
+      toast.error(`Something went wrong: ${err.message}`)
+    }
+    finally {
+      setLoading(false)
     }
   }
 
   return (
     <section className={styles.userSettingsContainer}>
+      {!currentUser && <Link to='/auth'>Log in to change password</Link>}
       {currentUser?.providerId === 'google.com' && (
         <header>
-          <h1>
+          <p style={{ fontSize: "20px" }}>
             Update Google account password at{' '}
             <a
               className={linkStyles.link}
@@ -40,15 +48,18 @@ const PasswordReset = () => {
               rel='noreferrer'>
               Google
             </a>{' '}
-          </h1>
+          </p>
         </header>
       )}
+
       {currentUser?.providerId !== 'google.com' && (
         <div className={styles.formContainer}>
           <form onSubmit={handleSubmit(formSubmit)} aria-label="Update password form">
             <header>
               <h1>Update Your Password</h1>
             </header>
+
+            {/**Password */}
             <div className={styles.inputContainer}>
               <label htmlFor='newPassword'>New Password</label>
               {errors.newPassword && <p className={styles.error}>{errors.newPassword.message}</p>}
@@ -56,15 +67,18 @@ const PasswordReset = () => {
                 {...register('newPassword', {
                   required: 'Password is required',
                   minLength: {
-                    value: 8,
-                    message: 'Password must have a minimum of 8 characters'
+                    value: 6,
+                    message: 'Password must have a minimum of 6 characters'
                   }
                 })}
                 id='newPassword'
                 type='password'
                 placeholder='********'
+                onChange={() => trigger('newPasswordConfirm')}
               />
             </div>
+
+            {/**Confirm Password */}
             <div className={styles.inputContainer}>
               <label htmlFor='newPasswordConfirm'>Confirm New Password</label>
               {errors.newPasswordConfirm && <p className={styles.error}>{errors.newPasswordConfirm.message}</p>}
@@ -82,7 +96,9 @@ const PasswordReset = () => {
               <input
                 type='submit'
                 name='submit'
-                value='Update Password'
+                value={loading ? 'Updating...' : 'Update Password'}
+                disabled={loading}
+
               />
             </div>
           </form>
@@ -92,4 +108,4 @@ const PasswordReset = () => {
   )
 }
 
-export default PasswordReset
+export default UserPasswordReset

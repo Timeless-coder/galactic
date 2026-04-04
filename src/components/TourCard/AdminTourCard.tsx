@@ -1,31 +1,29 @@
 import { IoArrowForwardCircleOutline } from 'react-icons/io5'
 
 import type { Tour } from '../../types/tour'
+import { UserComponent } from '../../pages/UserPage/UserPage'
+import CustomButton from '../../elements/CustomButton/CustomButton'
 
 import styles from './TourCard.module.scss'
 
 type TourCardProps = {
   tour: Tour
   setEditTour: React.Dispatch<React.SetStateAction<Tour | null>>
-  setShowSection: React.Dispatch<React.SetStateAction<string>>
+  setShowSection: React.Dispatch<React.SetStateAction<UserComponent>>
 }
 
 export const AdminTourCard = ({ tour, setEditTour, setShowSection }: TourCardProps) => {
 
   const setEditTourSetShowSectionAndEdit = () => {
     setEditTour(tour)
-    setShowSection('editTour')
+    setShowSection(UserComponent.EditTour)
   }
   
   return (
     <article className={styles.card}>
       {tour && (
-        <button
-          type="button"
-          onClick={setEditTourSetShowSectionAndEdit}
-          className={styles.cardButton}
-          aria-label={`Edit tour ${tour.name}`}
-        >
+        <main className={styles.cardButton}>
+          
           <header className={styles.cardHeader}>
             <div className={styles.cardPicture}>
               <img src={tour.imageCover} alt={tour.name} />
@@ -47,12 +45,16 @@ export const AdminTourCard = ({ tour, setEditTour, setShowSection }: TourCardPro
           </section>
 
           <section className={styles.cardDetails}>
-            <span className={styles.tourLink}>
+            <CustomButton
+                onClick={setEditTourSetShowSectionAndEdit} 
+                aria-label={`Edit tour ${tour.name}`}
+                width='100%'>
               Edit this tour
               <IoArrowForwardCircleOutline />
-            </span>
+            </CustomButton>
           </section>
-        </button>
+
+        </main>
       )}
     </article>
   )

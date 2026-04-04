@@ -16,21 +16,20 @@ type ReviewCardProps = {
 
 const ReviewCard = ({ rating, text, userName, userPhoto, createdAt, tour }: ReviewCardProps) => {
 
+  console.table(rating)
+
   return (
-    <article className={styles.reviewCard}>
-      <figure>
-        <img className={styles.backgroundImage} src={tour.imageCover} alt={tour.planet} />
-      </figure>
+    <article className={styles.reviewCard} style={{ backgroundImage: `url(${tour.imageCover})` }}>
       <section className={styles.content}>
-        <header>
-          <figure className={styles.userImage}>
-            <img src={userPhoto || defaultUserImageURL} alt={userName} />
-          </figure>
-          <h3>{userName || 'Anonymous'}</h3>
-          <p style={{ fontSize: '12px' }}>Reviewed: <em>{createdAt}</em></p>
+        <header className={styles.headerContainer}>
+          <div className={styles.userContainer}>
+            <img src={userPhoto || defaultUserImageURL} alt={userName} className={styles.userImage} />
+            <h3>{userName || 'Anonymous'}</h3>
+          </div>
+          <h3>{rating} / 100</h3>
         </header>
+        <p style={{ fontSize: '12px' }}>Reviewed: <em>{createdAt}</em></p>
         <p>{text}</p>
-        <h2>{rating} / 100</h2>
       </section>
     </article>
   )

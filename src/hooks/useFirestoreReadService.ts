@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
 
 export type FirestoreServiceOptions = {
 	successMessage?: string
@@ -21,35 +20,29 @@ type FirestoreServiceResult<T> = {
 }
 
 export const useFirestoreReadService = <T>(service: () => Promise<T>, options: FirestoreServiceOptions = defaultFirestoreServiceOptions): FirestoreServiceResult<T> => {
-	const { successMessage, errorMessage, immediate = true, silent = false } = options
+	const { immediate = true } = options
 	const [data, setData] = useState<T | null>(null)
 	const [error, setError] = useState<Error | null>(null)
 	const [loading, setLoading] = useState<boolean>(false)
 
-	const isMounted = useRef(true)
-
-	useEffect(() => {
-		isMounted.current = true
-		return () => { isMounted.current = false }
-	}, [])
+	const serviceRef = useRef(service)
+	useEffect(() => { serviceRef.current = service })
 
 	const readServiceQuery = useCallback(async () => {
 		setLoading(true)
 		setError(null)
 
 		try {
-			const result = await service()
-			if (isMounted.current) setData(result)
-			if (successMessage && !silent && isMounted.current) toast.success(successMessage)
+			const result = await serviceRef.current()
+			setData(result)
 		}
 		catch (err: any) {
-			if (isMounted.current) setError(err.message)
-			if (!silent && isMounted.current) toast.error(errorMessage || err.message || 'An error occurred')
+			setError(err instanceof Error ? err : new Error(String(err)))
 		}
 		finally {
-			if (isMounted.current) setLoading(false)
+			setLoading(false)
 		}
-	}, [service, successMessage, errorMessage, silent])
+	}, [])
 	
 	useEffect(() => {
 		if (immediate) readServiceQuery()

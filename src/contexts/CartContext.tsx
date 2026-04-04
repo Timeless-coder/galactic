@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react'
+import React, { createContext, useState, useEffect, useMemo, type SetStateAction } from 'react'
 
 import type { Booking } from '../types/booking'
 import type { Tour } from '../types/tour'
@@ -15,23 +15,44 @@ export type CartContextType = {
 	removePersonOrBooking: (item: CartItem) => void
 	removeItemFromCart: (item: CartItem) => void
 	clearCart: () => void
-	cartDropdownCollapsed: boolean
-	setCartDropdownCollapsed: (collapsed: boolean) => void
-	total: number
+	cartDropdownOpen: boolean
+	setCartDropdownOpen: React.Dispatch<SetStateAction<boolean>>
+	currentPricePerTour: number
+	totalCostForPurchase: number
+}
+
+export const currentPricePerTour = 1
+
+const isValidCartItems = (data: unknown): data is CartItem[] => {
+	if (!Array.isArray(data)) return false
+	return data.every(item =>
+		item &&
+		typeof item === 'object' &&
+		typeof item.booking?.id === 'string' &&
+		typeof item.booking?.people === 'number' &&
+		typeof item.tour?.id === 'string'
+	)
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 	const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-		const stored = localStorage.getItem('galacticCart')
-		return stored ? JSON.parse(stored) : []
+		try {
+			const storedCart = localStorage.getItem('galacticCart')
+			if (!storedCart) return []
+			const parsedCart: unknown = JSON.parse(storedCart)
+			return isValidCartItems(parsedCart) ? parsedCart : []
+		}
+		catch (err: any) {
+			console.error(err.message)
+			return []
+		}
 	})
-	const [cartDropdownCollapsed, setCartDropdownCollapsed] = useState(true)
+	const [cartDropdownOpen, setCartDropdownOpen] = useState<boolean>(false)
 
 	const addItemToCart = (item: CartItem) => {
-		item.booking.people= 1
-		setCartItems(prev => [...prev, item])
+		setCartItems(prev => [...prev, { ...item, booking: { ...item.booking, people: 1 } }])
 	}
 
 	const addPersonToBooking = (item: CartItem) => {
@@ -45,13 +66,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 	}
 
 	const removeItemFromCart = (item: CartItem) => {
-		setCartItems((prevCartItems) => prevCartItems.filter((i) => i !== item))
+		setCartItems((prevCartItems) => prevCartItems.filter((i) => i.booking.id !== item.booking.id))
 	}	
 
 	const subtractPersonFromBooking = (item: CartItem) => {
 		setCartItems((prevCartItems) =>
 			prevCartItems.map((cartItem) =>
-				cartItem === item ? { ...cartItem, booking: { ...cartItem.booking, people: item.booking.people - 1 } } : cartItem
+				cartItem.booking.id === item.booking.id ? { ...cartItem, booking: { ...cartItem.booking, people: item.booking.people - 1 } } : cartItem
 			)
 		)
 	}
@@ -65,14 +86,29 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 		setCartItems([])
 	}
 
-	const total = cartItems.reduce((acc, item) => acc + 1 * item.booking.people, 0)
+	const totalCostForPurchase = useMemo(
+		() => cartItems.reduce((acc, item) => acc + currentPricePerTour * item.booking.people, 0),
+		[cartItems]
+	)
 
 	useEffect(() => {
-		localStorage.setItem('galacticCart', JSON.stringify(cartItems))
+		try {
+			localStorage.setItem('galacticCart', JSON.stringify(cartItems))
+		}
+		catch (err: any) {
+			console.error(err.message)
+		}
 	}, [cartItems])
 
+	const contextValue = useMemo(() => ({
+		cartItems, addPersonToBooking, addItemToCart, removePersonOrBooking,
+		removeItemFromCart, clearCart, cartDropdownOpen, setCartDropdownOpen,
+		currentPricePerTour, totalCostForPurchase
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}), [cartItems, cartDropdownOpen, totalCostForPurchase])
+
 	return (
-		<CartContext value={{ cartItems, addPersonToBooking, addItemToCart, removePersonOrBooking, removeItemFromCart, clearCart, cartDropdownCollapsed, setCartDropdownCollapsed, total }}>
+		<CartContext value={contextValue}>
 			{children}
 		</CartContext>
 	)
