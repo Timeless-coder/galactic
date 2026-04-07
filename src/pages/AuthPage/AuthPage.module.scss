@@ -3,4 +3,19 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  padding-top: 50px;
+  opacity: 0;
+  transform: translateY(-8px);
+  animation: fadeInYAuth 0.3s forwards;
+}
+
+@keyframes fadeInYAuth {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

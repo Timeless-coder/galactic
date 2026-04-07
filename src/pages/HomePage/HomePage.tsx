@@ -4,7 +4,7 @@ import { GiStrikingArrows } from 'react-icons/gi'
 
 import { useAuth } from '../../hooks/useAuth'
 import { migrateCreatedAtFormat } from '../../services/firebase/reviewsService'
-import { migratedepartureDatesToDepartureDates } from '../../services/firebase/toursService'
+import { migratedepartureDatesToDepartureDates, migrateDepartureDateFormat } from '../../services/firebase/toursService'
 
 import zik from '../../assets/AlienHead.svg'
 
@@ -16,7 +16,7 @@ const Home = () => {
   const { currentUser } = useAuth()
 
   useEffect(() => {
-    // migrateCreatedAtFormat()
+    // migrateDepartureDateFormat()
   }, [])
 
   return (

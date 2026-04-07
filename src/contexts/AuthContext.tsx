@@ -12,7 +12,7 @@ export type AuthContextType = {
   loading: boolean
   setCurrentUser: (user: User | null) => void
   login: (email: string, password: string) => Promise<User>
-  signupWithEmailAndPassword: (name: string, email: string, password: string, photoURL: string) => Promise<User>
+  signupWithEmailAndPassword: (displayName: string, email: string, password: string, photoURL: string) => Promise<User>
   signinWithGoogle: () => Promise<User>
   updateUserAccount: (email: string, displayName: string, photoURL: string) => Promise<void>
   updatePassword: (newPassword: string) => Promise<void>
@@ -51,9 +51,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe()
   }, [])
   
-  const signupWithEmailAndPassword = async (name: string, email: string, password: string, photoURL: string): Promise<User> => {
+  const signupWithEmailAndPassword = async (displayName: string, email: string, password: string, photoURL: string): Promise<User> => {
     try {
-      return await signupWithEmailAndPasswordService(name, email, password, photoURL)
+      return await signupWithEmailAndPasswordService(displayName, email, password, photoURL)
     }
     catch (error) {
       console.error('Sign up error:', error)

@@ -96,6 +96,7 @@ const EditTour = ({ editTour, setShowSection }: EditTourProps) => {
 
   return (
     <section aria-labelledby="edit-tour-heading">
+      <h3>Edit a tour</h3>
       {(loading) && <Spinner />}
       <main className={localStyles.editTourContainer}>
         <article className={styles.formContainer}>

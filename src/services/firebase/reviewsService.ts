@@ -14,13 +14,6 @@ const mapFirebaseReview = (doc: any): Review => ({
 	createdAt: doc.data().createdAt ? String(doc.data().createdAt) : serverTimestamp().toString()
 })
 
-// Not used in app - I went with a compound query for performance.
-// This would have required that each Review do its own query to get User info.
-export const getReviewsByTourId = async (tourId: string): Promise<Review[]> => {
-	const q = query(collection(db, 'reviews'), where('tour', '==', tourId))
-	const querySnapshot = await getDocs(q)
-	return querySnapshot.docs.map(mapFirebaseReview)
-}
 
 export async function fetchReviewsForTour(tourId: string): Promise<ReviewWithUser[]> {
   // 1. Fetch reviews for this tour
@@ -155,3 +148,9 @@ export const migrateReviewFields = async (): Promise<void> => {
 	}
 }
 
+// *** Legacy ***
+export const getReviewsByTourId = async (tourId: string): Promise<Review[]> => {
+	const q = query(collection(db, 'reviews'), where('tour', '==', tourId))
+	const querySnapshot = await getDocs(q)
+	return querySnapshot.docs.map(mapFirebaseReview)
+}

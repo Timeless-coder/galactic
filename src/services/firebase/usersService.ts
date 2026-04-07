@@ -1,21 +1,7 @@
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteField } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteField, deleteDoc } from 'firebase/firestore'
 
 import { db } from './firebaseConfig'
 import type { User } from '../../types/user'
-
-export const getUserById = async (id: string): Promise<User> => {
-	const userRef = doc(db, 'users', id)
-	const userSnap = await getDoc(userRef)
-	if (!userSnap.exists()) {
-		throw new Error('User not found')
-	}
-	return { id: userSnap.id, ...userSnap.data() } as User
-}
-
-export const getAllUsers = async (): Promise<User[]> => {
-	const usersSnapshot = await getDocs(collection(db, 'users'))
-	return usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User))
-}
 
 export const createUserWithAuthId = async (user: User): Promise<void> => {
 	await setDoc(doc(db, 'users', user.id), user)
@@ -45,4 +31,19 @@ export const removeFieldFromUser = async (fieldLabel: string): Promise<void> => 
 			})
 		}
 	}
+}
+
+// *** Legacy ***
+export const getUserById = async (id: string): Promise<User> => {
+	const userRef = doc(db, 'users', id)
+	const userSnap = await getDoc(userRef)
+	if (!userSnap.exists()) {
+		throw new Error('User not found')
+	}
+	return { id: userSnap.id, ...userSnap.data() } as User
+}
+
+export const getAllUsers = async (): Promise<User[]> => {
+	const usersSnapshot = await getDocs(collection(db, 'users'))
+	return usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User))
 }

@@ -1,5 +1,5 @@
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, getAuth, updateEmail,
-  updateProfile, updatePassword, sendPasswordResetEmail} from 'firebase/auth'
+  updateProfile, updatePassword, sendPasswordResetEmail, deleteUser} from 'firebase/auth'
 
 import type { ActionCodeSettings, User as FirebaseUser } from 'firebase/auth'
 import type { User } from '../../types/user'
@@ -25,10 +25,10 @@ const actionCodeSettings: ActionCodeSettings = {
 }
 
 export const getRole = async (email: string) => {
-  const q = query(collection(db, 'adminEmails'), where('email', '==', email));
-  const snapshot = await getDocs(q);
-  return snapshot.empty ? Role.User : Role.Admin;
-};
+  const q = query(collection(db, 'adminEmails'), where('email', '==', email))
+  const snapshot = await getDocs(q)
+  return snapshot.empty ? Role.User : Role.Admin
+}
 
 const createUserWithRole = async (firebaseUser: FirebaseUser): Promise<User> => {
   if (!firebaseUser.email) throw new Error('User email is missing')
@@ -40,15 +40,27 @@ const createUserWithRole = async (firebaseUser: FirebaseUser): Promise<User> => 
 
 export const loginService = async (email: string, password: string): Promise<User> => {
   const result = await signInWithEmailAndPassword(auth, email, password)
-  return await createUserWithRole(result.user)
+  const firebaseUser = result.user
+
+  // Try to get the user doc from Firestore
+  const userRef = doc(db, 'users', firebaseUser.uid)
+  const userSnap = await getDoc(userRef)
+
+  return userSnap.exists()
+    ? { id: userSnap.id, ...userSnap.data() } as User
+    : await createUserWithRole(firebaseUser)
 }
 
-export const signupWithEmailAndPasswordService = async (name: string, email: string, password: string, photoURL: string): Promise<User> => {
+export const signupWithEmailAndPasswordService = async (displayName: string, email: string, password: string, photoURL: string): Promise<User> => {
   const result = await createUserWithEmailAndPassword(auth, email, password)
-  if (result.user) {
-    await updateProfile(result.user, { displayName: name, photoURL })
+
+  try {
+    await updateProfile(result.user, { displayName, photoURL })
+    return await createUserWithRole(result.user)
+  } catch (error) {
+    await deleteUser(result.user)
+    throw error
   }
-  return await createUserWithRole(result.user)
 }
 
 export const signinWithGoogleService = async (): Promise<User> => {

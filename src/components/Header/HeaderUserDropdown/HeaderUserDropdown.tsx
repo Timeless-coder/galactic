@@ -19,10 +19,10 @@ export const HeaderUserDropdown = ({ setUserMenuOpen }: HeaderUserDropdownProps)
     
     try {
       const displayNameOfUserLoggingOut = currentUser?.displayName ?? "Traveler"
-      await logout()
-      toast.success(`Thanks for visiting, ${displayNameOfUserLoggingOut}`)
       setUserMenuOpen(false)
+      await logout()
 
+      toast.success(`Thanks for visiting, ${displayNameOfUserLoggingOut}`)
       navigate('/auth')
     }
     catch (err: any) {
@@ -32,7 +32,7 @@ export const HeaderUserDropdown = ({ setUserMenuOpen }: HeaderUserDropdownProps)
   }
 
   return (
-    <nav className={styles.userDropdown} aria-label="User menu">
+    <nav id="header-user-dropdown" className={styles.userDropdown} aria-label="User menu">
 
       {currentUser && (
         <Link to={`/account/${currentUser.id}`} onClick={() => setUserMenuOpen(false)}>
@@ -40,10 +40,7 @@ export const HeaderUserDropdown = ({ setUserMenuOpen }: HeaderUserDropdownProps)
         </Link>
       )}
 
-      <button
-        onClick={signOut}
-        aria-label="Sign out"
-      >
+      <button onClick={signOut} aria-label="Sign out">
         Sign Out
       </button>
     </nav>

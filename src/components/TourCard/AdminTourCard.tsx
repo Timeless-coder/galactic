@@ -13,48 +13,51 @@ type TourCardProps = {
 }
 
 export const AdminTourCard = ({ tour, setEditTour, setShowSection }: TourCardProps) => {
-
   const setEditTourSetShowSectionAndEdit = () => {
     setEditTour(tour)
     setShowSection(UserComponent.EditTour)
   }
-  
+
   return (
     <article className={styles.card}>
       {tour && (
-        <main className={styles.cardButton}>
-          
+        <div className={styles.cardButton}>
           <header className={styles.cardHeader}>
             <div className={styles.cardPicture}>
               <img src={tour.imageCover} alt={tour.name} />
             </div>
-            <h1>{tour.planet}</h1>
+            <p className={styles.cardPlanet}>{tour.planet}</p>
           </header>
 
           <section className={`${styles.cardDetails} ${styles.one}`}>
             <h2>{tour.name}</h2>
-            <div className={styles.cardDetailsText}>
-              <h3>Difficulty:</h3> <h3>{tour.difficulty} / 100</h3>
-            </div>
-            <div className={styles.cardDetailsText}>
-              <h3>Average Rating:</h3> <h3>{tour.averageRating} / 100</h3>
-            </div>
-            <div className={styles.cardDetailsText}>
-              <h3>Total Reviews:</h3> <h3>{tour.reviews}</h3>
-            </div>
+            <dl>
+              <div className={styles.cardDetailsText}>
+                <dt>Difficulty:</dt>
+                <dd>{tour.difficulty} / 100</dd>
+              </div>
+              <div className={styles.cardDetailsText}>
+                <dt>Average Rating:</dt>
+                <dd>{tour.averageRating} / 100</dd>
+              </div>
+              <div className={styles.cardDetailsText}>
+                <dt>Total Reviews:</dt>
+                <dd>{tour.reviews}</dd>
+              </div>
+            </dl>
           </section>
 
           <section className={styles.cardDetails}>
             <CustomButton
-                onClick={setEditTourSetShowSectionAndEdit} 
-                aria-label={`Edit tour ${tour.name}`}
-                width='100%'>
+              onClick={setEditTourSetShowSectionAndEdit}
+              aria-label={`Edit tour ${tour.name}`}
+              width='100%'
+            >
               Edit this tour
               <IoArrowForwardCircleOutline />
             </CustomButton>
           </section>
-
-        </main>
+        </div>
       )}
     </article>
   )

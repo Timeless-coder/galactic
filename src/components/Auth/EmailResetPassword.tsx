@@ -1,5 +1,4 @@
-import React from 'react'
-import { useNavigate } from 'react-router'
+import React, {useState} from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
@@ -20,8 +19,8 @@ type EmailResetData = {
 
 const EmailResetPassword = ({ setHasAccount, setLostPassword }: EmailResetPasswordProps) => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<EmailResetData>()
-  const navigate = useNavigate()
   const { sendPasswordResetEmail } = useAuth()
+  const [loading, setLoading] = useState(false)
   
   const handleFoundEmail = () => {
     setLostPassword(false)
@@ -30,15 +29,20 @@ const EmailResetPassword = ({ setHasAccount, setLostPassword }: EmailResetPasswo
 
   const formSubmit = async({ email }: EmailResetData) => {
     try {
+      setLoading(true)
+      
       await sendPasswordResetEmail(email)
-      toast.success('Password reset email sent successfully.')
+      toast.success(`Password reset link sent successfully to ${email}. Check your inbox.`)
       
       reset()
-      navigate('/auth')
+      setHasAccount(true)
+      setLostPassword(false)
     }
     catch (err: any){
       console.error(err.message)
-      toast.error(`${err.message ?? err ?? 'An error occurred'} - Please try again`)
+      toast.error('Unable to send a password reset email right now. Please try again.')    }
+    finally {
+      setLoading(false)
     }
   }
   return (
@@ -54,17 +58,24 @@ const EmailResetPassword = ({ setHasAccount, setLostPassword }: EmailResetPasswo
 
       <form onSubmit={handleSubmit(formSubmit)}>
         <div className={styles.inputContainer}>
-          <label htmlFor='email'>Email</label>
-          {errors.email && <p className={styles.error}>{errors.email.message}</p>}
+          <label htmlFor='password-reset-email'>Email</label>
+          {errors.email && (
+          <p id='password-reset-email-error' className={styles.error} role='alert'>
+            {errors.email.message}
+          </p>
+          )}
           <input
             {...register('email', { required: 'Email is required' })}
             type='email'
             placeholder='example@xyz.com'
+            id='password-reset-email'
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'password-reset-email-error' : undefined}
           />
         </div>
 
         <div className={styles.inputContainer}>
-          <CustomButton type="submit" name="submit" layout='center' width='100%'>Submit</CustomButton>
+          <CustomButton disabled={loading} type="submit" name="submit" layout='center' width='100%'>Submit</CustomButton>
         </div>
       </form>
   </section>

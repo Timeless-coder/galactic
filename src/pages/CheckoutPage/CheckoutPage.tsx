@@ -32,34 +32,32 @@ const CheckoutPage = () => {
   }, [currentUser, navigate])
 
   useEffect(() => {
-  if (totalCostForPurchase <= 0) return
+    if (totalCostForPurchase <= 0) return
 
-  localStorage.setItem('galacticCartReceiptItems', JSON.stringify(cartItems))
-  localStorage.setItem('galacticCartReceiptTotal', JSON.stringify(totalCostForPurchase))
-
-  const fetchClientSecret = async () => {
-    if (!currentUser) return toast.error('Please log in to proceed')
-      
-    else {
-       try {
-          const functions = getFunctions()
-          const createPaymentIntent = httpsCallable<{ amount: number; userId: string; cartItems: { tourId: string; departureDate: string; people: number }[] }, { clientSecret: string }>(functions, 'createPaymentIntent')
-          const result = await createPaymentIntent({
-            amount: Math.round(totalCostForPurchase * 100),
-            userId: currentUser.id,
-            cartItems: cartItems.map(item => ({
-              tourId: item.booking.tourId,
-              departureDate: item.booking.departureDate,
-              people: item.booking.people,
-            })),
-          })
-          setClientSecret(result.data.clientSecret)
-        }
-        catch (err: any) {
-          console.error(err.message)
-          toast.error(`Unable to initialize payment: ${err.message ?? err}`)
-        }
-    }
+    const fetchClientSecret = async () => {
+      if (currentUser) {
+        try {
+            const functions = getFunctions()
+            const createPaymentIntent = httpsCallable<{ amount: number; userId: string; cartItems: { tourId: string; tourName: string; departureDate: string; people: number }[] }, { clientSecret: string }>(functions, 'createPaymentIntent')
+            const result = await createPaymentIntent({
+              amount: Math.round(totalCostForPurchase * 100),
+              userId: currentUser.id,
+              cartItems: cartItems.map(item => ({
+                tourId: item.booking.tourId,
+                tourName: item.tour.name,
+                departureDate: item.booking.departureDate,
+                people: item.booking.people,
+              })),
+            })
+            setClientSecret(result.data.clientSecret)
+          }
+          catch (err: any) {
+            console.error(err.message)
+            toast.error(`Unable to initialize payment: ${err.message ?? err}`)
+          }
+      }
+        
+      else return toast.error('Please log in to proceed')
    
   }
 

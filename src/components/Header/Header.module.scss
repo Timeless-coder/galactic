@@ -13,8 +13,8 @@
     background-image: url('../../assets/OptimizedBacks/outpost.jpg');
     background-size: cover;
     box-shadow: 
-      0 0 10px 2px var(--primary-blue-50),
-      0 15px 20px rgb(114, 116, 192);
+      0 0 5px 2px var(--primary-blue-50),
+      0 8px 20px var(--primary-blue-50);
     a {
         color: var(--primary-blue-50);
         text-shadow: 0 0 5px white;
@@ -87,8 +87,10 @@
               height: 1.7vw;
             }
             .userImageContainer {
-                width: clamp(37px, 4vw, 50px);
-                height: 4vw;
+              width: clamp(44px, 4vw, 50px);
+              height: clamp(44px, 4vw, 50px);
+              min-width: 44px;
+              min-height: 44px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;

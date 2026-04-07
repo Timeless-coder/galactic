@@ -4,20 +4,30 @@ import { useCart } from '../../../hooks/useCart'
 
 import styles from './HeaderCartIcon.module.scss'
 
-export const HeaderCartIcon = () => {
-  const { cartItems, setCartDropdownOpen } = useCart()
+type HeaderCartIconProps = {
+  onToggle?: () => void
+}
 
-  const toggleCartDropdown = () => setCartDropdownOpen(prev => !prev)
+export const HeaderCartIcon = ({ onToggle }: HeaderCartIconProps) => {
+  const { cartItems, cartDropdownOpen, setCartDropdownOpen } = useCart()
+
+  const toggleCartDropdown = () => {
+    onToggle?.()
+    setCartDropdownOpen(prev => !prev)
+  }
+  const itemCountLabel = `${cartItems.length} ${cartItems.length === 1 ? 'item' : 'items'}`
 
   return (
     <button
       className={styles.cartIconContainer}
       onClick={toggleCartDropdown}
-      aria-label="Toggle cart dropdown"
+      aria-label={`Shopping cart, ${itemCountLabel}`}
+      aria-expanded={cartDropdownOpen}
+      aria-controls="header-cart-dropdown"
       type="button"
     >
       <AiOutlineShoppingCart className={styles.icon} aria-hidden="true" />
-      <span className={styles.count} aria-label={`Cart items: ${cartItems.length}`}>{cartItems.length}</span>
+      <span className={styles.count} aria-hidden="true">{cartItems.length}</span>
     </button>
   )
 }

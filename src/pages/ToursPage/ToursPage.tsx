@@ -1,6 +1,6 @@
-
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
+import { gsap } from 'gsap'
 
 import type { Tour } from '../../types/tour'
 
@@ -14,6 +14,19 @@ import Spinner from '../../elements/Spinner/Spinner'
 
 export const ToursPage = () => {
   const { data: tours, loading, error } = useFirestoreReadService<Tour[]>(getAllToursService)
+  const containerRef = useRef<HTMLElement>(null)
+  const hasAnimated = useRef(false)
+
+  useEffect(() => {
+  if (!loading && tours && tours.length > 0 && containerRef.current && !hasAnimated.current) {
+    hasAnimated.current = true
+    gsap.fromTo(
+      containerRef.current.querySelectorAll('article'),
+      { opacity: 0, y: 8 },
+      { opacity: 1, y: 0, stagger: 0.05, duration: 0.3 }
+    )
+  }
+}, [loading, tours])
 
   useEffect(() => {
     if (error) toast.error(`Error fetching tours: ${error.message}`)
@@ -28,7 +41,7 @@ export const ToursPage = () => {
         <p>Hit a "Click for Details" button for more information about a particular tour.</p>
       </header>
       
-      <section className={styles.toursContainer} aria-label="Tours List">
+      <section ref={containerRef} className={styles.toursContainer} aria-label="Tours List">
         {loading && <Spinner />}
         {!loading && (!tours || tours.length === 0) && <h2>We have no tours. Something has gone horrible wrong.</h2>}
         {!loading && tours?.map(tour => <TourCard key={tour.id} tour={tour} />)}

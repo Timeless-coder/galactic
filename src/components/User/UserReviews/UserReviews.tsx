@@ -33,7 +33,7 @@ const UserReviews = () => {
       {myReviews && myReviews.length > 0 && (
         <>
           <header>
-            <h2 id="my-reviews-title">My Reviews</h2>
+            <h3 id="my-reviews-title">I have reviewed {myReviews.length} tours.</h3>
           </header>
           {myReviews.map(item => (
             <UserReviewCard

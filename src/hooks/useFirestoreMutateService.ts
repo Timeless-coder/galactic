@@ -11,7 +11,7 @@ const defaultFirestoreCreateServiceOptions: FirestoreMutateServiceOptions = {
 type FirestoreCreateServiceResult<T, TArgs extends any[]> = {
 	error: Error | null
 	loading: boolean
-	mutate: (...args: TArgs) => Promise<T | void>
+	mutate: (...args: TArgs) => Promise<T>
 }
 
 export const useFirestoreMutateService = <T, TArgs extends any[]>(service: (...args: TArgs) => Promise<T>, options: FirestoreMutateServiceOptions = defaultFirestoreCreateServiceOptions): FirestoreCreateServiceResult<T, TArgs> => {
@@ -31,7 +31,9 @@ export const useFirestoreMutateService = <T, TArgs extends any[]>(service: (...a
 			return await serviceRef.current(...args)
 		}
 		catch (err: any) {
-			setError(err instanceof Error ? err : new Error(String(err)))
+			const normalizedError = err instanceof Error ? err : new Error(String(err))
+			setError(normalizedError)
+			throw normalizedError
 		}
 		finally {
 			setLoading(false)

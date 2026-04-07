@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
+import { gsap } from 'gsap'
 
 import type { Tour } from '../../../types/tour'
 import { UserComponent } from '../../../pages/UserPage/UserPage'
@@ -24,10 +25,12 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
   const [myTours, setMyTours] = useState<Tour[]>([])
   const [reviewedTourIds, setReviewedTourIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
+  const containerRef = useRef<HTMLElement>(null)
+  const hasAnimated = useRef(false)
 
   useEffect(() => {
   if (!currentUser) return
-  setLoading(true)
+  setLoading(true) 
 
   const fetchData = async () => {
     try {
@@ -59,6 +62,17 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
   fetchData()
 }, [currentUser?.id])
 
+useEffect(() => {
+  if (!loading && myTours && myTours.length > 0 && containerRef.current && !hasAnimated.current) {
+    hasAnimated.current = true
+    gsap.fromTo(
+      containerRef.current.querySelectorAll('article'),
+      { opacity: 0, y: 8 },
+      { opacity: 1, y: 0, stagger: 0.05, duration: 0.3 }
+    )
+  }
+}, [loading, myTours])
+
   return (
     <section>
       {loading && <Spinner />}
@@ -70,9 +84,9 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
       {myTours.length > 0 && (
         <>
           <header>
-            <h3 style={{ marginBottom: "10px" }} id="user-tours-title">You can review tours you have booked but have not yet reviewed.</h3>
+            <h3 style={{ marginBottom: "10px" }} id="user-tours-title">I have booked {myTours.length} tours.</h3>
           </header>
-          <div className={styles.userToursContainer}>
+          <section ref={containerRef} className={styles.userToursContainer}>
             {myTours.map(tour => (
               <UserTourCard
                 key={tour.id}
@@ -82,7 +96,7 @@ const UserTours = ({ setShowSection, setReviewTour }: UserToursProps) => {
                 hasReview={reviewedTourIds.has(tour.id)}
               />
             ))}
-          </div>
+          </section>
         </>
       )}
     </section>

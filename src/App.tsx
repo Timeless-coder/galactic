@@ -26,9 +26,10 @@ function App() {
           <Route path='/' element={<HomePage />} />
           <Route path='/works' element={<Works />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path='/sale-complete-success' element={<StripeSuccessPage />} />
           <Route path='/tours' element={<ToursPage />} />
           <Route path='/tours/:slug' element={<TourSinglePage />} />
+          
+          <Route path='/checkout-success' element={<StripeSuccessPage />} />
           
           <Route path='/account/:userId' element={<PrivateRoute component={UserPage} />} />
           <Route path='/account/:userId/cart' element={<PrivateRoute component={CartPage} />} />

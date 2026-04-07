@@ -16,8 +16,6 @@ type ReviewCardProps = {
 
 const ReviewCard = ({ rating, text, userName, userPhoto, createdAt, tour }: ReviewCardProps) => {
 
-  console.table(rating)
-
   return (
     <article className={styles.reviewCard} style={{ backgroundImage: `url(${tour.imageCover})` }}>
       <section className={styles.content}>

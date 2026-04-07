@@ -25,9 +25,10 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
   const [loading, setLoading] = useState(false)
 
   const formSubmit = async (data: LoginFormData) => {
-    setLoading(true)
 
     try {
+      setLoading(true)
+      
       const user = await login(data.email, data.password)
       toast.success(`Welcome back, ${user.displayName}!`)
 
@@ -37,7 +38,7 @@ const LoginForm = ({ setHasAccount }: LoginFormProps) => {
     catch (err: any) {
       console.error(err.message)
       if (err.code === 'auth/invalid-credential') toast.error('Invalid email or password')
-      else toast.error(`Login failed: ${err.message ?? err} - Please contact customer service.`)
+      else toast.error('Unable to sign in right now. Please try again.')
     }
     finally {
       setLoading(false)

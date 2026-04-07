@@ -38,9 +38,21 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    .cartMessage {
-      font-size: 18px;
-      align-self: center;
-    }
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cartTourItem {
+    width: 100%;
+  }
+
+  .cartMessage {
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-size: 18px;
   }
 }

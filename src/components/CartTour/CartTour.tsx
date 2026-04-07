@@ -15,12 +15,14 @@ type CheckoutTourProps = {
 export const CartTour = ({ cartPageItem }: CheckoutTourProps) => {
   const { removePersonOrBooking, addPersonToBooking, removeItemFromCart } = useCart()
 
+  const tourLabel = `${cartPageItem.tour.planet} tour`
+
   return (
     <article className={styles.checkoutTourContainer}>
 
       {/**Cover Image */}
       <figure className={styles.imageContainer}>
-        <img src={cartPageItem.tour.imageCover} alt={cartPageItem.tour.planet} />
+        <img src={cartPageItem.tour.imageCover} alt="" />
       </figure>
 
       {/**Tour Details */}
@@ -35,21 +37,31 @@ export const CartTour = ({ cartPageItem }: CheckoutTourProps) => {
       <section className={styles.peopleContainer} aria-label="People selector">
         <div className={styles.carets}>
           <CustomButton
-            aria-label="Remove person or booking"
+            aria-label={
+              cartPageItem.booking.people === 1
+                ? `Remove ${tourLabel} from cart`
+                : `Remove one traveler from ${tourLabel}`
+            }
             onClick={() => removePersonOrBooking(cartPageItem)}
-            width='30px'
+            width='44px'
+            fontSize="clamp(18px, 1.2vw, 22px)"
             layout='center'
           >
-            &#10094;
+          <span font-size="clamp(18px, 1.2vw, 22px)" aria-hidden='true'>&#10094;</span>
           </CustomButton>
-          <span>{cartPageItem.booking.people}</span>
+
+          <span aria-live='polite' aria-atomic='true'>
+            {cartPageItem.booking.people}
+          </span>
+
           <CustomButton
-            aria-label="Add person to booking"
+            aria-label={`Add one traveler to ${tourLabel}`}
             onClick={() => addPersonToBooking(cartPageItem)}
-            width='33%'
+            width='44px'
+            fontSize="clamp(18px, 1.2vw, 22px)"
             layout='center'
           >
-            &#10095;
+            <span font-size="clamp(18px, 1.2vw, 22px)" aria-hidden='true'>&#10095;</span>
           </CustomButton>
         </div>
 
@@ -59,10 +71,11 @@ export const CartTour = ({ cartPageItem }: CheckoutTourProps) => {
       {/**Remove Tour Button */}
       <CustomButton
         onClick={() => removeItemFromCart(cartPageItem)}
-        aria-label="Remove item from cart"
-        width='8vw'
+        aria-label={`Remove ${tourLabel} from cart`}
+        width='clamp(96px, 18vw, 128px)'
+        fontSize="clamp(14px, 0.95vw, 16px)"
       >
-        &#10005;
+        <span aria-hidden='true'>&#10005;</span>
         <span>Remove</span>
       </CustomButton>
     </article>

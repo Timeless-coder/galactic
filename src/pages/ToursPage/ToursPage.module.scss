@@ -9,6 +9,27 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+      h1, p {
+        opacity: 0;
+        animation: fadeInToursPageTop 0.3s forwards;
+      }
+      h1 {
+        animation-delay: 0s;
+      }
+      p:nth-of-type(1) {
+        animation-delay: 0.05s;
+      }
+      p:nth-of-type(2) {
+        animation-delay: 0.1s;
+      }
+      @keyframes fadeInToursPageTop {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
     h2 {
       text-align: center;
       font-family: Orbitron;

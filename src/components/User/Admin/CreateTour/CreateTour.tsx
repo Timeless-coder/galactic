@@ -106,6 +106,7 @@ const CreateTour = ({ setShowSection }: CreateTourProps) => {
 
 	return (
 		<section>
+			<h3>Create a new Tour</h3>
 			{(formLoading || firestoreHookLoading) && <Spinner />}
 			<div className={localStyles.createTourContainer}>
 				<div className={styles.formContainer}>

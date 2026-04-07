@@ -200,10 +200,11 @@ const TourSinglePage = () => {
             </div>
 
             {/* Summary */}
-            <aside className={styles.mainRight}>
+            <section className={styles.mainRight}>
               <h2>{tour.summary}</h2>
               <p>{tour.description}</p>
-            </aside>
+            </section>
+
           </section>
 
           {/* Images */}

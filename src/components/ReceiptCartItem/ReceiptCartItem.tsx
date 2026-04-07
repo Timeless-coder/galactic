@@ -2,29 +2,38 @@ import { format, isValid, parseISO } from 'date-fns'
 
 import styles from './ReceiptCartItem.module.scss'
 
-import type { CartItem } from '../../contexts/CartContext'
-
-type ReceiptTourProps = {
-  cartItem: CartItem
+export type ReceiptItem = {
+  tourId: string
+  tourName: string
+  departureDate: string
+  people: number
 }
 
-const ReceiptTour = ({ cartItem }: ReceiptTourProps) => {
-  const parsedDate = parseISO(cartItem.booking.departureDate)
+type ReceiptTourProps = {
+  receiptItem: ReceiptItem
+}
+
+const ReceiptTour = ({ receiptItem }: ReceiptTourProps) => {
+  const parsedDate = parseISO(receiptItem.departureDate)
   const formattedDate = isValid(parsedDate) ? format(parsedDate, 'PPPP') : 'Invalid date'
 
   return (
     <article className={styles.receiptContainer}>
       <header>
-        <h3>{cartItem.tour.name}</h3>
+        <h3>{receiptItem.tourName}</h3>
       </header>
-      <section className={styles.tourDetailsText}>
-        <h4>Departure Date: <strong><em>{formattedDate}</em></strong></h4>
-      </section>
-      <section className={styles.tourDetailsText}>
-        <h4>People:</h4> <h5><strong><em>{cartItem.booking.people}</em></strong></h5>
-      </section>
+      <dl className={styles.tourDetailsList}>
+        <div className={styles.tourDetailsText}>
+          <dt>Departure Date: </dt>
+          <dd><strong><em>{formattedDate}</em></strong></dd>
+        </div>
+        <div className={styles.tourDetailsText}>
+          <dt>People:</dt>
+          <dd><strong><em>{receiptItem.people}</em></strong></dd>
+        </div>
+      </dl>
     </article>
-  );
+  )
 }
  
-export default ReceiptTour;
+export default ReceiptTour

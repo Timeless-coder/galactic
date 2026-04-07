@@ -1,3 +1,4 @@
+Bookings at not working. Not getting user's booked tours. Might be working.
 Firebase rules
 toast
 styling

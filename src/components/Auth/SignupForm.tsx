@@ -17,7 +17,7 @@ type SignupFormProps = {
 }
 
 type SignupFormData = {
-	name: string
+	displayName: string
 	email: string
 	password: string
 	passwordConfirm: string
@@ -32,14 +32,14 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 
 	const watchProfileImage = watch('profileImage')
 
-	const formSubmit = async (data: SignupFormData) => {		
-		setLoading(true)
-		
-		const profileImageFileName = `${data.email}-profileImage`
+	const formSubmit = async (data: SignupFormData) => {
+		const profileImageFileName = `${data.email}-profileImage`			
 
 		try {
+			setLoading(true)		
+
 			const photoURL = await uploadProfileImage(data.profileImage[0], profileImageFileName)
-			const firebaseUser = await signupWithEmailAndPassword(data.name, data.email, data.password, photoURL)
+			const firebaseUser = await signupWithEmailAndPassword(data.displayName, data.email, data.password, photoURL)
 			toast.success(`Welcome to Galactic Tours, ${firebaseUser.displayName}!`)
 			
 			reset()
@@ -49,11 +49,11 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 			await deleteProfileImageIfNeeded(profileImageFileName) // any errors deleting are ignored within storageService.
 
 			console.error(err.message)
-			if (err.code === 'auth/email-already-in-use') toast.error('Email is already in use')
+			if (err.code === 'auth/email-already-in-use') toast.error('Email is already in use. Please log in, or user a different email.')
 			else if (err.code === 'auth/weak-password') toast.error('Password should be at least 6 characters')
 			else if (err.code === 'auth/invalid-email') toast.error('Please include a valid email address')
 
-			else toast.error(`Sign Up failed - ${err.message ?? err}`)
+			else toast.error('Unable to create your account right now. Please try again.')
 		}
 		finally {
 			setLoading(false)
@@ -91,21 +91,21 @@ const SignupForm = ({ setHasAccount }: SignupFormProps) => {
 
 				{/* Name */}
 				<div className={styles.inputContainer}>
-					<label htmlFor='signup-name'>Name</label>
-					{errors.name && <p id="signup-name-error" className={styles.error} role="alert">{errors.name.message}</p>}
+					<label htmlFor='signup-displayName'>Name</label>
+					{errors.displayName && <p id="signup-displayName-error" className={styles.error} role="alert">{errors.displayName.message}</p>}
 					<input
-						{...register('name', {
+						{...register('displayName', {
 							required: 'Your name is required',
 							maxLength: {
 								value: 50,
 								message: 'Your name can be a maximum of 50 characters'
 							}
 						})}
-						id='signup-name'
+						id='signup-displayName'
 						type='text'
 						placeholder='Your name'
-						aria-invalid={!!errors.name}
-						aria-describedby={errors.name ? 'signup-name-error' : undefined}
+						aria-invalid={!!errors.displayName}
+						aria-describedby={errors.displayName ? 'signup-displayName-error' : undefined}
 					/>
 				</div>
         

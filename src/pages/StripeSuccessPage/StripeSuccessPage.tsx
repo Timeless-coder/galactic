@@ -1,74 +1,100 @@
-import { useEffect } from 'react'
-import { Link } from 'react-router'
+import { useEffect, useState } from 'react'
+import { useSearchParams, useNavigate } from 'react-router'
 import toast from 'react-hot-toast'
 
 import { useCart } from '../../hooks/useCart'
 import { useAuth } from '../../hooks/useAuth'
-import { addBookingsFromCart } from '../../services/firebase/bookingsService'
-import { useFirestoreMutateService } from '../../hooks/useFirestoreMutateService'
+import { getBookingsByPaymentIntentId } from '../../services/firebase/bookingsService'
 
 import CustomButton from '../../elements/CustomButton/CustomButton'
 import StripeReceipt from '../../components/Stripe/StripeReceipt'
+import type { ReceiptItem } from '../../components/ReceiptCartItem/ReceiptCartItem'
 
 import styles from './StripeSuccess.module.scss'
 
 const StripeSuccessPage = () => {
-  const { clearCart, cartItems } = useCart()
-  const { currentUser } = useAuth()
-  const { mutate: addAllCartItemsToBookings, error } = useFirestoreMutateService((items: any[]) => addBookingsFromCart(items))
+  const { clearCart } = useCart()
+  const { currentUser, loading } = useAuth()
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const [isPaymentVerified, setIsPaymentVerified] = useState(false)
+  const [isCheckingPayment, setIsCheckingPayment] = useState(true)
+  const [receiptItems, setReceiptItems] = useState<ReceiptItem[]>([])
+  const [receiptTotal, setReceiptTotal] = useState(0)
+  const [saleDate, setSaleDate] = useState<Date | null>(null)
 
   useEffect(() => {
-    if (!currentUser) {
-      toast.error("We're sorry. No one is currently logged in. Please contact customer service.")
-      return
-    }
-    else if (cartItems.length === 0) {
-      toast.error(`We're sorry, ${currentUser.displayName}. We could not locate your receipt. Please contact customer service.`)
-      return
-    }
+    const verifyPayment = async () => {
+      if (loading) return
 
-   const addAllToFirestore = async() => {
-     try {
-      const bookingsToAdd = cartItems.map(item => ({
-        tourId: item.tour.id,
-        bookingUserId: currentUser.id,
-        departureDate: item.booking.departureDate,
-        people: item.booking.people
-      }));
-      await addAllCartItemsToBookings(bookingsToAdd)
-        
-      toast.success(`Thank you for your purchase, ${currentUser.displayName}! Your receipt is ready to print.`) 
-      clearCart()
-    }
-    catch(err: any) {
-      console.error(err.message)
-      toast.error(`An error occurred while processing your order: ${error?.message || err.message}. Please contact customer service for assistance.`)
-    }
-   }
-   
-    addAllToFirestore()
-
-  }, [clearCart, addAllCartItemsToBookings])
-
-  useEffect(() => {
-      return () => {
-        localStorage.removeItem('galacticCartReceiptItems')
-        localStorage.removeItem('galacticCartReceiptTotal')
+      if (!currentUser) {
+        toast.error("We're sorry. No one is currently logged in. Please contact customer service.")
+        setIsCheckingPayment(false)
+        return
       }
-    }, [])
+
+      const redirectStatus = searchParams.get('redirect_status')
+      const paymentIntentId = searchParams.get('payment_intent')
+
+      if (redirectStatus !== 'succeeded' || !paymentIntentId) {
+        toast.error('We could not verify your payment confirmation. Please contact customer service.')
+        setIsCheckingPayment(false)
+        return
+      }
+
+      try {
+        const bookings = await getBookingsByPaymentIntentId(paymentIntentId, currentUser.id)
+
+        if (!bookings || bookings.length === 0) {
+          toast.error('Your payment was received but your receipt is not ready yet. Check your bookings shortly.')
+          setIsCheckingPayment(false)
+          return
+        }
+
+        const items: ReceiptItem[] = bookings.map(b => ({
+          tourId: b.tourId,
+          tourName: b.tourName ?? b.tourId,
+          departureDate: b.departureDate,
+          people: b.people,
+        }))
+
+        const total = bookings.reduce((sum, b) => sum + b.lineAmountCents, 0) / 100
+
+        setReceiptItems(items)
+        setReceiptTotal(total)
+        setSaleDate(bookings[0].createdAt.toDate())
+        setIsPaymentVerified(true)
+        toast.success(`Thank you for your purchase, ${currentUser.displayName}! Your receipt is ready to print.`)
+        clearCart()
+      } catch (err: any) {
+        console.error(err.message)
+        toast.error('We could not verify your payment confirmation. Please contact customer service.')
+      } finally {
+        setIsCheckingPayment(false)
+      }
+    }
+
+    void verifyPayment()
+  }, [currentUser, loading, searchParams])
 
   return (
     <section className={styles.paymentSuccessContainer} aria-labelledby="stripe-success-title">
       <header>
-        <h1 id="stripe-success-title">Payment Successful!</h1>
+        <h1 id="stripe-success-title">{isPaymentVerified ? 'Payment Successful!' : 'Payment Confirmation'}</h1>
       </header>
 
-      <StripeReceipt />
+      {isCheckingPayment && <p>Verifying your payment...</p>}
+
+      {!isCheckingPayment && isPaymentVerified && saleDate && (
+        <StripeReceipt receiptItems={receiptItems} total={receiptTotal} saleDate={saleDate} />
+      )}
+
+      {!isCheckingPayment && !isPaymentVerified && (
+        <p>We could not verify your payment confirmation. Please contact customer service if your card was charged.</p>
+      )}
 
       <div className={styles.continue}>
-        <Link to='/tours' aria-label="Continue Shopping">
-          <CustomButton>Continue Shopping</CustomButton>
-        </Link>
+        <CustomButton onClick={() => navigate('/tours')}>Continue Shopping</CustomButton>
       </div>
     </section>
   )

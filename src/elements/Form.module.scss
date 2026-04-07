@@ -14,13 +14,9 @@ input[type="file"] {
   transition: all .3s ease-in-out;
   background: transparent;
   border-radius: 8px;
-  box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.4),
-    0 0 1px 1px var(--primary-blue-50);
+  box-shadow: var(--card-box-shadow);
   &:hover {
-    box-shadow:
-      0 20px 40px rgba(0,0,0,0.5),
-      0 0 10px 3px var(--primary-blue-50);
+    box-shadow: var(--card-hover-box-shadow);
     transform: translateY(-4px);
   }
   h2 {
@@ -69,9 +65,7 @@ input[type="file"] {
         font-weight: 600;
         font-size: clamp(10px, 3vw, 18px);
         margin-bottom: 10px;
-        box-shadow:
-          inset -1px -1px 1px rgba(255,255,255,0.2),
-          inset 3px 3px 3px rgba(0,0,0,1);
+        box-shadow: var(--input-box-shadow);
         &::placeholder {
           color: #868686;
           font-size: clamp(10px, 3vw, 18px);
@@ -79,24 +73,11 @@ input[type="file"] {
         &[type='submit'] {
           cursor: pointer;
           color: var(--primary-blue-50);
-          box-shadow:
-          inset 1.5px 1.5px 2px rgba(255,255,255,0.2),
-          inset -1.5px -1.5px 3px rgba(0,0,0,1),
-          1.5px 1.5px 2px rgba(0,0,0, 1)
-          ;
+          box-shadow: var(--button-box-shadow);
           &:active {
             color: var(--primary-blue-70);
-            box-shadow:
-            inset -1.5px -1.5px 2px rgba(255,255,255,0.2),
-            inset 1.5px 1.5px 3px rgba(0,0,0,1);   
+            box-shadow: var(--button-clicked-box-shadow);
           }
-        }
-      }
-      textarea {
-        border-radius: 12px;
-        &::placeholder {
-          color: #868686;
-          font-size: clamp(10px, 3vw, 18px);
         }
       }
       img {
@@ -106,15 +87,10 @@ input[type="file"] {
       .labelContainer {
         padding: 12px;
         border-radius: 8px;
-        box-shadow:
-          inset 1.5px 1.5px 2px rgba(255,255,255,0.2),
-          inset -1.5px -1.5px 3px rgba(0,0,0,1),
-          1.5px 1.5px 2px rgba(0,0,0, 1);   
+        box-shadow: var(--button-box-shadow) ;
         margin-bottom: 7px;
       &:active {
-        box-shadow:
-          inset -1.5px -1.5px 2px rgba(255,255,255,0.2),
-          inset 1.5px 1.5px 3px rgba(0,0,0,1);   
+        box-shadow: var(--button-clicked-box-shadow);
       }
       label {
         display: flex;
@@ -140,9 +116,12 @@ input[type="file"] {
         font-size: 18px;
         color: var(--primary-blue-50);
         border: none;
-        box-shadow:
-            inset -1px -1px 1px rgba(255,255,255,0.2),
-            inset 3px 3px 3px rgba(0,0,0,1);
+        box-shadow: var(--input-box-shadow);
+        border-radius: 12px;
+        &::placeholder {
+          color: #868686;
+          font-size: clamp(10px, 3vw, 18px);
+        }
       }
     }
     .error {

@@ -16,7 +16,7 @@ const CartDropdownTour = ({ booking, tour }: CartDropdownTourProps  ) => {
   return (
     <article className={styles.cartTourContainer}>
       <figure>
-        <img className={styles.cartTourImage} src={tour.imageCover} alt={tour.planet} />
+        <img className={styles.cartTourImage} src={tour.imageCover} alt="" />
       </figure>
       <section className={styles.cartTourDetailsContainer}>
         <span>{tour.planet}</span>

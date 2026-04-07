@@ -17,6 +17,7 @@ import CreateTour from '../../components/User/Admin/CreateTour/CreateTour'
 import CreateReview from '../../components/User/UserReviews/CreateReview'
 import EditTour from '../../components/User/Admin/EditTour/EditTour'
 import UserPassword from '../../components/User/UserPassword/UserPassword'
+import CustomButton from '../../elements/CustomButton/CustomButton'
 
 import styles from './UserPage.module.scss'
   
@@ -45,33 +46,33 @@ const UserPage = () => {
   return (
     <main className={styles.accountContainer} aria-labelledby="user-page-title">
       <nav className={styles.sideNav} aria-label="User account navigation">
-        <button className={styles.sideNavItem}  onClick={() => setShowSection(UserComponent.UserSettings)} aria-label="User Settings" aria-pressed={showSection === UserComponent.UserSettings}>
+        <CustomButton width={'180px'} onClick={() => setShowSection(UserComponent.UserSettings)} aria-label="User Settings" aria-pressed={showSection === UserComponent.UserSettings}>
           <IoSettingsOutline />
           <span>User Settings</span>
-        </button>
-        <button type="button" onClick={() => setShowSection(UserComponent.UserPassword)} className={`${styles.sideNavItem} ${styles.iconButton}`} aria-label="Update Password" aria-pressed={showSection === UserComponent.UserPassword}>
+        </CustomButton>
+        <CustomButton width={'180px'} onClick={() => setShowSection(UserComponent.UserPassword)} aria-label="Update Password" aria-pressed={showSection === UserComponent.UserPassword}>
           <RiLockPasswordLine />
           <span>Update Password</span>
-        </button>
-        <button type="button" onClick={() => setShowSection(UserComponent.UserTours)} className={`${styles.sideNavItem} ${styles.iconButton}`} aria-label="My Booked Tours" aria-pressed={showSection === UserComponent.UserTours}>
+        </CustomButton>
+        <CustomButton width={'180px'} onClick={() => setShowSection(UserComponent.UserTours)} aria-label="My Booked Tours" aria-pressed={showSection === UserComponent.UserTours}>
           <IoRocketOutline />
           <span>My Booked Tours</span>
-        </button>
-        <button type="button" onClick={() => setShowSection(UserComponent.UserReviews)} className={`${styles.sideNavItem} ${styles.iconButton}`} aria-label="My Reviews" aria-pressed={showSection === UserComponent.UserReviews}>
+        </CustomButton>
+        <CustomButton width={'180px'} onClick={() => setShowSection(UserComponent.UserReviews)} aria-label="My Reviews" aria-pressed={showSection === UserComponent.UserReviews}>
           <IoClipboardOutline />
           <span>My Reviews</span>
-        </button>
+        </CustomButton>
         {currentUser?.role === Role.Admin && (
           <>
             <h2>Administration:</h2>
-            <button type="button" onClick={() => setShowSection(UserComponent.CreateTour)} className={`${styles.sideNavItem} ${styles.iconButton}`} aria-label="Create Tour" aria-pressed={showSection === UserComponent.CreateTour}>
+            <CustomButton width={'180px'} onClick={() => setShowSection(UserComponent.CreateTour)} aria-label="Create Tour" aria-pressed={showSection === UserComponent.CreateTour}>
               <CgMathPlus />
               <span>Create Tour</span>
-            </button>
-            <button type="button" onClick={() => setShowSection(UserComponent.ManageTours)} className={`${styles.sideNavItem} ${styles.iconButton}`} aria-label="Manage Tours" aria-pressed={showSection === UserComponent.ManageTours}>
+            </CustomButton>
+            <CustomButton width={'180px'} onClick={() => setShowSection(UserComponent.ManageTours)} aria-label="Manage Tours" aria-pressed={showSection === UserComponent.ManageTours}>
               <IoPlanetOutline />
               <span>Manage Tours</span>
-            </button>
+            </CustomButton>
           </>
         )}
       </nav>

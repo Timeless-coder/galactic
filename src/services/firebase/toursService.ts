@@ -35,7 +35,7 @@ export const createTourService = async (tour: Omit<Tour, 'id' | 'departureDates'
 	if (userRole !== Role.Admin) {
 		throw new Error('There was an issue verifying your Admin credentials')
 	}
-	const departureDates: string[] = Array.from({ length: 3 }, () => (`${createRandomNumber(2027, 2029)} ${createRandomNumber(1, 12)} ${createRandomNumber(1, 28)}`))
+	const departureDates: string[] = Array.from({ length: 3 }, () => (`${createRandomNumber(2027, 2029).toString()}-${createRandomNumber(1, 12).toString().padStart(2, '0')}-${createRandomNumber(1, 28).toString().padStart(2, '0')}`))
   const docRef = await addDoc(collection(db, 'tours'), { ...tour, departureDates })
   return docRef.id
 }
@@ -49,6 +49,7 @@ export const updateTourService = async (id: string, tour: Partial<Tour>, email: 
 	await setDoc(tourRef, tour, { merge: true })
 }
 
+// not implemented
 export const deleteTourService = async (id: string): Promise<void> => {
 	const tourRef = doc(db, 'tours', id)
 	await getDoc(tourRef) // Check if the document exists
@@ -70,6 +71,21 @@ export const migrateTourDepartureDates = async (): Promise<void> => {
 					departureDates: newDepartureDates
 				})
 	}
+}
+
+export const migrateDepartureDateFormat = async (): Promise<void> => {
+  const toursSnap = await getDocs(collection(db, 'tours'))
+  for (const tourDoc of toursSnap.docs) {
+    const data = tourDoc.data()
+    const departureDates: string[] = data.departureDates ?? []
+    const fixed = departureDates.map((date: string) => {
+      const parts = date.split(' ')
+      if (parts.length !== 3) return date // already migrated or unexpected format
+      const [year, month, day] = parts
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+    })
+    await updateDoc(doc(db, 'tours', tourDoc.id), { departureDates: fixed })
+  }
 }
 
 export const removeFieldFromTour = async (fieldLabel: string): Promise<void> => {

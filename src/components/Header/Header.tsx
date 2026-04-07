@@ -18,22 +18,25 @@ const defaultUserImageURL = anonymousImage
 
 export const Header = () => {
   const { currentUser } = useAuth()
-  const { cartDropdownOpen } = useCart()
+  const { cartDropdownOpen, setCartDropdownOpen } = useCart()
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userImage = currentUser?.photoURL ?? defaultUserImageURL
   // console.table(currentUser)
 
-  const toggleUserMenu = () => setUserMenuOpen(prev => !prev)
+  const toggleUserMenu = () => {
+    setCartDropdownOpen(false)
+    setUserMenuOpen(prev => !prev)
+  }
 
   return (
     <header className={styles.headerContainer}>
-       <Link to='/' className={styles.logoLinkContainer}>
-          <VscRocket className={styles.rocketIcon} />
+       <Link to='/' className={styles.logoLinkContainer} aria-label='Home'>
+          <VscRocket className={styles.rocketIcon} aria-hidden='true' />
           <span className={styles.logoLink}>GalacticTours&#8482;</span>
         </Link>
 
-      <Link className={styles.toursLinkContainer} to='/tours'>
-        <IoPlanetOutline className={styles.planetIcon} />
+      <Link className={styles.toursLinkContainer} to='/tours' aria-label='Browse all tours'>
+        <IoPlanetOutline className={styles.planetIcon} aria-hidden='true' />
         <span className={styles.toursLink}>Browse All Tours</span>
       </Link>
 
@@ -42,16 +45,18 @@ export const Header = () => {
           <>
             <div className={styles.headerRightIcons}>
 
-              <HeaderCartIcon />
+              <HeaderCartIcon onToggle={() => setUserMenuOpen(false)} />
               
               {cartDropdownOpen && <HeaderCartDropdown />}     
               <button
                 className={styles.userImageContainer}
                 onClick={toggleUserMenu}
-                aria-label="Open user menu"
+                aria-label="User menu"
+                aria-expanded={userMenuOpen}
+                aria-controls="header-user-dropdown"
                 type="button"
               >
-                <img src={userImage} alt='View/Update your account' />
+                <img src={userImage} alt='' />
                 <BsCaretDown className={styles.caret} />
               </button>
             </div>

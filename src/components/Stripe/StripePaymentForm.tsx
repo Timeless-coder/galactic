@@ -16,7 +16,7 @@ const StripePaymentForm = () => {
     const {error} = await stripe!.confirmPayment({
       elements,
       confirmParams: {
-        return_url: 'http://localhost:5173/sale-complete-success',
+        return_url: import.meta.env.VITE_STRIPE_RETURN_URL,
       },
     })
 
